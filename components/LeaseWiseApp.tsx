@@ -32,9 +32,11 @@ export default function LeaseWiseApp() {
     const file = e.target.files?.[0];
     if (!file) return;
     
-    // Updated to 5MB limit for production compatibility
-    if (file.size > 5 * 1024 * 1024) {
-      setError('File too large. Maximum size is 5MB for production compatibility');
+    // Check file size limits
+    const maxBlobSize = 20 * 1024 * 1024; // 20MB for blob storage
+    
+    if (file.size > maxBlobSize) {
+      setError('File too large. Maximum size is 20MB.');
       return;
     }
     if (file.type !== 'application/pdf') {
@@ -44,17 +46,7 @@ export default function LeaseWiseApp() {
     
     setError(null);
     setUploadedFile(file);
-    setUploadProgress(0);
-    
-    const interval = setInterval(() => {
-      setUploadProgress(prev => {
-        if (prev >= 100) { 
-          clearInterval(interval);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 100);
+    setUploadProgress(100);
   };
 
   const handleAnalyze = async () => {
@@ -65,16 +57,59 @@ export default function LeaseWiseApp() {
     
     setIsAnalyzing(true);
     setError(null);
-    
-    const formData = new FormData();
-    formData.append('file', uploadedFile);
-    formData.append('address', address);
 
     try {
-      const response = await fetch('/api/analyze-lease', { 
-        method: 'POST', 
-        body: formData 
-      });
+      const maxDirectSize = 4 * 1024 * 1024; // 4MB
+      let response;
+      
+      if (uploadedFile.size <= maxDirectSize) {
+        // Use direct upload for small files
+        const formData = new FormData();
+        formData.append('file', uploadedFile);
+        formData.append('address', address);
+        
+        response = await fetch('/api/analyze-lease', { 
+          method: 'POST',
+          body: formData
+        });
+      } else {
+        // For large files, upload to blob storage first
+        console.log('Uploading large file to blob storage...');
+        
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', uploadedFile);
+        uploadFormData.append('address', address);
+        
+        const uploadResponse = await fetch('/api/upload-url', {
+          method: 'POST',
+          body: uploadFormData,
+        });
+        
+        if (!uploadResponse.ok) {
+          const errorData = await uploadResponse.json().catch(() => ({}));
+          if (errorData.setupRequired) {
+            throw new Error('Blob storage setup required for files over 4MB. Please check the BLOB_SETUP.md file for instructions.');
+          }
+          throw new Error(`Upload failed: ${uploadResponse.status} - ${errorData.error || 'Unknown error'}`);
+        }
+        
+        const uploadData = await uploadResponse.json();
+        console.log('Upload response:', uploadData);
+        
+        if (!uploadData.success || !uploadData.blobUrl) {
+          throw new Error(uploadData.error || 'Failed to upload file');
+        }
+        
+        // Now analyze using the blob URL
+        response = await fetch('/api/analyze-lease', { 
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            blobUrl: uploadData.blobUrl,
+            address
+          })
+        });
+      }
       
       const data = await response.json();
       
@@ -91,7 +126,7 @@ export default function LeaseWiseApp() {
         setError(data.error || 'Failed to analyze lease. Please try again.');
       }
     } catch (error) {
-      setError('Something went wrong. Please try again.');
+      setError(error instanceof Error ? error.message : 'Something went wrong. Please try again.');
       console.error('Analysis error:', error);
     } finally {
       setIsAnalyzing(false);
@@ -274,7 +309,7 @@ export default function LeaseWiseApp() {
                 <p className="text-lg font-medium text-slate-900 mb-2">
                   {uploadedFile ? uploadedFile.name : 'Click to upload PDF'}
                 </p>
-                <p className="text-sm text-slate-500">Maximum file size: 5MB</p>
+                <p className="text-sm text-slate-500">Maximum file size: 4MB (direct) / 20MB (with blob storage)</p>
               </label>
               
               {uploadedFile && uploadProgress < 100 && (

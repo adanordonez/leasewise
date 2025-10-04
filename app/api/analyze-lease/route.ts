@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeLease, generateActionableScenarios } from '@/lib/openai';
 import { extractText } from 'unpdf';
+import { getDownloadUrl } from '@vercel/blob';
 
 // Helper function to chunk large text
 function chunkText(text: string, maxChunkSize: number = 50000): string[] {
@@ -34,29 +35,65 @@ function chunkText(text: string, maxChunkSize: number = 50000): string[] {
 
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
-    const address = formData.get('address') as string;
+    const contentType = request.headers.get('content-type');
+    let blobUrl: string | null = null;
+    let address: string | null = null;
+    let uint8Array: Uint8Array;
 
-    if (!file || !address) {
-      return NextResponse.json(
-        { error: 'File and address are required' },
-        { status: 400 }
-      );
+    // Check if this is a direct file upload or blob URL request
+    if (contentType?.includes('multipart/form-data')) {
+      // Direct file upload (for small files)
+      const formData = await request.formData();
+      const file = formData.get('file') as File;
+      address = formData.get('address') as string;
+
+      if (!file || !address) {
+        return NextResponse.json(
+          { error: 'File and address are required' },
+          { status: 400 }
+        );
+      }
+
+      // Check file size (4MB limit for direct upload)
+      const maxFileSize = 4 * 1024 * 1024; // 4MB
+      if (file.size > maxFileSize) {
+        return NextResponse.json(
+          { error: 'File too large for direct upload. Maximum size is 4MB.' },
+          { status: 413 }
+        );
+      }
+
+      // Convert file to Uint8Array
+      const bytes = await file.arrayBuffer();
+      uint8Array = new Uint8Array(bytes);
+    } else {
+      // Blob URL request (for large files)
+      const { blobUrl: url, address: addr } = await request.json();
+      blobUrl = url;
+      address = addr;
+
+      if (!blobUrl || !address) {
+        return NextResponse.json(
+          { error: 'Blob URL and address are required' },
+          { status: 400 }
+        );
+      }
+
+      // Download the file from Vercel Blob Storage
+      const downloadUrl = await getDownloadUrl(blobUrl);
+      const response = await fetch(downloadUrl);
+      const arrayBuffer = await response.arrayBuffer();
+      uint8Array = new Uint8Array(arrayBuffer);
+
+      // Check file size (20MB limit for blob storage)
+      const maxFileSize = 20 * 1024 * 1024; // 20MB
+      if (uint8Array.length > maxFileSize) {
+        return NextResponse.json(
+          { error: 'File too large. Maximum size is 20MB.' },
+          { status: 413 }
+        );
+      }
     }
-
-    // Check file size (5MB limit for Vercel)
-    const maxFileSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxFileSize) {
-      return NextResponse.json(
-        { error: 'File too large. Maximum size is 5MB for production.' },
-        { status: 413 }
-      );
-    }
-
-    // Convert file to Uint8Array (not Buffer)
-    const bytes = await file.arrayBuffer();
-    const uint8Array = new Uint8Array(bytes);
 
     // Extract text from PDF
     const { text } = await extractText(uint8Array);

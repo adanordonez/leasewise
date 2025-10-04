@@ -2,6 +2,9 @@
   "functions": {
     "app/api/analyze-lease/route.ts": {
       "maxDuration": 30
+    },
+    "app/api/upload-url/route.ts": {
+      "maxDuration": 10
     }
   },
   "headers": [
@@ -22,5 +25,8 @@
         }
       ]
     }
-  ]
+  ],
+  "blob": {
+    "maxFileSize": "20MB"
+  }
 }
