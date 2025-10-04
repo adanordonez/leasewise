@@ -7,6 +7,15 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  experimental: {
+    serverComponentsExternalPackages: ['unpdf'],
+  },
+  // Increase body size limit for API routes
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
 };
 
 export default nextConfig;

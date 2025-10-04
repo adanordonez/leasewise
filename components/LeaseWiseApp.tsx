@@ -32,8 +32,9 @@ export default function LeaseWiseApp() {
     const file = e.target.files?.[0];
     if (!file) return;
     
-    if (file.size > 10 * 1024 * 1024) {
-      setError('File too large. Maximum size is 10MB');
+    // Updated to 5MB limit for production compatibility
+    if (file.size > 5 * 1024 * 1024) {
+      setError('File too large. Maximum size is 5MB for production compatibility');
       return;
     }
     if (file.type !== 'application/pdf') {
@@ -81,8 +82,13 @@ export default function LeaseWiseApp() {
         setAnalysisResult(data.analysis);
         setScenarios(data.scenarios);
         setCurrentPage('results');
+        
+        // Show warning if text was chunked
+        if (data.chunked) {
+          console.warn('Large PDF detected - analysis based on first portion of document');
+        }
       } else {
-        setError('Failed to analyze lease. Please try again.');
+        setError(data.error || 'Failed to analyze lease. Please try again.');
       }
     } catch (error) {
       setError('Something went wrong. Please try again.');
@@ -268,7 +274,7 @@ export default function LeaseWiseApp() {
                 <p className="text-lg font-medium text-slate-900 mb-2">
                   {uploadedFile ? uploadedFile.name : 'Click to upload PDF'}
                 </p>
-                <p className="text-sm text-slate-500">Maximum file size: 10MB</p>
+                <p className="text-sm text-slate-500">Maximum file size: 5MB</p>
               </label>
               
               {uploadedFile && uploadProgress < 100 && (
