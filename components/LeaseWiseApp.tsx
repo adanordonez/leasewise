@@ -82,10 +82,29 @@ export default function LeaseWiseApp() {
         formData.append('file', uploadedFile);
         formData.append('address', address);
         
-        response = await fetch('/api/analyze-lease', {
-          method: 'POST',
-          body: formData,
-        });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes timeout
+        
+        try {
+          response = await fetch('/api/analyze-lease', {
+            method: 'POST',
+            body: formData,
+            signal: controller.signal,
+          });
+          clearTimeout(timeoutId);
+        } catch (error) {
+          clearTimeout(timeoutId);
+          if (error.name === 'AbortError') {
+            throw new Error('Request timed out. Please try with a smaller file or configure Supabase for better performance.');
+          }
+          throw error;
+        }
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('API Error Response:', errorText);
+          throw new Error(`API request failed: ${response.status} - ${errorText}`);
+        }
         
         const data = await response.json();
         
@@ -131,10 +150,29 @@ export default function LeaseWiseApp() {
           formData.append('file', uploadedFile);
           formData.append('address', address);
           
-          response = await fetch('/api/analyze-lease', {
-            method: 'POST',
-            body: formData,
-          });
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes timeout
+          
+          try {
+            response = await fetch('/api/analyze-lease', {
+              method: 'POST',
+              body: formData,
+              signal: controller.signal,
+            });
+            clearTimeout(timeoutId);
+          } catch (error) {
+            clearTimeout(timeoutId);
+            if (error.name === 'AbortError') {
+              throw new Error('Request timed out. Please try with a smaller file or configure Supabase for better performance.');
+            }
+            throw error;
+          }
+          
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('API Error Response:', errorText);
+            throw new Error(`API request failed: ${response.status} - ${errorText}`);
+          }
           
           const data = await response.json();
           
@@ -181,14 +219,33 @@ export default function LeaseWiseApp() {
       }
 
       // Now analyze the file
-      response = await fetch('/api/analyze-lease', { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pdfUrl: urlData.publicUrl,
-          address
-        })
-      });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes timeout
+      
+      try {
+        response = await fetch('/api/analyze-lease', { 
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pdfUrl: urlData.publicUrl,
+            address
+          }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+      } catch (error) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+          throw new Error('Request timed out. Please try with a smaller file or configure Supabase for better performance.');
+        }
+        throw error;
+      }
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
+        throw new Error(`API request failed: ${response.status} - ${errorText}`);
+      }
       
       const data = await response.json();
       
@@ -299,7 +356,7 @@ export default function LeaseWiseApp() {
               ].map((item, i) => (
                 <div key={i} className="group">
                   <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200/60 hover:shadow-lg hover:border-slate-300/60 transition-all duration-300 h-full">
-                    <div className="flex items-center justify-center w-24 h-24 bg-slate-100 rounded-xl mb-6 group-hover:bg-slate-900 transition-colors duration-200">
+                    <div className="flex items-center justify-center w-full h-48 bg-slate-100 rounded-xl mb-6 group-hover:bg-slate-900 transition-colors duration-200">
                       <item.icon />
                     </div>
                     <h3 className="text-xl font-semibold text-slate-900 mb-3">{item.title}</h3>

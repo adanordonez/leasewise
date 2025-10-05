@@ -1,7 +1,7 @@
 {
   "functions": {
     "app/api/analyze-lease/route.ts": {
-      "maxDuration": 30
+      "maxDuration": 60
     },
     "app/api/upload-url/route.ts": {
       "maxDuration": 10

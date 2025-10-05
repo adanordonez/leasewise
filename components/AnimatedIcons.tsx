@@ -1,7 +1,7 @@
 import React from 'react';
 
 export const SmartExtractionIcon = () => (
-  <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-20 h-20">
+  <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-32 h-32">
     {/* Document */}
     <rect x="50" y="40" width="100" height="120" rx="4" fill="#ffffff" stroke="#dee2e6" strokeWidth="2"/>
     
@@ -49,7 +49,7 @@ export const SmartExtractionIcon = () => (
 );
 
 export const RedFlagDetectionIcon = () => (
-  <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-20 h-20">
+  <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-32 h-32">
     {/* Map base */}
     <rect x="40" y="50" width="120" height="100" rx="4" fill="#e8f4f8" stroke="#0369a1" strokeWidth="2"/>
     
@@ -125,7 +125,7 @@ export const RedFlagDetectionIcon = () => (
 );
 
 export const KnowYourRightsIcon = () => (
-  <svg width="300" height="150" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg" className="w-20 h-20">
+  <svg width="300" height="150" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg" className="w-32 h-32">
     {/* Document */}
     <rect x="30" y="30" width="80" height="90" rx="4" fill="#f8f9fa" stroke="#dee2e6" strokeWidth="2"/>
     
