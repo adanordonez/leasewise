@@ -46,20 +46,16 @@ export async function POST(request: NextRequest) {
     if (contentType?.includes('multipart/form-data')) {
       // Direct file upload (legacy support) - THIS SHOULD NOT HAPPEN IN PRODUCTION
       console.error('ANALYZE-LEASE: Received direct file upload - this bypasses Supabase!');
-      const formData = await request.formData();
-      const file = formData.get('file') as File;
-      address = formData.get('address') as string;
-
-      if (!file || !address) {
-        return NextResponse.json(
-          { error: 'File and address are required' },
-          { status: 400 }
-        );
-      }
-
-      // Convert file to Uint8Array
-      const bytes = await file.arrayBuffer();
-      uint8Array = new Uint8Array(bytes);
+      console.error('ANALYZE-LEASE: This will cause "Request Entity Too Large" error in production!');
+      
+      // Reject direct uploads in production to prevent payload errors
+      return NextResponse.json(
+        { 
+          error: 'Direct file uploads are not supported. Please use the Supabase upload flow.',
+          details: 'This endpoint only accepts PDF URLs from Supabase storage.'
+        },
+        { status: 400 }
+      );
     } else {
       // PDF URL request (new Supabase approach)
       console.log('ANALYZE-LEASE: Using Supabase URL approach');
