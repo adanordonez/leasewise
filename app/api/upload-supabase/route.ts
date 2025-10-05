@@ -39,8 +39,17 @@ export async function POST(request: NextRequest) {
 
     if (uploadError) {
       console.error('Supabase upload error:', uploadError);
+      
+      // Provide specific error messages
+      if (uploadError.message.includes('row-level security')) {
+        return NextResponse.json(
+          { error: 'Storage access denied. Please check Supabase RLS policies.' },
+          { status: 500 }
+        );
+      }
+      
       return NextResponse.json(
-        { error: 'Failed to upload file to storage' },
+        { error: `Failed to upload file to storage: ${uploadError.message}` },
         { status: 500 }
       );
     }

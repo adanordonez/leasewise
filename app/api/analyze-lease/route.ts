@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeLeaseStructured, generateActionableScenarios } from '@/lib/lease-analysis';
+import { extractBasicLeaseInfo } from '@/lib/lease-extraction';
 import { extractText } from 'unpdf';
 import { getDownloadUrl } from '@vercel/blob';
 import { supabase } from '@/lib/supabase';
@@ -37,7 +38,7 @@ function chunkText(text: string, maxChunkSize: number = 50000): string[] {
 export async function POST(request: NextRequest) {
   try {
     const contentType = request.headers.get('content-type');
-    let blobUrl: string | null = null;
+    let pdfUrl: string | null = null;
     let address: string | null = null;
     let uint8Array: Uint8Array;
 
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
     } else {
       // PDF URL request (new Supabase approach)
       const { pdfUrl: url, address: addr } = await request.json();
-      const pdfUrl = url;
+      pdfUrl = url;
       address = addr;
 
       if (!pdfUrl || !address) {
@@ -97,6 +98,9 @@ export async function POST(request: NextRequest) {
     const { text } = await extractText(uint8Array);
     const leaseText = Array.isArray(text) ? text.join(' ') : text;
 
+    // Extract basic lease info first (for map data)
+    const basicInfo = await extractBasicLeaseInfo(leaseText, address);
+    
     // Check if text is too large and chunk if necessary
     const maxTextSize = 100000; // 100k characters
     let structuredData, scenarios;
@@ -121,26 +125,27 @@ export async function POST(request: NextRequest) {
       const { data: leaseData, error: leaseError } = await supabase
         .from('lease_data')
         .insert({
-          pdf_url: '', // Will be updated if we have the URL
-          building_name: structuredData.building_name,
-          property_address: structuredData.property_address,
-          monthly_rent: structuredData.monthly_rent,
-          security_deposit: structuredData.security_deposit,
-          lease_start_date: structuredData.lease_start_date,
-          lease_end_date: structuredData.lease_end_date,
+          pdf_url: pdfUrl || '', // Will be updated if we have the URL
+          user_address: address, // User's input address for map pins
+          building_name: basicInfo.building_name,
+          property_address: basicInfo.property_address, // AI-extracted address from lease
+          monthly_rent: basicInfo.monthly_rent,
+          security_deposit: basicInfo.security_deposit,
+          lease_start_date: basicInfo.lease_start_date,
+          lease_end_date: basicInfo.lease_end_date,
           notice_period_days: structuredData.notice_period_days,
-          property_type: structuredData.property_type,
-          square_footage: structuredData.square_footage,
-          bedrooms: structuredData.bedrooms,
-          bathrooms: structuredData.bathrooms,
+          property_type: basicInfo.property_type,
+          square_footage: basicInfo.square_footage,
+          bedrooms: basicInfo.bedrooms,
+          bathrooms: basicInfo.bathrooms,
           parking_spaces: structuredData.parking_spaces,
           pet_policy: structuredData.pet_policy,
-          utilities_included: structuredData.utilities_included,
-          amenities: structuredData.amenities,
-          landlord_name: structuredData.landlord_name,
-          management_company: structuredData.management_company,
-          contact_email: structuredData.contact_email,
-          contact_phone: structuredData.contact_phone,
+          utilities_included: basicInfo.utilities_included,
+          amenities: basicInfo.amenities,
+          landlord_name: basicInfo.landlord_name,
+          management_company: basicInfo.management_company,
+          contact_email: basicInfo.contact_email,
+          contact_phone: basicInfo.contact_phone,
           lease_terms: structuredData.lease_terms,
           special_clauses: structuredData.special_clauses,
           market_analysis: structuredData.market_analysis,
@@ -165,10 +170,10 @@ export async function POST(request: NextRequest) {
     // Convert structured data to the format expected by the frontend
     const analysis = {
       summary: {
-        monthlyRent: `$${structuredData.monthly_rent.toLocaleString()}`,
-        securityDeposit: `$${structuredData.security_deposit.toLocaleString()}`,
-        leaseStart: structuredData.lease_start_date,
-        leaseEnd: structuredData.lease_end_date,
+        monthlyRent: `$${basicInfo.monthly_rent.toLocaleString()}`,
+        securityDeposit: `$${basicInfo.security_deposit.toLocaleString()}`,
+        leaseStart: basicInfo.lease_start_date,
+        leaseEnd: basicInfo.lease_end_date,
         noticePeriod: `${structuredData.notice_period_days} days`
       },
       redFlags: structuredData.red_flags,

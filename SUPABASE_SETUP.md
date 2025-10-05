@@ -114,6 +114,25 @@ CREATE POLICY "Allow public insert on lease_data" ON lease_data
 -- Allow anyone to read lease data
 CREATE POLICY "Allow public read on lease_data" ON lease_data
   FOR SELECT USING (true);
+
+-- Allow anyone to update lease data
+CREATE POLICY "Allow public update on lease_data" ON lease_data
+  FOR UPDATE USING (true);
+```
+
+### Set up Storage Bucket Policies
+```sql
+-- Allow public access to storage bucket
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('lease-documents', 'lease-documents', true);
+
+-- Allow anyone to upload files
+CREATE POLICY "Allow public uploads" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'lease-documents');
+
+-- Allow anyone to read files
+CREATE POLICY "Allow public access" ON storage.objects
+  FOR SELECT USING (bucket_id = 'lease-documents');
 ```
 
 ## 7. Deploy to Vercel

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, Shield, AlertCircle, CheckCircle, FileText, Calendar, Download, Plus, X } from 'lucide-react';
+import { Upload, Shield, AlertCircle, CheckCircle, FileText, Calendar, Download, Plus, X, BarChart3 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 
 type Page = 'landing' | 'upload' | 'results';
@@ -131,12 +131,21 @@ export default function LeaseWiseApp() {
                 </div>
                 <span className="text-xl font-semibold text-slate-900">LeaseWise</span>
               </div>
-              <button 
-                onClick={() => setCurrentPage('upload')}
-                className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                Get Started
-              </button>
+              <div className="flex items-center gap-3">
+                <a 
+                  href="/dashboard"
+                  className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-all duration-200 flex items-center gap-2"
+                >
+                  <BarChart3 className="h-4 w-4" />
+                  Dashboard
+                </a>
+                <button 
+                  onClick={() => setCurrentPage('upload')}
+                  className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-all duration-200 shadow-sm hover:shadow-md"
+                >
+                  Get Started
+                </button>
+              </div>
             </div>
           </div>
         </nav>
@@ -402,6 +411,13 @@ export default function LeaseWiseApp() {
               <span className="text-xl font-semibold text-slate-900">LeaseWise</span>
             </div>
             <div className="flex items-center gap-3">
+              <a 
+                href="/dashboard"
+                className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-all duration-200 flex items-center gap-2"
+              >
+                <BarChart3 className="h-4 w-4" />
+                Dashboard
+              </a>
               <button className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-all duration-200 flex items-center gap-2">
                 <Download className="h-4 w-4" />
                 Export

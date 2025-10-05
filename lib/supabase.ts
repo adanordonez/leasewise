@@ -10,8 +10,9 @@ export interface LeaseData {
   id?: string
   created_at?: string
   pdf_url: string
+  user_address: string // User's input address for map pins
   building_name: string
-  property_address: string
+  property_address: string // AI-extracted address from lease
   monthly_rent: number
   security_deposit: number
   lease_start_date: string
