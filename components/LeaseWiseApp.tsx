@@ -62,54 +62,39 @@ export default function LeaseWiseApp() {
       const maxDirectSize = 4 * 1024 * 1024; // 4MB
       let response;
       
-      if (uploadedFile.size <= maxDirectSize) {
-        // Use direct upload for small files
-        const formData = new FormData();
-        formData.append('file', uploadedFile);
-        formData.append('address', address);
-        
-        response = await fetch('/api/analyze-lease', { 
-          method: 'POST',
-          body: formData
-        });
-      } else {
-        // For large files, upload to blob storage first
-        console.log('Uploading large file to blob storage...');
-        
-        const uploadFormData = new FormData();
-        uploadFormData.append('file', uploadedFile);
-        uploadFormData.append('address', address);
-        
-        const uploadResponse = await fetch('/api/upload-url', {
-          method: 'POST',
-          body: uploadFormData,
-        });
-        
-        if (!uploadResponse.ok) {
-          const errorData = await uploadResponse.json().catch(() => ({}));
-          if (errorData.setupRequired) {
-            throw new Error('Blob storage setup required for files over 4MB. Please check the BLOB_SETUP.md file for instructions.');
-          }
-          throw new Error(`Upload failed: ${uploadResponse.status} - ${errorData.error || 'Unknown error'}`);
-        }
-        
-        const uploadData = await uploadResponse.json();
-        console.log('Upload response:', uploadData);
-        
-        if (!uploadData.success || !uploadData.blobUrl) {
-          throw new Error(uploadData.error || 'Failed to upload file');
-        }
-        
-        // Now analyze using the blob URL
-        response = await fetch('/api/analyze-lease', { 
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            blobUrl: uploadData.blobUrl,
-            address
-          })
-        });
+      // Upload to Supabase first
+      console.log('Uploading file to Supabase...');
+      
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', uploadedFile);
+      uploadFormData.append('address', address);
+      
+      const uploadResponse = await fetch('/api/upload-supabase', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+      
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json().catch(() => ({}));
+        throw new Error(`Upload failed: ${uploadResponse.status} - ${errorData.error || 'Unknown error'}`);
       }
+      
+      const uploadData = await uploadResponse.json();
+      console.log('Upload response:', uploadData);
+      
+      if (!uploadData.success || !uploadData.url) {
+        throw new Error(uploadData.error || 'Failed to upload file');
+      }
+      
+      // Now analyze the file
+      response = await fetch('/api/analyze-lease', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pdfUrl: uploadData.url,
+          address
+        })
+      });
       
       const data = await response.json();
       
