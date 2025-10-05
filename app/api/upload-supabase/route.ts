@@ -3,11 +3,21 @@ import { supabase } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('Upload-supabase: Starting file upload...');
+    
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const address = formData.get('address') as string;
 
+    console.log('Upload-supabase: File details:', {
+      fileName: file?.name,
+      fileSize: file?.size,
+      fileType: file?.type,
+      address: address
+    });
+
     if (!file || !address) {
+      console.error('Upload-supabase: Missing file or address');
       return NextResponse.json(
         { error: 'File and address are required' },
         { status: 400 }
@@ -63,10 +73,11 @@ export async function POST(request: NextRequest) {
     const { data: pdfData, error: dbError } = await supabase
       .from('pdf_uploads')
       .insert({
-        filename: file.name,
+        file_name: file.name,
         file_size: file.size,
-        content_type: file.type,
-        url: urlData.publicUrl
+        file_type: file.type,
+        storage_url: urlData.publicUrl,
+        address: address
       })
       .select()
       .single();
@@ -81,7 +92,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      pdfId: pdfData.id,
+      pdfUploadId: pdfData.id,
       url: urlData.publicUrl,
       filename: file.name
     });

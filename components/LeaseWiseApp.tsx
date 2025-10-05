@@ -59,11 +59,12 @@ export default function LeaseWiseApp() {
     setError(null);
 
     try {
-      const maxDirectSize = 4 * 1024 * 1024; // 4MB
-      let response;
-      
-      // Upload to Supabase first
-      console.log('Uploading file to Supabase...');
+      // Upload to Supabase first (bypasses Vercel's 4.5MB payload limit)
+      console.log('Uploading file to Supabase...', {
+        fileName: uploadedFile.name,
+        fileSize: uploadedFile.size,
+        fileType: uploadedFile.type
+      });
       
       const uploadFormData = new FormData();
       uploadFormData.append('file', uploadedFile);
@@ -86,8 +87,8 @@ export default function LeaseWiseApp() {
         throw new Error(uploadData.error || 'Failed to upload file');
       }
       
-      // Now analyze the file
-      response = await fetch('/api/analyze-lease', { 
+      // Now analyze the file using the Supabase URL
+      const response = await fetch('/api/analyze-lease', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
