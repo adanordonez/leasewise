@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
 // Dynamically import the map component to avoid SSR issues
-const MapboxMap = dynamic(() => import('@/components/MapboxMap'), { 
+const DashboardMapboxMap = dynamic(() => import('@/components/DashboardMapboxMap'), { 
   ssr: false,
   loading: () => <div className="h-96 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg flex items-center justify-center">
     <div className="text-center">
@@ -290,7 +290,7 @@ export default function Dashboard() {
             <h3 className="text-lg font-semibold text-gray-900">Lease Locations Map</h3>
             <span className="text-sm text-gray-500">({filteredLeases.length} locations)</span>
           </div>
-          <MapboxMap leases={filteredLeases} />
+          <DashboardMapboxMap leases={filteredLeases} />
         </div>
 
         {/* Leases List */}

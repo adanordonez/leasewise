@@ -185,34 +185,6 @@ export default function LeaseWiseApp() {
   if (currentPage === 'landing') {
     return (
       <div className="min-h-screen gradient-bg-modern">
-        {/* Navigation */}
-        <nav className="border-b border-slate-200/60 backdrop-blur-sm bg-white/80 sticky top-0 z-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-8 h-8 bg-slate-900 rounded-lg">
-                  <Shield className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-xl font-semibold text-slate-900">LeaseWise</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <a 
-                  href="/dashboard"
-                  className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-all duration-200 flex items-center gap-2"
-                >
-                  <BarChart3 className="h-4 w-4" />
-                  Dashboard
-                </a>
-                <button 
-                  onClick={() => setCurrentPage('upload')}
-                  className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-all duration-200 shadow-sm hover:shadow-md"
-                >
-                  Get Started
-                </button>
-              </div>
-            </div>
-          </div>
-        </nav>
 
         {/* Hero Section */}
         <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -247,47 +219,108 @@ export default function LeaseWiseApp() {
             </div>
           </div>
 
-          {/* Features Grid */}
+          {/* Main Options */}
           <div className="py-20">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+                Choose Your Path
+              </h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                Get started with LeaseWise in three simple ways
+              </p>
+            </div>
+            
             <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-              {[
-                { 
-                  icon: SmartExtractionIcon, 
-                  title: 'Smart Extraction', 
-                  desc: 'AI extracts key terms, dates, and clauses automatically from your lease document.' 
-                },
-                { 
-                  icon: RedFlagDetectionIcon, 
-                  title: 'Red Flag Detection', 
-                  desc: 'Instantly identifies problematic clauses and terms that might not be in your favor.' 
-                },
-                { 
-                  icon: KnowYourRightsIcon, 
-                  title: 'Know Your Rights', 
-                  desc: 'Get location-specific tenant rights information based on your property address.' 
-                }
-              ].map((item, i) => (
-                <div key={i} className="group">
-                  <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200/60 hover:shadow-lg hover:border-slate-300/60 transition-all duration-300 h-full">
-                    <div className="flex items-center justify-center w-full h-48 bg-slate-100 rounded-xl mb-6 group-hover:bg-slate-900 transition-colors duration-200">
-                      <item.icon />
-                    </div>
-                    <h3 className="text-xl font-semibold text-slate-900 mb-3">{item.title}</h3>
-                    <p className="text-slate-600 leading-relaxed">{item.desc}</p>
+              {/* Dashboard Option */}
+              <div className="group">
+                <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200/60 hover:shadow-lg hover:border-slate-300/60 transition-all duration-300 h-full">
+                  <div className="flex items-center justify-center w-full h-48 bg-slate-100 rounded-xl mb-6 group-hover:bg-slate-900 transition-colors duration-200">
+                    <SmartExtractionIcon />
                   </div>
+                  <h3 className="text-xl font-semibold text-slate-900 mb-3">Dashboard</h3>
+                  <p className="text-slate-600 leading-relaxed mb-6">
+                    Compare your rental data with others in your area. Market trends, average rents, and more!
+                  </p>
+                  <a 
+                    href="/dashboard"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-all duration-200"
+                  >
+                    View Dashboard
+                    <BarChart3 className="h-4 w-4" />
+                  </a>
                 </div>
-              ))}
+              </div>
+
+              {/* Laws Option */}
+              <div className="group">
+                <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200/60 hover:shadow-lg hover:border-slate-300/60 transition-all duration-300 h-full">
+                  <div className="flex items-center justify-center w-full h-48 bg-slate-100 rounded-xl mb-6 group-hover:bg-slate-900 transition-colors duration-200">
+                    <KnowYourRightsIcon />
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-900 mb-3">Laws</h3>
+                  <p className="text-slate-600 leading-relaxed mb-6">
+                    Learn about landlord-tenant laws in your state. Know your rights and responsibilities as a tenant.
+                  </p>
+                  <a 
+                    href="/laws"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-all duration-200"
+                  >
+                    View Laws
+                    <FileText className="h-4 w-4" />
+                  </a>
+                </div>
+              </div>
+
+              {/* Analyze Option */}
+              <div className="group">
+                <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200/60 hover:shadow-lg hover:border-slate-300/60 transition-all duration-300 h-full">
+                  <div className="flex items-center justify-center w-full h-48 bg-slate-100 rounded-xl mb-6 group-hover:bg-slate-900 transition-colors duration-200">
+                    <RedFlagDetectionIcon />
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-900 mb-3">Analyze</h3>
+                  <p className="text-slate-600 leading-relaxed mb-6">
+                    Upload your lease PDF and get instant AI analysis of terms, red flags, and important dates.
+                  </p>
+                  <button 
+                    onClick={() => setCurrentPage('upload')}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-all duration-200"
+                  >
+                    Get Started
+                    <Upload className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Trust Section */}
           <div className="py-16 text-center">
             <p className="text-slate-500 text-sm mb-8">Trusted by thousands of renters</p>
-            <div className="flex items-center justify-center gap-8 opacity-60">
-              <div className="h-8 w-24 bg-slate-200 rounded"></div>
-              <div className="h-8 w-24 bg-slate-200 rounded"></div>
-              <div className="h-8 w-24 bg-slate-200 rounded"></div>
-              <div className="h-8 w-24 bg-slate-200 rounded"></div>
+            <div className="flex items-center justify-center gap-12 opacity-60">
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <Shield className="w-6 h-6 text-blue-600" />
+                </div>
+                <span className="text-xs text-slate-500 font-medium">Secure</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+                <span className="text-xs text-slate-500 font-medium">Reliable</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-purple-600" />
+                </div>
+                <span className="text-xs text-slate-500 font-medium">Accurate</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                  <BarChart3 className="w-6 h-6 text-orange-600" />
+                </div>
+                <span className="text-xs text-slate-500 font-medium">Smart</span>
+              </div>
             </div>
           </div>
         </main>
@@ -483,6 +516,13 @@ export default function LeaseWiseApp() {
               >
                 <BarChart3 className="h-4 w-4" />
                 Dashboard
+              </a>
+              <a 
+                href="/laws"
+                className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-all duration-200 flex items-center gap-2"
+              >
+                <FileText className="h-4 w-4" />
+                Laws
               </a>
               <button className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-all duration-200 flex items-center gap-2">
                 <Download className="h-4 w-4" />

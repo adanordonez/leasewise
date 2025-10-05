@@ -1,0 +1,13 @@
+state,city,topic,info
+California,Los Angeles,Security Deposit,Maximum security deposit is 2 months rent for unfurnished units, 3 months for furnished units. Landlord must return deposit within 21 days of move-out.
+California,San Francisco,Security Deposit,Maximum security deposit is 2 months rent for unfurnished units, 3 months for furnished units. Landlord must return deposit within 21 days of move-out.
+California,San Diego,Security Deposit,Maximum security deposit is 2 months rent for unfurnished units, 3 months for furnished units. Landlord must return deposit within 21 days of move-out.
+New York,New York City,Security Deposit,Maximum security deposit is 1 month rent. Landlord must return deposit within 14 days of move-out or provide written explanation for deductions.
+New York,Buffalo,Security Deposit,Maximum security deposit is 1 month rent. Landlord must return deposit within 14 days of move-out or provide written explanation for deductions.
+Texas,Houston,Security Deposit,No maximum limit on security deposits. Landlord must return deposit within 30 days of move-out.
+Texas,Austin,Security Deposit,No maximum limit on security deposits. Landlord must return deposit within 30 days of move-out.
+Texas,Dallas,Security Deposit,No maximum limit on security deposits. Landlord must return deposit within 30 days of move-out.
+Florida,Miami,Security Deposit,No maximum limit on security deposits. Landlord must return deposit within 15 days of move-out.
+Florida,Orlando,Security Deposit,No maximum limit on security deposits. Landlord must return deposit within 15 days of move-out.
+Illinois,Chicago,Security Deposit,Maximum security deposit is 1.5 months rent. Landlord must return deposit within 30 days of move-out.
+Illinois,Springfield,Security Deposit,Maximum security deposit is 1.5 months rent. Landlord must return deposit within 30 days of move-out.
