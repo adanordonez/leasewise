@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Upload, Shield, AlertCircle, CheckCircle, FileText, Calendar, Download, Plus, X, BarChart3 } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
+import { SmartExtractionIcon, RedFlagDetectionIcon, KnowYourRightsIcon } from './AnimatedIcons';
 
 type Page = 'landing' | 'upload' | 'results';
 
@@ -33,10 +34,17 @@ export default function LeaseWiseApp() {
     if (!file) return;
     
     // Check file size limits
+    const maxDirectSize = 4 * 1024 * 1024; // 4MB for direct API upload
     const maxSupabaseSize = 50 * 1024 * 1024; // 50MB for direct Supabase upload
     
-    if (file.size > maxSupabaseSize) {
+    // Check if Supabase is configured
+    const hasSupabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    if (hasSupabase && file.size > maxSupabaseSize) {
       setError('File too large. Maximum size is 50MB.');
+      return;
+    } else if (!hasSupabase && file.size > maxDirectSize) {
+      setError('File too large. Maximum size is 4MB without Supabase configuration.');
       return;
     }
     if (file.type !== 'application/pdf') {
@@ -63,7 +71,32 @@ export default function LeaseWiseApp() {
       
       // Check if we have Supabase configured
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        throw new Error('Supabase not configured. Please check your environment variables.');
+        console.warn('Supabase not configured, falling back to direct API upload');
+        // Fallback to direct API upload for small files
+        if (uploadedFile.size > 4 * 1024 * 1024) { // 4MB
+          throw new Error('File too large for direct upload. Please configure Supabase for files over 4MB.');
+        }
+        
+        // Use direct API upload for small files
+        const formData = new FormData();
+        formData.append('file', uploadedFile);
+        formData.append('address', address);
+        
+        response = await fetch('/api/analyze-lease', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          setAnalysisResult(data.analysis);
+          setScenarios(data.scenarios);
+          setCurrentPage('results');
+        } else {
+          setError(data.error || 'Failed to analyze lease. Please try again.');
+        }
+        return;
       }
 
       // Upload directly to Supabase from client (bypasses Vercel payload limits)
@@ -90,7 +123,32 @@ export default function LeaseWiseApp() {
 
       if (uploadError) {
         console.error('Supabase upload error:', uploadError);
-        throw new Error(`Failed to upload file: ${uploadError.message}`);
+        
+        // If Supabase upload fails, try direct API upload for small files
+        if (uploadedFile.size <= 4 * 1024 * 1024) { // 4MB
+          console.warn('Supabase upload failed, falling back to direct API upload');
+          const formData = new FormData();
+          formData.append('file', uploadedFile);
+          formData.append('address', address);
+          
+          response = await fetch('/api/analyze-lease', {
+            method: 'POST',
+            body: formData,
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            setAnalysisResult(data.analysis);
+            setScenarios(data.scenarios);
+            setCurrentPage('results');
+          } else {
+            setError(data.error || 'Failed to analyze lease. Please try again.');
+          }
+          return;
+        } else {
+          throw new Error(`Failed to upload file: ${uploadError.message}`);
+        }
       }
 
       // Get public URL
@@ -224,25 +282,25 @@ export default function LeaseWiseApp() {
             <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
               {[
                 { 
-                  icon: FileText, 
+                  icon: SmartExtractionIcon, 
                   title: 'Smart Extraction', 
                   desc: 'AI extracts key terms, dates, and clauses automatically from your lease document.' 
                 },
                 { 
-                  icon: AlertCircle, 
+                  icon: RedFlagDetectionIcon, 
                   title: 'Red Flag Detection', 
                   desc: 'Instantly identifies problematic clauses and terms that might not be in your favor.' 
                 },
                 { 
-                  icon: Shield, 
+                  icon: KnowYourRightsIcon, 
                   title: 'Know Your Rights', 
                   desc: 'Get location-specific tenant rights information based on your property address.' 
                 }
               ].map((item, i) => (
                 <div key={i} className="group">
                   <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200/60 hover:shadow-lg hover:border-slate-300/60 transition-all duration-300 h-full">
-                    <div className="flex items-center justify-center w-12 h-12 bg-slate-100 rounded-xl mb-6 group-hover:bg-slate-900 transition-colors duration-200">
-                      <item.icon className="h-6 w-6 text-slate-700 group-hover:text-white transition-colors duration-200" />
+                    <div className="flex items-center justify-center w-24 h-24 bg-slate-100 rounded-xl mb-6 group-hover:bg-slate-900 transition-colors duration-200">
+                      <item.icon />
                     </div>
                     <h3 className="text-xl font-semibold text-slate-900 mb-3">{item.title}</h3>
                     <p className="text-slate-600 leading-relaxed">{item.desc}</p>
@@ -339,7 +397,11 @@ export default function LeaseWiseApp() {
                 <p className="text-lg font-medium text-slate-900 mb-2">
                   {uploadedFile ? uploadedFile.name : 'Click to upload PDF'}
                 </p>
-                <p className="text-sm text-slate-500">Maximum file size: 50MB (direct Supabase upload)</p>
+                <p className="text-sm text-slate-500">
+                  {process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY 
+                    ? 'Maximum file size: 50MB (direct Supabase upload)' 
+                    : 'Maximum file size: 4MB (direct upload)'}
+                </p>
               </label>
               
               {uploadedFile && uploadProgress < 100 && (
