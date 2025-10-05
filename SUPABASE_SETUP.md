@@ -42,10 +42,11 @@ Run these SQL commands in your Supabase SQL Editor:
 CREATE TABLE pdf_uploads (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  filename TEXT NOT NULL,
+  file_name TEXT NOT NULL,
   file_size BIGINT NOT NULL,
-  content_type TEXT NOT NULL,
-  url TEXT NOT NULL,
+  file_type TEXT NOT NULL,
+  storage_url TEXT NOT NULL,
+  address TEXT NOT NULL,
   lease_data_id UUID REFERENCES lease_data(id)
 );
 ```

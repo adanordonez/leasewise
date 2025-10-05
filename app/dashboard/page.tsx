@@ -86,10 +86,11 @@ export default function Dashboard() {
     if (!searchTerm) return true;
     const searchLower = searchTerm.toLowerCase();
     return (
-      lease.building_name.toLowerCase().includes(searchLower) ||
-      lease.property_address.toLowerCase().includes(searchLower) ||
-      lease.landlord_name?.toLowerCase().includes(searchLower) ||
-      lease.management_company?.toLowerCase().includes(searchLower)
+      (lease.building_name?.toLowerCase().includes(searchLower) ?? false) ||
+      (lease.property_address?.toLowerCase().includes(searchLower) ?? false) ||
+      (lease.landlord_name?.toLowerCase().includes(searchLower) ?? false) ||
+      (lease.management_company?.toLowerCase().includes(searchLower) ?? false) ||
+      (lease.user_address?.toLowerCase().includes(searchLower) ?? false)
     );
   });
 

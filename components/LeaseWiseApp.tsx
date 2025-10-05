@@ -33,10 +33,10 @@ export default function LeaseWiseApp() {
     if (!file) return;
     
     // Check file size limits
-    const maxBlobSize = 20 * 1024 * 1024; // 20MB for blob storage
+    const maxSupabaseSize = 50 * 1024 * 1024; // 50MB for direct Supabase upload
     
-    if (file.size > maxBlobSize) {
-      setError('File too large. Maximum size is 20MB.');
+    if (file.size > maxSupabaseSize) {
+      setError('File too large. Maximum size is 50MB.');
       return;
     }
     if (file.type !== 'application/pdf') {
@@ -59,47 +59,75 @@ export default function LeaseWiseApp() {
     setError(null);
 
     try {
-      // ALWAYS use Supabase for file uploads (bypasses Vercel's 4.5MB payload limit)
-      console.log('=== LEASEWISE UPLOAD FLOW ===');
-      console.log('Uploading file to Supabase...', {
-        fileName: uploadedFile.name,
-        fileSize: uploadedFile.size,
-        fileType: uploadedFile.type,
-        address: address
-      });
-      console.log('This bypasses Vercel\'s 4.5MB payload limit by using Supabase Storage');
+      let response;
       
-      const uploadFormData = new FormData();
-      uploadFormData.append('file', uploadedFile);
-      uploadFormData.append('address', address);
-      
-      const uploadResponse = await fetch('/api/upload-supabase', {
-        method: 'POST',
-        body: uploadFormData,
-      });
-      
-      if (!uploadResponse.ok) {
-        const errorData = await uploadResponse.json().catch(() => ({}));
-        throw new Error(`Upload failed: ${uploadResponse.status} - ${errorData.error || 'Unknown error'}`);
+      // Check if we have Supabase configured
+      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        throw new Error('Supabase not configured. Please check your environment variables.');
       }
+
+      // Upload directly to Supabase from client (bypasses Vercel payload limits)
+      console.log('Uploading file directly to Supabase...');
       
-      const uploadData = await uploadResponse.json();
-      console.log('Upload response:', uploadData);
-      
-      if (!uploadData.success || !uploadData.url) {
-        throw new Error(uploadData.error || 'Failed to upload file');
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      );
+
+      const timestamp = Date.now();
+      const fileExt = uploadedFile.name.split('.').pop();
+      const fileName = `${timestamp}-${uploadedFile.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+      const filePath = `leases/${fileName}`;
+
+      // Upload file to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('lease-documents')
+        .upload(filePath, uploadedFile, {
+          contentType: uploadedFile.type,
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('Supabase upload error:', uploadError);
+        throw new Error(`Failed to upload file: ${uploadError.message}`);
       }
-      
-      // Now analyze the file using the Supabase URL (NOT direct file upload)
-      console.log('=== SENDING TO ANALYZE-LEASE ===');
-      console.log('Using Supabase URL (NOT direct file upload):', uploadData.url);
-      console.log('Content-Type: application/json (NOT multipart/form-data)');
-      
-      const response = await fetch('/api/analyze-lease', { 
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('lease-documents')
+        .getPublicUrl(filePath);
+
+      if (!urlData?.publicUrl) {
+        throw new Error('Failed to get public URL for uploaded file');
+      }
+
+      console.log('File uploaded successfully:', urlData.publicUrl);
+
+      // Save PDF metadata to database
+      const { data: pdfUploadData, error: pdfUploadError } = await supabase
+        .from('pdf_uploads')
+        .insert({
+          file_name: uploadedFile.name,
+          file_size: uploadedFile.size,
+          file_type: uploadedFile.type,
+          storage_url: urlData.publicUrl,
+          address: address,
+        })
+        .select()
+        .single();
+
+      if (pdfUploadError) {
+        console.error('Error saving PDF upload metadata:', pdfUploadError);
+        // Don't throw error here, continue with analysis
+      }
+
+      // Now analyze the file
+      response = await fetch('/api/analyze-lease', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          pdfUrl: uploadData.url,
+          pdfUrl: urlData.publicUrl,
           address
         })
       });
@@ -311,7 +339,7 @@ export default function LeaseWiseApp() {
                 <p className="text-lg font-medium text-slate-900 mb-2">
                   {uploadedFile ? uploadedFile.name : 'Click to upload PDF'}
                 </p>
-                <p className="text-sm text-slate-500">Maximum file size: 4MB (direct) / 20MB (with blob storage)</p>
+                <p className="text-sm text-slate-500">Maximum file size: 50MB (direct Supabase upload)</p>
               </label>
               
               {uploadedFile && uploadProgress < 100 && (
