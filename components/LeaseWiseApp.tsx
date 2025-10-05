@@ -33,18 +33,19 @@ export default function LeaseWiseApp() {
     const file = e.target.files?.[0];
     if (!file) return;
     
-    // Check file size limits
-    const maxDirectSize = 4 * 1024 * 1024; // 4MB for direct API upload
-    const maxSupabaseSize = 50 * 1024 * 1024; // 50MB for direct Supabase upload
+    // Check file size limits - all files go to Supabase
+    const maxSupabaseSize = 50 * 1024 * 1024; // 50MB for Supabase upload
     
     // Check if Supabase is configured
     const hasSupabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     
-    if (hasSupabase && file.size > maxSupabaseSize) {
-      setError('File too large. Maximum size is 50MB.');
+    if (!hasSupabase) {
+      setError('Supabase not configured. Please set up Supabase environment variables to upload files.');
       return;
-    } else if (!hasSupabase && file.size > maxDirectSize) {
-      setError('File too large. Maximum size is 4MB without Supabase configuration.');
+    }
+    
+    if (file.size > maxSupabaseSize) {
+      setError('File too large. Maximum size is 50MB.');
       return;
     }
     if (file.type !== 'application/pdf') {
@@ -71,51 +72,7 @@ export default function LeaseWiseApp() {
       
       // Check if we have Supabase configured
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        console.warn('Supabase not configured, falling back to direct API upload');
-        // Fallback to direct API upload for small files
-        if (uploadedFile.size > 4 * 1024 * 1024) { // 4MB
-          throw new Error('File too large for direct upload. Please configure Supabase for files over 4MB.');
-        }
-        
-        // Use direct API upload for small files
-        const formData = new FormData();
-        formData.append('file', uploadedFile);
-        formData.append('address', address);
-        
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes timeout
-        
-        try {
-          response = await fetch('/api/analyze-lease', {
-            method: 'POST',
-            body: formData,
-            signal: controller.signal,
-          });
-          clearTimeout(timeoutId);
-        } catch (error) {
-          clearTimeout(timeoutId);
-          if (error.name === 'AbortError') {
-            throw new Error('Request timed out. Please try with a smaller file or configure Supabase for better performance.');
-          }
-          throw error;
-        }
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('API Error Response:', errorText);
-          throw new Error(`API request failed: ${response.status} - ${errorText}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data.success) {
-          setAnalysisResult(data.analysis);
-          setScenarios(data.scenarios);
-          setCurrentPage('results');
-        } else {
-          setError(data.error || 'Failed to analyze lease. Please try again.');
-        }
-        return;
+        throw new Error('Supabase not configured. Please set up Supabase environment variables to upload files.');
       }
 
       // Upload directly to Supabase from client (bypasses Vercel payload limits)
@@ -142,51 +99,7 @@ export default function LeaseWiseApp() {
 
       if (uploadError) {
         console.error('Supabase upload error:', uploadError);
-        
-        // If Supabase upload fails, try direct API upload for small files
-        if (uploadedFile.size <= 4 * 1024 * 1024) { // 4MB
-          console.warn('Supabase upload failed, falling back to direct API upload');
-          const formData = new FormData();
-          formData.append('file', uploadedFile);
-          formData.append('address', address);
-          
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes timeout
-          
-          try {
-            response = await fetch('/api/analyze-lease', {
-              method: 'POST',
-              body: formData,
-              signal: controller.signal,
-            });
-            clearTimeout(timeoutId);
-          } catch (error) {
-            clearTimeout(timeoutId);
-            if (error.name === 'AbortError') {
-              throw new Error('Request timed out. Please try with a smaller file or configure Supabase for better performance.');
-            }
-            throw error;
-          }
-          
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API Error Response:', errorText);
-            throw new Error(`API request failed: ${response.status} - ${errorText}`);
-          }
-          
-          const data = await response.json();
-          
-          if (data.success) {
-            setAnalysisResult(data.analysis);
-            setScenarios(data.scenarios);
-            setCurrentPage('results');
-          } else {
-            setError(data.error || 'Failed to analyze lease. Please try again.');
-          }
-          return;
-        } else {
-          throw new Error(`Failed to upload file: ${uploadError.message}`);
-        }
+        throw new Error(`Failed to upload file to Supabase: ${uploadError.message}`);
       }
 
       // Get public URL
@@ -455,9 +368,7 @@ export default function LeaseWiseApp() {
                   {uploadedFile ? uploadedFile.name : 'Click to upload PDF'}
                 </p>
                 <p className="text-sm text-slate-500">
-                  {process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY 
-                    ? 'Maximum file size: 50MB (direct Supabase upload)' 
-                    : 'Maximum file size: 4MB (direct upload)'}
+                  Maximum file size: 50MB (Supabase upload)
                 </p>
               </label>
               
