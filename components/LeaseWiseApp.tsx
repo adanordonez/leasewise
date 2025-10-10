@@ -28,11 +28,9 @@ export default function LeaseWiseApp() {
   const [scenarios, setScenarios] = useState<Scenarios | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
+  const validateAndSetFile = (file: File) => {
     // Check file size limits - all files go to Supabase
     const maxSupabaseSize = 50 * 1024 * 1024; // 50MB for Supabase upload
     
@@ -56,6 +54,41 @@ export default function LeaseWiseApp() {
     setError(null);
     setUploadedFile(file);
     setUploadProgress(100);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    validateAndSetFile(file);
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      validateAndSetFile(file);
+    }
   };
 
   const handleAnalyze = async () => {
@@ -390,18 +423,34 @@ export default function LeaseWiseApp() {
               />
               <label 
                 htmlFor="file-upload"
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
                 className={`block border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-all duration-200 ${
-                  uploadedFile 
-                    ? 'border-slate-900 bg-slate-50/50' 
-                    : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50/50'
+                  isDragging
+                    ? 'border-blue-500 bg-blue-50 scale-105'
+                    : uploadedFile 
+                      ? 'border-slate-900 bg-slate-50/50' 
+                      : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50/50'
                 }`}
               >
-                <Upload className={`h-12 w-12 mx-auto mb-4 ${uploadedFile ? 'text-slate-900' : 'text-slate-400'}`} />
+                <Upload className={`h-12 w-12 mx-auto mb-4 transition-all duration-200 ${
+                  isDragging 
+                    ? 'text-blue-600 scale-110' 
+                    : uploadedFile 
+                      ? 'text-slate-900' 
+                      : 'text-slate-400'
+                }`} />
                 <p className="text-lg font-medium text-slate-900 mb-2">
-                  {uploadedFile ? uploadedFile.name : 'Click to upload PDF'}
+                  {isDragging 
+                    ? 'Drop your PDF here' 
+                    : uploadedFile 
+                      ? uploadedFile.name 
+                      : 'Click to upload or drag & drop PDF'}
                 </p>
                 <p className="text-sm text-slate-500">
-                  Maximum file size: 50MB (Supabase upload)
+                  {isDragging ? 'Release to upload' : 'Maximum file size: 50MB (Supabase upload)'}
                 </p>
               </label>
               
