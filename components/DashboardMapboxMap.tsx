@@ -1,13 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Map, { Marker, Popup, NavigationControl, GeolocateControl } from 'react-map-gl';
+import { useEffect, useState, useMemo } from 'react';
+import Map, { Marker, Popup, NavigationControl, GeolocateControl, Source, Layer } from 'react-map-gl';
+import type { MapRef } from 'react-map-gl';
+import { Badge } from '@/components/ui/badge';
+import { MapPin, Building2, DollarSign, Home, Ruler } from 'lucide-react';
 
 interface LeaseData {
   id: string;
-  user_address: string; // User's input address for map pins
+  user_address: string;
   building_name: string;
-  property_address: string; // AI-extracted address from lease
+  property_address: string;
   monthly_rent: number;
   security_deposit: number;
   property_type: string;
@@ -33,10 +36,20 @@ interface Coordinates {
   lng: number;
 }
 
+interface HoverStats {
+  count: number;
+  avgRent: number;
+  minRent: number;
+  maxRent: number;
+}
+
 export default function DashboardMapboxMap({ leases }: DashboardMapboxMapProps) {
   const [coordinates, setCoordinates] = useState<globalThis.Map<string, Coordinates>>(new globalThis.Map());
   const [loading, setLoading] = useState(true);
   const [selectedLease, setSelectedLease] = useState<LeaseData | null>(null);
+  const [hoveredLease, setHoveredLease] = useState<LeaseData | null>(null);
+  const [hoverStats, setHoverStats] = useState<HoverStats | null>(null);
+  const [zoom, setZoom] = useState(4);
   const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
   // Geocoding function using Mapbox Geocoding API
@@ -58,6 +71,7 @@ export default function DashboardMapboxMap({ leases }: DashboardMapboxMapProps) 
     }
   };
 
+  // Batch geocode with parallel requests for faster loading
   useEffect(() => {
     const geocodeLeases = async () => {
       if (!mapboxToken) {
@@ -68,17 +82,29 @@ export default function DashboardMapboxMap({ leases }: DashboardMapboxMapProps) 
       setLoading(true);
       const coordsMap = new globalThis.Map<string, Coordinates>();
       
-      for (const lease of leases) {
-        // Use user's input address for geocoding (where they actually live)
-        const coords = await geocodeAddress(lease.user_address);
-        if (coords) {
-          coordsMap.set(lease.id, coords);
+      // Batch geocode in chunks of 10 for faster loading
+      const batchSize = 10;
+      for (let i = 0; i < leases.length; i += batchSize) {
+        const batch = leases.slice(i, i + batchSize);
+        const results = await Promise.all(
+          batch.map(lease => geocodeAddress(lease.user_address))
+        );
+        
+        batch.forEach((lease, index) => {
+          if (results[index]) {
+            coordsMap.set(lease.id, results[index]!);
+          }
+        });
+        
+        // Update state incrementally for better UX
+        setCoordinates(new globalThis.Map(coordsMap));
+        
+        // Small delay between batches to avoid rate limiting
+        if (i + batchSize < leases.length) {
+          await new Promise(resolve => setTimeout(resolve, 200));
         }
-        // Add delay to avoid rate limiting
-        await new Promise(resolve => setTimeout(resolve, 100));
       }
       
-      setCoordinates(coordsMap);
       setLoading(false);
     };
 
@@ -88,6 +114,120 @@ export default function DashboardMapboxMap({ leases }: DashboardMapboxMapProps) 
       setLoading(false);
     }
   }, [leases, mapboxToken]);
+
+  // Create GeoJSON for clustering
+  const geojsonData = useMemo(() => {
+    const validLeases = leases.filter(lease => coordinates.has(lease.id));
+    
+    return {
+      type: 'FeatureCollection' as const,
+      features: validLeases.map(lease => {
+        const coords = coordinates.get(lease.id)!;
+        return {
+          type: 'Feature' as const,
+          properties: {
+            id: lease.id,
+            rent: lease.monthly_rent,
+            building: lease.building_name,
+          },
+          geometry: {
+            type: 'Point' as const,
+            coordinates: [coords.lng, coords.lat],
+          },
+        };
+      }),
+    };
+  }, [leases, coordinates]);
+
+  // Cluster layer configuration
+  const clusterLayer: any = {
+    id: 'clusters',
+    type: 'circle',
+    source: 'leases',
+    filter: ['has', 'point_count'],
+    paint: {
+      'circle-color': [
+        'step',
+        ['get', 'point_count'],
+        '#6366F1',
+        10,
+        '#8B5CF6',
+        25,
+        '#EC4899'
+      ],
+      'circle-radius': [
+        'step',
+        ['get', 'point_count'],
+        20,
+        10,
+        30,
+        25,
+        40
+      ],
+      'circle-stroke-width': 3,
+      'circle-stroke-color': '#fff'
+    }
+  };
+
+  const clusterCountLayer: any = {
+    id: 'cluster-count',
+    type: 'symbol',
+    source: 'leases',
+    filter: ['has', 'point_count'],
+    layout: {
+      'text-field': '{point_count_abbreviated}',
+      'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+      'text-size': 14
+    },
+    paint: {
+      'text-color': '#ffffff'
+    }
+  };
+
+  const unclusteredPointLayer: any = {
+    id: 'unclustered-point',
+    type: 'circle',
+    source: 'leases',
+    filter: ['!', ['has', 'point_count']],
+    paint: {
+      'circle-color': '#3B82F6',
+      'circle-radius': 8,
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#fff'
+    }
+  };
+
+  // Handle hover for stats
+  const handleMarkerHover = (lease: LeaseData) => {
+    setHoveredLease(lease);
+    
+    // Calculate stats for nearby leases (within same city roughly)
+    const coords = coordinates.get(lease.id);
+    if (!coords) return;
+    
+    const nearbyLeases = leases.filter(l => {
+      const lCoords = coordinates.get(l.id);
+      if (!lCoords) return false;
+      
+      // Calculate simple distance (rough approximation)
+      const distance = Math.sqrt(
+        Math.pow(lCoords.lat - coords.lat, 2) + 
+        Math.pow(lCoords.lng - coords.lng, 2)
+      );
+      
+      return distance < 0.5; // Roughly same area
+    });
+    
+    if (nearbyLeases.length > 0) {
+      const rents = nearbyLeases.map(l => l.monthly_rent);
+      setHoverStats({
+        count: nearbyLeases.length,
+        avgRent: Math.round(rents.reduce((a, b) => a + b, 0) / rents.length),
+        minRent: Math.min(...rents),
+        maxRent: Math.max(...rents),
+      });
+    }
+  };
 
   if (!mapboxToken) {
     return (
@@ -114,12 +254,13 @@ export default function DashboardMapboxMap({ leases }: DashboardMapboxMapProps) 
     );
   }
 
-  if (loading) {
+  if (loading && coordinates.size === 0) {
     return (
       <div className="h-[600px] bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl flex items-center justify-center shadow-lg border border-gray-200">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading beautiful map...</p>
+          <p className="text-gray-600 font-medium">Loading map data...</p>
+          <p className="text-sm text-gray-500 mt-2">Geocoding {leases.length} locations</p>
         </div>
       </div>
     );
@@ -144,35 +285,58 @@ export default function DashboardMapboxMap({ leases }: DashboardMapboxMapProps) 
   }
 
   // Default to US center for country-wide view
-  const centerLat = validLeases.length > 0 ? 
-    validLeases.reduce((sum, lease) => {
-      const coords = coordinates.get(lease.id);
-      return sum + (coords?.lat || 0);
-    }, 0) / validLeases.length : 39.8283; // Default to US center
-
-  const centerLng = validLeases.length > 0 ? 
-    validLeases.reduce((sum, lease) => {
-      const coords = coordinates.get(lease.id);
-      return sum + (coords?.lng || 0);
-    }, 0) / validLeases.length : -98.5795; // Default to US center
+  const centerLat = 39.8283;
+  const centerLng = -98.5795;
 
   return (
-    <div className="h-[600px] rounded-2xl overflow-hidden shadow-xl border border-gray-200">
+    <div className="relative h-[600px] rounded-2xl overflow-hidden shadow-xl border border-gray-200">
+      {loading && coordinates.size > 0 && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 bg-white px-4 py-2 rounded-full shadow-lg">
+          <p className="text-sm text-gray-600">Loading {leases.length - coordinates.size} more locations...</p>
+        </div>
+      )}
+      
       <Map
         mapboxAccessToken={mapboxToken}
         initialViewState={{
           longitude: centerLng,
           latitude: centerLat,
-          zoom: validLeases.length === 1 ? 8 : 4 // Zoom out for country view, closer if only one location
+          zoom: 4
         }}
         style={{ width: '100%', height: '100%' }}
         mapStyle="mapbox://styles/mapbox/light-v11"
         attributionControl={false}
+        onZoom={(e) => setZoom(e.viewState.zoom)}
+        interactiveLayerIds={['clusters', 'unclustered-point']}
+        onClick={(e) => {
+          const feature = e.features?.[0];
+          if (feature?.properties && feature.properties.id) {
+            const lease = leases.find(l => l.id === feature.properties!.id);
+            if (lease) setSelectedLease(lease);
+          }
+        }}
       >
         <NavigationControl position="top-right" />
         <GeolocateControl position="top-right" />
 
-        {validLeases.map((lease) => {
+        {/* Render clustered points at low zoom levels */}
+        {zoom < 10 && (
+          <Source
+            id="leases"
+            type="geojson"
+            data={geojsonData}
+            cluster={true}
+            clusterMaxZoom={10}
+            clusterRadius={50}
+          >
+            <Layer {...clusterLayer} />
+            <Layer {...clusterCountLayer} />
+            <Layer {...unclusteredPointLayer} />
+          </Source>
+        )}
+
+        {/* Render individual markers at high zoom levels */}
+        {zoom >= 10 && validLeases.map((lease) => {
           const coords = coordinates.get(lease.id);
           if (!coords) return null;
           
@@ -183,15 +347,58 @@ export default function DashboardMapboxMap({ leases }: DashboardMapboxMapProps) 
               latitude={coords.lat}
               onClick={() => setSelectedLease(lease)}
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full border-3 border-white shadow-xl flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-200 hover:shadow-2xl">
-                <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+              <div 
+                className="relative group"
+                onMouseEnter={() => handleMarkerHover(lease)}
+                onMouseLeave={() => {
+                  setHoveredLease(null);
+                  setHoverStats(null);
+                }}
+              >
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full border-3 border-white shadow-xl flex items-center justify-center cursor-pointer hover:scale-125 transition-all duration-200 hover:shadow-2xl">
+                  <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                  </div>
                 </div>
               </div>
             </Marker>
           );
         })}
 
+        {/* Hover stats card */}
+        {hoveredLease && hoverStats && !selectedLease && (
+          <Popup
+            longitude={coordinates.get(hoveredLease.id)?.lng || 0}
+            latitude={coordinates.get(hoveredLease.id)?.lat || 0}
+            closeButton={false}
+            closeOnClick={false}
+            className="hover-stats-popup"
+            anchor="bottom"
+            offset={15}
+          >
+            <div className="bg-white rounded-lg shadow-2xl p-4 min-w-[240px]">
+              <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Area Statistics</p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Properties</span>
+                  <span className="text-sm font-bold text-gray-900">{hoverStats.count}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Avg Rent</span>
+                  <span className="text-sm font-bold text-blue-600">${hoverStats.avgRent.toLocaleString()}/mo</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Range</span>
+                  <span className="text-xs font-medium text-gray-700">
+                    ${hoverStats.minRent.toLocaleString()} - ${hoverStats.maxRent.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Popup>
+        )}
+
+        {/* Selected lease popup */}
         {selectedLease && (
           <Popup
             longitude={coordinates.get(selectedLease.id)?.lng || 0}
@@ -200,79 +407,105 @@ export default function DashboardMapboxMap({ leases }: DashboardMapboxMapProps) 
             closeButton={true}
             closeOnClick={false}
             className="custom-popup"
-            maxWidth="360px"
+            maxWidth="400px"
           >
-            <div className="p-6 min-w-[360px]">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">🏠</span>
-                </div>
-                <div>
-                  <h3 className="font-bold text-xl text-gray-900">{selectedLease.building_name || 'Property'}</h3>
-                  <p className="text-sm text-gray-500">Lease Location</p>
-                </div>
-              </div>
-              
-              <div className="space-y-4 mb-6">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <span className="text-blue-600 text-sm">📍</span>
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-700">Address</p>
-                      <p className="text-sm text-gray-600">{selectedLease.user_address}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-green-50 rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-green-600 text-sm">💰</span>
-                      <p className="text-sm font-semibold text-gray-700">Monthly Rent</p>
-                    </div>
-                    <p className="text-lg font-bold text-green-700">${selectedLease.monthly_rent.toLocaleString()}</p>
+            <div className="min-w-[380px]">
+              {/* Card Header */}
+              <div className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <Badge className="bg-blue-600 text-white px-2 py-0.5 rounded-md border text-xs font-semibold">
+                    {selectedLease.property_type}
+                  </Badge>
+                  
+                  <div className="flex items-center gap-1.5">
+                    <h2 className="text-lg font-semibold text-card-foreground">
+                      {selectedLease.building_name || 'Property'}
+                    </h2>
                   </div>
                   
-                  <div className="bg-yellow-50 rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-yellow-600 text-sm">🔒</span>
-                      <p className="text-sm font-semibold text-gray-700">Security Deposit</p>
+                  {/* Key Stats Row */}
+                  <div className="flex items-center gap-2">
+                    <div className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 rounded-md">
+                      <DollarSign className="w-3 h-3 text-green-600" />
+                      <span className="text-sm font-semibold text-green-700">
+                        ${selectedLease.monthly_rent.toLocaleString()}/mo
+                      </span>
                     </div>
-                    <p className="text-lg font-bold text-yellow-700">${selectedLease.security_deposit.toLocaleString()}</p>
+                    {selectedLease.bedrooms !== undefined && (
+                      <div className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 rounded-md">
+                        <Home className="w-3 h-3 text-indigo-600" />
+                        <span className="text-sm font-medium text-indigo-700">
+                          {selectedLease.bedrooms} bed
+                        </span>
+                      </div>
+                    )}
+                    {selectedLease.bathrooms && (
+                      <div className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 rounded-md">
+                        <span className="text-sm font-medium text-blue-700">
+                          {selectedLease.bathrooms} bath
+                        </span>
+                      </div>
+                    )}
                   </div>
+                  
+                  {/* Property Details */}
+                  <div className="flex flex-col gap-2 pt-2">
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">
+                        {selectedLease.user_address}
+                      </span>
+                    </div>
+                    
+                    {selectedLease.management_company && (
+                      <div className="flex items-center gap-1">
+                        <Building2 className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          {selectedLease.management_company}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {selectedLease.square_footage && (
+                      <div className="flex items-center gap-1">
+                        <Ruler className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          {selectedLease.square_footage.toLocaleString()} sq ft
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Amenities Preview */}
+                  {selectedLease.amenities && selectedLease.amenities.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-2">
+                      {selectedLease.amenities.slice(0, 4).map((amenity, index) => (
+                        <span 
+                          key={index}
+                          className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded-md"
+                        >
+                          {amenity}
+                        </span>
+                      ))}
+                      {selectedLease.amenities.length > 4 && (
+                        <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded-md">
+                          +{selectedLease.amenities.length - 4} more
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
-                
-                {(selectedLease.bedrooms || selectedLease.bathrooms || selectedLease.square_footage) && (
-                  <div className="bg-indigo-50 rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-indigo-600 text-sm">🛏️</span>
-                      <p className="text-sm font-semibold text-gray-700">Property Details</p>
-                    </div>
-                    <div className="flex flex-wrap gap-4 text-sm">
-                      {selectedLease.bedrooms && (
-                        <span className="text-indigo-700 font-medium">{selectedLease.bedrooms} bed</span>
-                      )}
-                      {selectedLease.bathrooms && (
-                        <span className="text-indigo-700 font-medium">{selectedLease.bathrooms} bath</span>
-                      )}
-                      {selectedLease.square_footage && (
-                        <span className="text-indigo-700 font-medium">{selectedLease.square_footage} sq ft</span>
-                      )}
-                      <span className="text-indigo-700 font-medium capitalize">{selectedLease.property_type}</span>
-                    </div>
-                  </div>
-                )}
               </div>
               
-              <div className="pt-4 border-t border-gray-200">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-gray-500">Market Analysis</p>
-                  <p className="text-xs font-semibold text-blue-600">
-                    {selectedLease.market_analysis.rent_percentile}th percentile
-                  </p>
-                </div>
+              {/* Card Footer */}
+              <div className="flex items-center gap-3 p-6 pt-0 border-t">
+                <p className="text-sm text-card-foreground">
+                  Security Deposit: ${selectedLease.security_deposit.toLocaleString()}
+                </p>
+                <div className="h-5 w-px bg-gray-200"></div>
+                <p className="text-sm text-muted-foreground">
+                  {selectedLease.market_analysis.rent_percentile}th percentile
+                </p>
               </div>
             </div>
           </Popup>

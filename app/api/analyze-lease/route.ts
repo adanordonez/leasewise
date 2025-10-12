@@ -162,6 +162,34 @@ export async function POST(request: NextRequest) {
       } else {
         leaseDataId = leaseData.id;
         console.log('Lease data saved with ID:', leaseDataId);
+        
+        // Save PDF upload metadata to pdf_uploads table if we have a URL
+        if (pdfUrl) {
+          try {
+            // Extract file info from the URL
+            const urlParts = pdfUrl.split('/');
+            const fileName = urlParts[urlParts.length - 1];
+            
+            const { error: uploadError } = await supabase
+              .from('pdf_uploads')
+              .insert({
+                file_name: fileName,
+                file_size: uint8Array.length,
+                file_type: 'application/pdf',
+                storage_url: pdfUrl,
+                address: address,
+                lease_data_id: leaseDataId
+              });
+
+            if (uploadError) {
+              console.error('Error saving PDF upload metadata:', uploadError);
+            } else {
+              console.log('PDF upload metadata saved for lease:', leaseDataId);
+            }
+          } catch (uploadError) {
+            console.error('Error saving PDF metadata:', uploadError);
+          }
+        }
       }
     } catch (error) {
       console.error('Error saving to database:', error);

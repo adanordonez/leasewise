@@ -1,9 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, Shield, AlertCircle, CheckCircle, FileText, Calendar, Download, Plus, X, BarChart3 } from 'lucide-react';
+import { Upload, Shield, AlertCircle, CheckCircle, FileText, Calendar, Download, Plus, X, BarChart3, ArrowRight, Star, Menu } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { SmartExtractionIcon, RedFlagDetectionIcon, KnowYourRightsIcon } from './AnimatedIcons';
+import { KnowYourRightsLargeIcon } from './KnowYourRightsLargeIcon';
+import { AnalyzeLargeIcon } from './AnalyzeLargeIcon';
+import { MarketDashboardLargeIcon } from './MarketDashboardLargeIcon';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import Image from 'next/image';
 
 type Page = 'landing' | 'upload' | 'results';
 
@@ -170,7 +178,7 @@ export default function LeaseWiseApp() {
       
       try {
         response = await fetch('/api/analyze-lease', { 
-          method: 'POST',
+        method: 'POST', 
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             pdfUrl: urlData.publicUrl,
@@ -179,9 +187,9 @@ export default function LeaseWiseApp() {
           signal: controller.signal,
         });
         clearTimeout(timeoutId);
-      } catch (error) {
+      } catch (error: unknown) {
         clearTimeout(timeoutId);
-        if (error.name === 'AbortError') {
+        if (error instanceof Error && error.name === 'AbortError') {
           throw new Error('Request timed out. Please try with a smaller file or configure Supabase for better performance.');
         }
         throw error;
@@ -218,145 +226,407 @@ export default function LeaseWiseApp() {
   if (currentPage === 'landing') {
     return (
       <div className="min-h-screen gradient-bg-modern">
-
-        {/* Hero Section */}
-        <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="pt-20 pb-16 text-center">
-            <div className="max-w-4xl mx-auto">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium mb-8">
-                <CheckCircle className="h-4 w-4" />
-                AI-Powered Lease Analysis
+        {/* Navbar */}
+        <nav className="container mx-auto max-w-7xl py-6 px-6 relative z-50">
+          <div className="flex justify-between items-center">
+              <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-[#6039B3] rounded-lg flex items-center justify-center">
+                  <Shield className="h-5 w-5 text-white" />
               </div>
-              
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-slate-900 mb-8 leading-[1.1] tracking-tight">
-                Understand your lease in 
-                <span className="text-slate-600"> minutes</span>
-              </h1>
-              
-              <p className="text-xl sm:text-2xl text-slate-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-                Upload your lease PDF and get instant AI analysis of terms, rights, and important dates. 
-                Make informed decisions with clarity.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <button 
-                  onClick={() => setCurrentPage('upload')}
-                  className="px-8 py-4 bg-slate-900 text-white rounded-xl font-semibold text-lg hover:bg-slate-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                >
-                  Analyze Your Lease
-                </button>
-                <div className="text-sm text-slate-500">
-                  Free • No signup required • Secure
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Options */}
-          <div className="py-20">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-                Choose Your Path
-              </h2>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                Get started with LeaseWise in three simple ways
-              </p>
+              <span className="text-xl font-bold text-slate-900">LeaseWise</span>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-              {/* Dashboard Option */}
-              <div className="group">
-                <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200/60 hover:shadow-lg hover:border-slate-300/60 transition-all duration-300 h-full">
-                  <div className="flex items-center justify-center w-full h-48 bg-slate-100 rounded-xl mb-6 group-hover:bg-slate-900 transition-colors duration-200">
-                    <SmartExtractionIcon />
-                  </div>
-                  <h3 className="text-xl font-semibold text-slate-900 mb-3">Dashboard</h3>
-                  <p className="text-slate-600 leading-relaxed mb-6">
-                    Compare your rental data with others in your area. Market trends, average rents, and more!
-                  </p>
-                  <a 
-                    href="/dashboard"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-all duration-200"
-                  >
-                    View Dashboard
-                    <BarChart3 className="h-4 w-4" />
-                  </a>
-                </div>
-              </div>
+            <div className="hidden md:flex items-center gap-2">
+              <a 
+                href="/dashboard"
+                className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                Dashboard
+              </a>
+              <a 
+                href="/laws"
+                className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                Laws
+              </a>
+              <button 
+                onClick={() => setCurrentPage('upload')}
+                className="inline-flex h-9 items-center justify-center gap-2 px-4 rounded-[10px] bg-[#6039B3] text-white font-semibold text-sm hover:bg-[#5030A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]"
+              >
+                Get Started
+              </button>
+            </div>
 
-              {/* Laws Option */}
-              <div className="group">
-                <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200/60 hover:shadow-lg hover:border-slate-300/60 transition-all duration-300 h-full">
-                  <div className="flex items-center justify-center w-full h-48 bg-slate-100 rounded-xl mb-6 group-hover:bg-slate-900 transition-colors duration-200">
-                    <KnowYourRightsIcon />
-                  </div>
-                  <h3 className="text-xl font-semibold text-slate-900 mb-3">Laws</h3>
-                  <p className="text-slate-600 leading-relaxed mb-6">
-                    Learn about landlord-tenant laws in your state. Know your rights and responsibilities as a tenant.
-                  </p>
-                  <a 
-                    href="/laws"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-all duration-200"
-                  >
-                    View Laws
-                    <FileText className="h-4 w-4" />
-                  </a>
-                </div>
-              </div>
+            <button className="md:hidden p-2">
+              <Menu className="h-6 w-6 text-slate-700" />
+            </button>
+          </div>
+        </nav>
 
-              {/* Analyze Option */}
-              <div className="group">
-                <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200/60 hover:shadow-lg hover:border-slate-300/60 transition-all duration-300 h-full">
-                  <div className="flex items-center justify-center w-full h-48 bg-slate-100 rounded-xl mb-6 group-hover:bg-slate-900 transition-colors duration-200">
-                    <RedFlagDetectionIcon />
+        {/* Hero Section */}
+        <main className="container mx-auto max-w-7xl px-6 relative z-10">
+          <div className="pt-12 pb-8 flex justify-center items-start">
+            <div className="max-w-2xl flex flex-col items-center gap-8">
+              <div className="w-full flex flex-col items-center gap-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg bg-white/80 backdrop-blur-sm">
+                  <span className="text-sm font-medium text-slate-600">AI-Powered Lease Analysis</span>
+              </div>
+              
+                <h1 className="text-5xl sm:text-6xl font-bold text-center text-slate-900 leading-tight">
+                  Understand your lease in <span className="text-[#6039B3]">minutes</span>
+              </h1>
+              
+                <p className="text-lg text-center text-slate-600 leading-7 max-w-xl">
+                  Upload your lease PDF and get instant AI analysis of terms, rights, and red flags. Make informed rental decisions with confidence and clarity.
+              </p>
+              </div>
+              
+                <button 
+                  onClick={() => setCurrentPage('upload')}
+                className="inline-flex h-12 items-center justify-center gap-2 px-8 rounded-[10px] bg-[#6039B3] text-white font-semibold text-base hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
+                >
+                Get Access
+                <ArrowRight className="w-4 h-4" />
+                </button>
+              
+              <div className="flex flex-col items-center gap-2">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center -space-x-3">
+                    <Avatar className="w-10 h-10 border-2 border-white ring-2 ring-slate-100">
+                      <AvatarImage src="/pictures/1668121215339.jpeg" alt="Happy renter" />
+                    </Avatar>
+                    <Avatar className="w-10 h-10 border-2 border-white ring-2 ring-slate-100">
+                      <AvatarImage src="/pictures/1693251709501.jpeg" alt="Satisfied customer" />
+                    </Avatar>
+                    <Avatar className="w-10 h-10 border-2 border-white ring-2 ring-slate-100">
+                      <AvatarImage src="/pictures/1722123700269.jpeg" alt="Verified user" />
+                    </Avatar>
+                    <Avatar className="w-10 h-10 border-2 border-white ring-2 ring-slate-100">
+                      <AvatarImage src="/pictures/1735159522967.jpeg" alt="Trusted renter" />
+                    </Avatar>
                   </div>
-                  <h3 className="text-xl font-semibold text-slate-900 mb-3">Analyze</h3>
-                  <p className="text-slate-600 leading-relaxed mb-6">
-                    Upload your lease PDF and get instant AI analysis of terms, red flags, and important dates.
-                  </p>
-                  <button 
-                    onClick={() => setCurrentPage('upload')}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-all duration-200"
-                  >
-                    Get Started
-                    <Upload className="h-4 w-4" />
-                  </button>
+                  
+                  <div className="flex items-center gap-0.5">
+                    <Star className="w-5 h-5 fill-yellow-500 text-yellow-500" />
+                    <Star className="w-5 h-5 fill-yellow-500 text-yellow-500" />
+                    <Star className="w-5 h-5 fill-yellow-500 text-yellow-500" />
+                    <Star className="w-5 h-5 fill-yellow-500 text-yellow-500" />
+                    <Star className="w-5 h-5 fill-yellow-500 text-yellow-500" />
+                  </div>
                 </div>
+                
+                <p className="text-sm text-slate-500 text-center">
+                  Trusted by thousands of renters
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Trust Section */}
-          <div className="py-16 text-center">
-            <p className="text-slate-500 text-sm mb-8">Trusted by thousands of renters</p>
-            <div className="flex items-center justify-center gap-12 opacity-60">
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <Shield className="w-6 h-6 text-blue-600" />
+          {/* Features Section - Three Features */}
+          <div className="pt-8 pb-24 flex flex-col items-center gap-20 lg:gap-32">
+            {/* Feature 1: AI Analysis - Image Right on Desktop */}
+            <div className="container mx-auto max-w-6xl px-6">
+              {/* Mobile Layout */}
+              <div className="lg:hidden flex flex-col items-start justify-start gap-12 max-w-2xl mx-auto">
+                <div className="flex flex-col items-start justify-start gap-10 w-full">
+                  <div className="flex flex-col items-start justify-start gap-6 w-full">
+                    <div className="inline-flex h-10 px-8 py-2 items-center gap-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
+                      <p className="text-sm font-medium text-foreground">AI-Powered Analysis</p>
+                    </div>
+                    <h1 className="text-3xl font-bold text-foreground">
+                      Get instant AI analysis of your lease
+                    </h1>
+                    <p className="text-base text-muted-foreground">
+                      Upload your lease PDF and receive comprehensive analysis in minutes. Our AI detects red flags, explains complex terms, identifies important dates, and provides actionable insights about your rental agreement.
+                    </p>
+                  </div>
+                  
+                  <div className="flex flex-col items-start justify-start gap-6 w-full">
+                    <div className="flex flex-col items-start justify-start gap-4 w-full">
+                      <h3 className="text-xl font-bold text-foreground">Under 2 min</h3>
+                      <p className="text-base text-muted-foreground">
+                        Fast analysis that examines every clause, identifies potential issues, and explains what matters most in plain English.
+                      </p>
+                    </div>
+                    
+                    <div className="flex flex-col items-start justify-start gap-4 w-full">
+                      <h3 className="text-xl font-bold text-foreground">Free</h3>
+                      <p className="text-base text-muted-foreground">
+                        No signup required. Upload your lease and get instant analysis with detailed breakdowns and personalized insights.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <button 
+                      onClick={() => setCurrentPage('upload')}
+                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] transition-colors shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]"
+                    >
+                      Get access
+                    </button>
+                  </div>
                 </div>
-                <span className="text-xs text-slate-500 font-medium">Secure</span>
+                
+                <div className="w-full aspect-[3/2] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
+                  <div className="w-full h-full flex items-center justify-center p-6">
+                    <AnalyzeLargeIcon />
+                  </div>
+                </div>
               </div>
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-green-600" />
+
+              {/* Desktop Layout - Image Right */}
+              <div className="hidden lg:flex justify-between items-center gap-20">
+                <div className="flex flex-col gap-8 flex-1 max-w-xl">
+                  <div className="flex flex-col gap-6">
+                    <div className="inline-flex h-10 px-8 py-2 items-center gap-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] w-fit">
+                      <p className="text-sm font-medium text-foreground">AI-Powered Analysis</p>
+                    </div>
+                    <h1 className="text-4xl font-bold text-foreground">
+                      Get instant AI analysis of your lease
+                    </h1>
+                    <p className="text-base text-muted-foreground">
+                      Upload your lease PDF and receive comprehensive analysis in minutes. Our AI detects red flags, explains complex terms, identifies important dates, and provides actionable insights about your rental agreement.
+                    </p>
+                  </div>
+                  
+                  <div className="flex gap-8">
+                    <div className="flex flex-col gap-2 flex-1">
+                      <h2 className="text-3xl font-bold text-foreground">Under 2 min</h2>
+                      <p className="text-base text-muted-foreground">
+                        Fast analysis that examines every clause, identifies potential issues, and explains what matters most in plain English.
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-2 flex-1">
+                      <h2 className="text-3xl font-bold text-foreground">Free</h2>
+                      <p className="text-base text-muted-foreground">
+                        No signup required. Upload your lease and get instant analysis with detailed breakdowns and personalized insights.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <button 
+                      onClick={() => setCurrentPage('upload')}
+                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] transition-colors shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]"
+                    >
+                      Get access
+                    </button>
+                  </div>
                 </div>
-                <span className="text-xs text-slate-500 font-medium">Reliable</span>
+                
+                <div className="flex-1 flex justify-center">
+                  <div className="w-full max-w-lg aspect-[3/2] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
+                    <div className="w-full h-full flex items-center justify-center p-6">
+                      <AnalyzeLargeIcon />
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-purple-600" />
+            </div>
+
+            {/* Feature 2: Know Your Rights - Image Left on Desktop */}
+            <div className="container mx-auto max-w-6xl px-6">
+              {/* Mobile Layout */}
+              <div className="lg:hidden flex flex-col items-start justify-start gap-12 max-w-2xl mx-auto">
+                <div className="flex flex-col items-start justify-start gap-10 w-full">
+                  <div className="flex flex-col items-start justify-start gap-6 w-full">
+                    <div className="inline-flex h-10 px-8 py-2 items-center gap-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
+                      <p className="text-sm font-medium text-foreground">Know Your Rights</p>
+                    </div>
+                    <h1 className="text-3xl font-bold text-foreground">
+                      Understand your state's landlord-tenant laws
+                    </h1>
+                    <p className="text-base text-muted-foreground">
+                      Access comprehensive information about your rights as a tenant. Learn about security deposits, lease terminations, maintenance obligations, and legal protections specific to your state and city.
+                    </p>
+                  </div>
+                  
+                  <div className="flex flex-col items-start justify-start gap-6 w-full">
+                    <div className="flex flex-col items-start justify-start gap-4 w-full">
+                      <h3 className="text-xl font-bold text-foreground">50 States</h3>
+                      <p className="text-base text-muted-foreground">
+                        Complete coverage of landlord-tenant laws across all US states with city-specific regulations and requirements.
+                      </p>
+                    </div>
+                    
+                    <div className="flex flex-col items-start justify-start gap-4 w-full">
+                      <h3 className="text-xl font-bold text-foreground">Updated</h3>
+                      <p className="text-base text-muted-foreground">
+                        Current legal information with sources cited, so you always have accurate and reliable tenant law guidance.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <a 
+                      href="/laws"
+                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] transition-colors shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]"
+                    >
+                      Get access
+                    </a>
+                  </div>
                 </div>
-                <span className="text-xs text-slate-500 font-medium">Accurate</span>
+                
+                <div className="w-full aspect-[2/1] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
+                  <div className="w-full h-full flex items-center justify-center p-6">
+                    <KnowYourRightsLargeIcon />
+                  </div>
+                </div>
               </div>
-              <div className="flex flex-col items-center gap-2">
-                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                  <BarChart3 className="w-6 h-6 text-orange-600" />
+
+              {/* Desktop Layout - Image Left */}
+              <div className="hidden lg:flex flex-row-reverse justify-between items-center gap-20">
+                <div className="flex flex-col gap-8 flex-1 max-w-xl">
+                  <div className="flex flex-col gap-6">
+                    <div className="inline-flex h-10 px-8 py-2 items-center gap-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] w-fit">
+                      <p className="text-sm font-medium text-foreground">Know Your Rights</p>
+                    </div>
+                    <h1 className="text-4xl font-bold text-foreground">
+                      Understand your state's landlord-tenant laws
+                    </h1>
+                    <p className="text-base text-muted-foreground">
+                      Access comprehensive information about your rights as a tenant. Learn about security deposits, lease terminations, maintenance obligations, and legal protections specific to your state and city.
+                    </p>
+                  </div>
+                  
+                  <div className="flex gap-8">
+                    <div className="flex flex-col gap-2 flex-1">
+                      <h2 className="text-3xl font-bold text-foreground">50 States</h2>
+                      <p className="text-base text-muted-foreground">
+                        Complete coverage of landlord-tenant laws across all US states with city-specific regulations and requirements.
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-2 flex-1">
+                      <h2 className="text-3xl font-bold text-foreground">Updated</h2>
+                      <p className="text-base text-muted-foreground">
+                        Current legal information with sources cited, so you always have accurate and reliable tenant law guidance.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <a 
+                      href="/laws"
+                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] transition-colors shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]"
+                    >
+                      Get access
+                    </a>
+                  </div>
                 </div>
-                <span className="text-xs text-slate-500 font-medium">Smart</span>
+                
+                <div className="flex-1 flex justify-center">
+                  <div className="w-full max-w-2xl aspect-[2/1] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
+                    <div className="w-full h-full flex items-center justify-center p-6">
+                      <KnowYourRightsLargeIcon />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature 3: Market Dashboard - Image Right on Desktop */}
+            <div className="container mx-auto max-w-6xl px-6">
+              {/* Mobile Layout */}
+              <div className="lg:hidden flex flex-col items-start justify-start gap-12 max-w-2xl mx-auto">
+                <div className="flex flex-col items-start justify-start gap-10 w-full">
+                  <div className="flex flex-col items-start justify-start gap-6 w-full">
+                    <div className="inline-flex h-10 px-8 py-2 items-center gap-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
+                      <p className="text-sm font-medium text-foreground">Market Dashboard</p>
+                    </div>
+                    <h1 className="text-3xl font-bold text-foreground">
+                      Compare your rental data with market trends
+                    </h1>
+                    <p className="text-base text-muted-foreground">
+                      See how your lease compares to thousands of rentals in your area. Get instant insights on market rates, price percentiles, and whether you're getting a fair deal on your rental agreement.
+                    </p>
+                  </div>
+                  
+                  <div className="flex flex-col items-start justify-start gap-6 w-full">
+                    <div className="flex flex-col items-start justify-start gap-4 w-full">
+                      <h3 className="text-xl font-bold text-foreground">3,200+</h3>
+                      <p className="text-base text-muted-foreground">
+                        Active leases analyzed to provide you with accurate market comparisons and pricing insights for your area.
+                      </p>
+                    </div>
+                    
+                    <div className="flex flex-col items-start justify-start gap-4 w-full">
+                      <h3 className="text-xl font-bold text-foreground">Real-time</h3>
+                      <p className="text-base text-muted-foreground">
+                        Up-to-date market data helps you understand if your rent is competitive and make informed decisions.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <a 
+                      href="/dashboard"
+                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] transition-colors shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]"
+                    >
+                      Get access
+                    </a>
+                  </div>
+                </div>
+                
+                <div className="w-full aspect-[8/5] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
+                  <div className="w-full h-full flex items-center justify-center p-6">
+                    <MarketDashboardLargeIcon />
+                  </div>
+                </div>
+              </div>
+
+              {/* Desktop Layout - Image Right */}
+              <div className="hidden lg:flex justify-between items-center gap-20">
+                <div className="flex flex-col gap-8 flex-1 max-w-xl">
+                  <div className="flex flex-col gap-6">
+                    <div className="inline-flex h-10 px-8 py-2 items-center gap-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] w-fit">
+                      <p className="text-sm font-medium text-foreground">Market Dashboard</p>
+                    </div>
+                    <h1 className="text-4xl font-bold text-foreground">
+                      Compare your rental data with market trends
+                    </h1>
+                    <p className="text-base text-muted-foreground">
+                      See how your lease compares to thousands of rentals in your area. Get instant insights on market rates, price percentiles, and whether you're getting a fair deal on your rental agreement.
+                    </p>
+                  </div>
+                  
+                  <div className="flex gap-8">
+                    <div className="flex flex-col gap-2 flex-1">
+                      <h2 className="text-3xl font-bold text-foreground">3,200+</h2>
+                      <p className="text-base text-muted-foreground">
+                        Active leases analyzed to provide you with accurate market comparisons and pricing insights for your area.
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-2 flex-1">
+                      <h2 className="text-3xl font-bold text-foreground">Real-time</h2>
+                      <p className="text-base text-muted-foreground">
+                        Up-to-date market data helps you understand if your rent is competitive and make informed decisions.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <a 
+                      href="/dashboard"
+                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] transition-colors shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]"
+                    >
+                      Get access
+                    </a>
+            </div>
+          </div>
+
+                <div className="flex-1 flex justify-center">
+                  <div className="w-full max-w-2xl aspect-[8/5] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
+                    <div className="w-full h-full flex items-center justify-center p-6">
+                      <MarketDashboardLargeIcon />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </main>
+        
+        <Footer />
       </div>
     );
   }
@@ -364,25 +634,7 @@ export default function LeaseWiseApp() {
   if (currentPage === 'upload') {
     return (
       <div className="min-h-screen gradient-bg-modern">
-        {/* Navigation */}
-        <nav className="border-b border-slate-200/60 backdrop-blur-sm bg-white/80 sticky top-0 z-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-8 h-8 bg-slate-900 rounded-lg">
-                  <Shield className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-xl font-semibold text-slate-900">LeaseWise</span>
-              </div>
-              <button 
-                onClick={() => setCurrentPage('landing')}
-                className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-all duration-200"
-              >
-                Back
-              </button>
-            </div>
-          </div>
-        </nav>
+        <Header />
 
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
           <div className="text-center mb-12">
@@ -431,8 +683,8 @@ export default function LeaseWiseApp() {
                   isDragging
                     ? 'border-blue-500 bg-blue-50 scale-105'
                     : uploadedFile 
-                      ? 'border-slate-900 bg-slate-50/50' 
-                      : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50/50'
+                    ? 'border-slate-900 bg-slate-50/50' 
+                    : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50/50'
                 }`}
               >
                 <Upload className={`h-12 w-12 mx-auto mb-4 transition-all duration-200 ${
@@ -498,13 +750,13 @@ export default function LeaseWiseApp() {
               <button
                 onClick={handleAnalyze}
                 disabled={!address || !uploadedFile || isAnalyzing || uploadProgress < 100}
-                className="w-full px-8 py-4 bg-slate-900 text-white rounded-xl font-semibold text-lg hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:transform-none disabled:shadow-lg"
+                className="w-full inline-flex h-12 px-6 py-3 justify-center items-center gap-2 rounded-[10px] bg-[#6039B3] text-white font-semibold text-lg hover:bg-[#5030A0] active:bg-[#4829A0] disabled:bg-slate-300 disabled:cursor-not-allowed transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] disabled:shadow-none transform hover:-translate-y-0.5 disabled:transform-none"
               >
                 {isAnalyzing ? (
-                  <span className="flex items-center justify-center gap-3">
+                  <>
                     <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     Analyzing your lease...
-                  </span>
+                  </>
                 ) : (
                   'Analyze Lease'
                 )}
@@ -548,32 +800,12 @@ export default function LeaseWiseApp() {
 
   return (
     <div className="min-h-screen gradient-bg-modern">
-      {/* Navigation */}
-      <nav className="border-b border-slate-200/60 backdrop-blur-sm bg-white/80 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-8 h-8 bg-slate-900 rounded-lg">
-                <Shield className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-xl font-semibold text-slate-900">LeaseWise</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <a 
-                href="/dashboard"
-                className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-all duration-200 flex items-center gap-2"
-              >
-                <BarChart3 className="h-4 w-4" />
-                Dashboard
-              </a>
-              <a 
-                href="/laws"
-                className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-all duration-200 flex items-center gap-2"
-              >
-                <FileText className="h-4 w-4" />
-                Laws
-              </a>
-              <button className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-all duration-200 flex items-center gap-2">
+      <Header />
+
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Action Buttons */}
+        <div className="mb-8 flex items-center justify-end gap-3">
+          <button className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-all duration-200 flex items-center gap-2 bg-white">
                 <Download className="h-4 w-4" />
                 Export
               </button>
@@ -592,11 +824,6 @@ export default function LeaseWiseApp() {
                 New Analysis
               </button>
             </div>
-          </div>
-        </div>
-      </nav>
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">Lease Analysis Complete</h1>
@@ -772,7 +999,7 @@ export default function LeaseWiseApp() {
             </div>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }
