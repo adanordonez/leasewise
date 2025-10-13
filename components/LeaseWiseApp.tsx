@@ -586,7 +586,7 @@ export default function LeaseWiseApp() {
           </div>
         </main>
         
-        <Footer />
+        <Footer showDisclaimer />
       </div>
     );
   }
@@ -753,7 +753,7 @@ export default function LeaseWiseApp() {
           </div>
         </main>
         
-        <Footer />
+        <Footer showDisclaimer />
       </div>
     );
   }
@@ -963,7 +963,7 @@ export default function LeaseWiseApp() {
         )}
       </main>
       
-      <Footer />
+      <Footer showDisclaimer />
     </div>
   );
 }

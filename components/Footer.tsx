@@ -2,12 +2,25 @@
 
 import Image from 'next/image';
 
-export default function Footer() {
+interface FooterProps {
+  showDisclaimer?: boolean;
+}
+
+export default function Footer({ showDisclaimer = false }: FooterProps) {
   return (
     <footer className="bg-white border-t border-gray-300 py-12 mt-auto">
       <div className="container mx-auto px-6 max-w-4xl">
         {/* Main Content - All in front */}
         <div className="flex flex-col items-center gap-8">
+          {/* Disclaimer - Only shown on analyze pages */}
+          {showDisclaimer && (
+            <div className="w-full max-w-3xl bg-amber-50 border border-amber-200 rounded-lg p-6">
+              <p className="text-sm text-slate-700 leading-relaxed text-center">
+                <span className="font-bold text-amber-900">Disclaimer:</span> This is a beta product. It uses AI and may provide wrong information. Anything you upload will be shared with ChatGPT. LeaseWise provides legal information, not legal advice. Using LeaseWise does not create an attorney-client relationship. LeaseWise is not your attorney.
+              </p>
+            </div>
+          )}
+          
           {/* Logo and Navigation */}
           <div className="flex flex-col items-center gap-4">
             <a href="/" className="hover:opacity-80 transition-opacity">
