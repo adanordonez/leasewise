@@ -1,13 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, Shield, AlertCircle, CheckCircle, FileText, Calendar, Download, Plus, X, BarChart3, ArrowRight, Star, Menu } from 'lucide-react';
+import { Upload, AlertCircle, CheckCircle, FileText, Calendar, Download, Plus, X, BarChart3, ArrowRight, Menu } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { SmartExtractionIcon, RedFlagDetectionIcon, KnowYourRightsIcon } from './AnimatedIcons';
 import { KnowYourRightsLargeIcon } from './KnowYourRightsLargeIcon';
 import { AnalyzeLargeIcon } from './AnalyzeLargeIcon';
 import { MarketDashboardLargeIcon } from './MarketDashboardLargeIcon';
-import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -229,26 +228,30 @@ export default function LeaseWiseApp() {
         {/* Navbar */}
         <nav className="container mx-auto max-w-7xl py-6 px-6 relative z-50">
           <div className="flex justify-between items-center">
-              <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-[#6039B3] rounded-lg flex items-center justify-center">
-                  <Shield className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-slate-900">LeaseWise</span>
-            </div>
+              <button 
+                onClick={() => setCurrentPage('landing')}
+                className="hover:opacity-80 transition-opacity"
+              >
+              <span className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'var(--font-comfortaa)' }}>LeaseWise</span>
+            </button>
             
             <div className="hidden md:flex items-center gap-2">
+              {/* Temporarily hidden - Dashboard
               <a 
                 href="/dashboard"
                 className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
               >
                 Dashboard
               </a>
+              */}
+              {/* Temporarily hidden - Laws
               <a 
                 href="/laws"
                 className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
               >
                 Laws
               </a>
+              */}
               <button 
                 onClick={() => setCurrentPage('upload')}
                 className="inline-flex h-9 items-center justify-center gap-2 px-4 rounded-[10px] bg-[#6039B3] text-white font-semibold text-sm hover:bg-[#5030A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]"
@@ -268,8 +271,8 @@ export default function LeaseWiseApp() {
           <div className="pt-12 pb-8 flex justify-center items-start">
             <div className="max-w-2xl flex flex-col items-center gap-8">
               <div className="w-full flex flex-col items-center gap-6">
-                <div className="inline-flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg bg-white/80 backdrop-blur-sm">
-                  <span className="text-sm font-medium text-slate-600">AI-Powered Lease Analysis</span>
+                <div className="inline-flex h-10 px-8 py-2 items-center gap-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
+                  <p className="text-sm font-medium text-foreground">AI-Powered Lease Analysis</p>
               </div>
               
                 <h1 className="text-5xl sm:text-6xl font-bold text-center text-slate-900 leading-tight">
@@ -285,38 +288,25 @@ export default function LeaseWiseApp() {
                   onClick={() => setCurrentPage('upload')}
                 className="inline-flex h-12 items-center justify-center gap-2 px-8 rounded-[10px] bg-[#6039B3] text-white font-semibold text-base hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
                 >
-                Get Access
+                Analyze your lease
                 <ArrowRight className="w-4 h-4" />
                 </button>
               
-              <div className="flex flex-col items-center gap-2">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center -space-x-3">
-                    <Avatar className="w-10 h-10 border-2 border-white ring-2 ring-slate-100">
-                      <AvatarImage src="/pictures/1668121215339.jpeg" alt="Happy renter" />
-                    </Avatar>
-                    <Avatar className="w-10 h-10 border-2 border-white ring-2 ring-slate-100">
-                      <AvatarImage src="/pictures/1693251709501.jpeg" alt="Satisfied customer" />
-                    </Avatar>
-                    <Avatar className="w-10 h-10 border-2 border-white ring-2 ring-slate-100">
-                      <AvatarImage src="/pictures/1722123700269.jpeg" alt="Verified user" />
-                    </Avatar>
-                    <Avatar className="w-10 h-10 border-2 border-white ring-2 ring-slate-100">
-                      <AvatarImage src="/pictures/1735159522967.jpeg" alt="Trusted renter" />
-                    </Avatar>
-                  </div>
-                  
-                  <div className="flex items-center gap-0.5">
-                    <Star className="w-5 h-5 fill-yellow-500 text-yellow-500" />
-                    <Star className="w-5 h-5 fill-yellow-500 text-yellow-500" />
-                    <Star className="w-5 h-5 fill-yellow-500 text-yellow-500" />
-                    <Star className="w-5 h-5 fill-yellow-500 text-yellow-500" />
-                    <Star className="w-5 h-5 fill-yellow-500 text-yellow-500" />
-                  </div>
+              <div className="flex flex-col items-center gap-3">
+                <p className="text-sm font-medium text-center" style={{ color: '#737373', fontFamily: 'Georgia, serif' }}>
+                  Created by
+                </p>
+                <div className="relative h-8 w-auto">
+                  <Image
+                    src="/pictures/New+Logo+-+2022 (1).png"
+                    alt="University of Chicago Law School"
+                    width={140}
+                    height={32}
+                    className="object-contain"
+                  />
                 </div>
-                
-                <p className="text-sm text-slate-500 text-center">
-                  Trusted by thousands of renters
+                <p className="text-sm font-medium text-center" style={{ color: '#800000', fontFamily: 'Georgia, serif' }}>
+                  University of Chicago Law School • AI Lab
                 </p>
               </div>
             </div>
@@ -330,9 +320,6 @@ export default function LeaseWiseApp() {
               <div className="lg:hidden flex flex-col items-start justify-start gap-12 max-w-2xl mx-auto">
                 <div className="flex flex-col items-start justify-start gap-10 w-full">
                   <div className="flex flex-col items-start justify-start gap-6 w-full">
-                    <div className="inline-flex h-10 px-8 py-2 items-center gap-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
-                      <p className="text-sm font-medium text-foreground">AI-Powered Analysis</p>
-                    </div>
                     <h1 className="text-3xl font-bold text-foreground">
                       Get instant AI analysis of your lease
                     </h1>
@@ -362,7 +349,7 @@ export default function LeaseWiseApp() {
                       onClick={() => setCurrentPage('upload')}
                       className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] transition-colors shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]"
                     >
-                      Get access
+                      Analyze your lease now
                     </button>
                   </div>
                 </div>
@@ -378,9 +365,6 @@ export default function LeaseWiseApp() {
               <div className="hidden lg:flex justify-between items-center gap-20">
                 <div className="flex flex-col gap-8 flex-1 max-w-xl">
                   <div className="flex flex-col gap-6">
-                    <div className="inline-flex h-10 px-8 py-2 items-center gap-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] w-fit">
-                      <p className="text-sm font-medium text-foreground">AI-Powered Analysis</p>
-                    </div>
                     <h1 className="text-4xl font-bold text-foreground">
                       Get instant AI analysis of your lease
                     </h1>
@@ -409,7 +393,7 @@ export default function LeaseWiseApp() {
                       onClick={() => setCurrentPage('upload')}
                       className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] transition-colors shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]"
                     >
-                      Get access
+                      Analyze your lease now
                     </button>
                   </div>
                 </div>
@@ -430,14 +414,11 @@ export default function LeaseWiseApp() {
               <div className="lg:hidden flex flex-col items-start justify-start gap-12 max-w-2xl mx-auto">
                 <div className="flex flex-col items-start justify-start gap-10 w-full">
                   <div className="flex flex-col items-start justify-start gap-6 w-full">
-                    <div className="inline-flex h-10 px-8 py-2 items-center gap-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
-                      <p className="text-sm font-medium text-foreground">Know Your Rights</p>
-                    </div>
                     <h1 className="text-3xl font-bold text-foreground">
-                      Understand your state's landlord-tenant laws
+                      Understand your state's landlord-renter laws
                     </h1>
                     <p className="text-base text-muted-foreground">
-                      Access comprehensive information about your rights as a tenant. Learn about security deposits, lease terminations, maintenance obligations, and legal protections specific to your state and city.
+                      Access comprehensive information about your rights as a renter. Learn about security deposits, lease terminations, maintenance obligations, and legal protections specific to your state and city.
                     </p>
                   </div>
                   
@@ -445,25 +426,22 @@ export default function LeaseWiseApp() {
                     <div className="flex flex-col items-start justify-start gap-4 w-full">
                       <h3 className="text-xl font-bold text-foreground">50 States</h3>
                       <p className="text-base text-muted-foreground">
-                        Complete coverage of landlord-tenant laws across all US states with city-specific regulations and requirements.
+                        Complete coverage of landlord-renter laws across all US states with city-specific regulations and requirements.
                       </p>
                     </div>
                     
                     <div className="flex flex-col items-start justify-start gap-4 w-full">
                       <h3 className="text-xl font-bold text-foreground">Updated</h3>
                       <p className="text-base text-muted-foreground">
-                        Current legal information with sources cited, so you always have accurate and reliable tenant law guidance.
+                        Current legal information with sources cited, so you always have accurate and reliable renter law guidance.
                       </p>
                     </div>
                   </div>
                   
                   <div>
-                    <a 
-                      href="/laws"
-                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] transition-colors shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]"
-                    >
-                      Get access
-                    </a>
+                    <div className="inline-flex h-10 items-center justify-center gap-2 px-6 py-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
+                      <p className="text-sm font-medium text-[#800000]">Coming Soon</p>
+                    </div>
                   </div>
                 </div>
                 
@@ -478,14 +456,11 @@ export default function LeaseWiseApp() {
               <div className="hidden lg:flex flex-row-reverse justify-between items-center gap-20">
                 <div className="flex flex-col gap-8 flex-1 max-w-xl">
                   <div className="flex flex-col gap-6">
-                    <div className="inline-flex h-10 px-8 py-2 items-center gap-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] w-fit">
-                      <p className="text-sm font-medium text-foreground">Know Your Rights</p>
-                    </div>
                     <h1 className="text-4xl font-bold text-foreground">
-                      Understand your state's landlord-tenant laws
+                      Understand your state's landlord-renter laws
                     </h1>
                     <p className="text-base text-muted-foreground">
-                      Access comprehensive information about your rights as a tenant. Learn about security deposits, lease terminations, maintenance obligations, and legal protections specific to your state and city.
+                      Access comprehensive information about your rights as a renter. Learn about security deposits, lease terminations, maintenance obligations, and legal protections specific to your state and city.
                     </p>
                   </div>
                   
@@ -493,24 +468,21 @@ export default function LeaseWiseApp() {
                     <div className="flex flex-col gap-2 flex-1">
                       <h2 className="text-3xl font-bold text-foreground">50 States</h2>
                       <p className="text-base text-muted-foreground">
-                        Complete coverage of landlord-tenant laws across all US states with city-specific regulations and requirements.
+                        Complete coverage of landlord-renter laws across all US states with city-specific regulations and requirements.
                       </p>
                     </div>
                     <div className="flex flex-col gap-2 flex-1">
                       <h2 className="text-3xl font-bold text-foreground">Updated</h2>
                       <p className="text-base text-muted-foreground">
-                        Current legal information with sources cited, so you always have accurate and reliable tenant law guidance.
+                        Current legal information with sources cited, so you always have accurate and reliable renter law guidance.
                       </p>
                     </div>
                   </div>
                   
                   <div>
-                    <a 
-                      href="/laws"
-                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] transition-colors shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]"
-                    >
-                      Get access
-                    </a>
+                    <div className="inline-flex h-10 items-center justify-center gap-2 px-6 py-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
+                      <p className="text-sm font-medium text-[#800000]">Coming Soon</p>
+                    </div>
                   </div>
                 </div>
                 
@@ -524,15 +496,12 @@ export default function LeaseWiseApp() {
               </div>
             </div>
 
-            {/* Feature 3: Market Dashboard - Image Right on Desktop */}
+            {/* Feature 3: Market Dashboard */}
             <div className="container mx-auto max-w-6xl px-6">
               {/* Mobile Layout */}
               <div className="lg:hidden flex flex-col items-start justify-start gap-12 max-w-2xl mx-auto">
                 <div className="flex flex-col items-start justify-start gap-10 w-full">
                   <div className="flex flex-col items-start justify-start gap-6 w-full">
-                    <div className="inline-flex h-10 px-8 py-2 items-center gap-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
-                      <p className="text-sm font-medium text-foreground">Market Dashboard</p>
-                    </div>
                     <h1 className="text-3xl font-bold text-foreground">
                       Compare your rental data with market trends
                     </h1>
@@ -558,12 +527,9 @@ export default function LeaseWiseApp() {
                   </div>
                   
                   <div>
-                    <a 
-                      href="/dashboard"
-                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] transition-colors shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]"
-                    >
-                      Get access
-                    </a>
+                    <div className="inline-flex h-10 items-center justify-center gap-2 px-6 py-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
+                      <p className="text-sm font-medium text-[#800000]">Coming Soon</p>
+                    </div>
                   </div>
                 </div>
                 
@@ -578,9 +544,6 @@ export default function LeaseWiseApp() {
               <div className="hidden lg:flex justify-between items-center gap-20">
                 <div className="flex flex-col gap-8 flex-1 max-w-xl">
                   <div className="flex flex-col gap-6">
-                    <div className="inline-flex h-10 px-8 py-2 items-center gap-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] w-fit">
-                      <p className="text-sm font-medium text-foreground">Market Dashboard</p>
-                    </div>
                     <h1 className="text-4xl font-bold text-foreground">
                       Compare your rental data with market trends
                     </h1>
@@ -601,18 +564,15 @@ export default function LeaseWiseApp() {
                       <p className="text-base text-muted-foreground">
                         Up-to-date market data helps you understand if your rent is competitive and make informed decisions.
                       </p>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <a 
-                      href="/dashboard"
-                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] transition-colors shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]"
-                    >
-                      Get access
-                    </a>
             </div>
           </div>
+
+                  <div>
+                    <div className="inline-flex h-10 items-center justify-center gap-2 px-6 py-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
+                      <p className="text-sm font-medium text-[#800000]">Coming Soon</p>
+                    </div>
+                  </div>
+                </div>
 
                 <div className="flex-1 flex justify-center">
                   <div className="w-full max-w-2xl aspect-[8/5] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
@@ -634,7 +594,7 @@ export default function LeaseWiseApp() {
   if (currentPage === 'upload') {
     return (
       <div className="min-h-screen gradient-bg-modern">
-        <Header />
+        <Header showBackButton onBackClick={() => setCurrentPage('landing')} />
 
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
           <div className="text-center mb-12">
@@ -792,6 +752,8 @@ export default function LeaseWiseApp() {
             </div>
           </div>
         </main>
+        
+        <Footer />
       </div>
     );
   }
@@ -800,7 +762,7 @@ export default function LeaseWiseApp() {
 
   return (
     <div className="min-h-screen gradient-bg-modern">
-      <Header />
+      <Header showBackButton onBackClick={() => setCurrentPage('landing')} />
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Action Buttons */}
@@ -1000,6 +962,8 @@ export default function LeaseWiseApp() {
           </div>
         )}
       </main>
+      
+      <Footer />
     </div>
   );
 }

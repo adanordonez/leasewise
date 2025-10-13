@@ -10,11 +10,8 @@ export default function Footer() {
         <div className="flex flex-col items-center gap-8">
           {/* Logo and Navigation */}
           <div className="flex flex-col items-center gap-4">
-            <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">L</span>
-              </div>
-              <span className="text-xl font-bold text-slate-900">LeaseWise</span>
+            <a href="/" className="hover:opacity-80 transition-opacity">
+              <span className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'var(--font-comfortaa)' }}>LeaseWise</span>
             </a>
             
             <div className="flex flex-wrap items-center justify-center gap-8">
@@ -25,6 +22,7 @@ export default function Footer() {
                 Home
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-600 group-hover:w-full transition-all duration-300"></span>
               </a>
+              {/* Temporarily hidden - Laws
               <a 
                 href="/laws" 
                 className="text-base font-semibold text-slate-900 hover:text-purple-600 transition-colors relative group"
@@ -32,6 +30,8 @@ export default function Footer() {
                 Laws
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-600 group-hover:w-full transition-all duration-300"></span>
               </a>
+              */}
+              {/* Temporarily hidden - Dashboard
               <a 
                 href="/dashboard" 
                 className="text-base font-semibold text-slate-900 hover:text-purple-600 transition-colors relative group"
@@ -39,6 +39,7 @@ export default function Footer() {
                 Dashboard
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-600 group-hover:w-full transition-all duration-300"></span>
               </a>
+              */}
               <a 
                 href="/" 
                 className="text-base font-semibold text-slate-900 hover:text-purple-600 transition-colors relative group"
