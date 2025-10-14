@@ -1,0 +1,179 @@
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import LeaseReportHTML from '@/components/LeaseReportHTML';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
+interface AnalysisData {
+  summary: {
+    monthlyRent: string;
+    securityDeposit: string;
+    leaseStart: string;
+    leaseEnd: string;
+    noticePeriod: string;
+  };
+  redFlags: Array<{ issue: string; severity: string; explanation: string }>;
+  rights: Array<{ right: string; law: string }>;
+  keyDates: Array<{ event: string; date: string; description: string }>;
+  address: string;
+  userName: string;
+  userEmail: string;
+  comprehensiveLegalInfo?: Array<{
+    lawType: string;
+    explanation: string;
+    example: string;
+    sourceUrl?: string;
+    sourceTitle?: string;
+  }>;
+}
+
+/**
+ * Export lease report as PDF using HTML-to-canvas approach
+ * This creates a beautiful, branded PDF with proper styling
+ */
+export async function exportLeaseReportHTML(data: AnalysisData): Promise<void> {
+  try {
+    console.log('🎨 Starting HTML-to-PDF export...');
+
+    // Create a temporary container
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'absolute';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.top = '0';
+    tempContainer.style.width = '1400px'; // Extra wide for full content display
+    tempContainer.style.backgroundColor = 'white';
+    tempContainer.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+    document.body.appendChild(tempContainer);
+
+    // Render the HTML component with PDF flag
+    const htmlElement = createElement(LeaseReportHTML, { data, isPDF: true });
+    tempContainer.innerHTML = renderToStaticMarkup(htmlElement);
+
+    // Wait for fonts and images to load
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Increased for Street View image
+    
+    // Ensure all images are loaded
+    const images = tempContainer.querySelectorAll('img');
+    const imagePromises = Array.from(images).map(img => {
+      return new Promise((resolve) => {
+        if (img.complete) {
+          resolve(true);
+        } else {
+          img.onload = () => resolve(true);
+          img.onerror = () => resolve(true); // Continue even if image fails
+          // Timeout after 3 seconds
+          setTimeout(() => resolve(true), 3000);
+        }
+      });
+    });
+    
+    await Promise.all(imagePromises);
+
+    // Convert to canvas with high quality
+    const canvas = await html2canvas(tempContainer, {
+      scale: 2, // High quality
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      width: tempContainer.scrollWidth,
+      height: tempContainer.scrollHeight,
+      scrollX: 0,
+      scrollY: 0,
+      imageTimeout: 5000, // Wait up to 5 seconds for images
+      logging: false, // Disable console logging
+    });
+
+    // Clean up
+    document.body.removeChild(tempContainer);
+
+    // Create PDF
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF({
+      orientation: 'landscape', // Landscape for wider content
+      unit: 'mm',
+      format: 'a4',
+    });
+
+    // Calculate dimensions
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    const imgWidth = canvas.width;
+    const imgHeight = canvas.height;
+    const ratio = imgWidth / imgHeight;
+    
+    let finalWidth = pdfWidth;
+    let finalHeight = pdfWidth / ratio;
+
+    // If the content is taller than one page, scale it down
+    if (finalHeight > pdfHeight) {
+      finalHeight = pdfHeight;
+      finalWidth = pdfHeight * ratio;
+    }
+
+    // Center the content
+    const xOffset = (pdfWidth - finalWidth) / 2;
+    const yOffset = (pdfHeight - finalHeight) / 2;
+
+    // Add the image to PDF
+    pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+
+    // Generate filename
+    const timestamp = new Date().toISOString().split('T')[0];
+    const addressSlug = data.address ? 
+      data.address.split(',')[0].replace(/[^a-zA-Z0-9]/g, '_').substring(0, 20) : 
+      'lease';
+    const filename = `LeaseWise_Report_${addressSlug}_${timestamp}.pdf`;
+
+    // Save the PDF
+    pdf.save(filename);
+
+    console.log('✅ PDF export completed successfully!');
+
+  } catch (error) {
+    console.error('❌ Error exporting PDF:', error);
+    
+    // Fallback to simple text export
+    const fallbackContent = `
+LeaseWise - Lease Analysis Report
+Generated: ${new Date().toLocaleDateString()}
+
+TENANT INFORMATION
+Name: ${data.userName}
+Email: ${data.userEmail}
+Property: ${data.address}
+
+LEASE SUMMARY
+Monthly Rent: ${data.summary.monthlyRent}
+Security Deposit: ${data.summary.securityDeposit}
+Lease Start: ${data.summary.leaseStart}
+Lease End: ${data.summary.leaseEnd}
+Notice Period: ${data.summary.noticePeriod}
+
+RED FLAGS
+${data.redFlags.map(flag => `- ${flag.issue} (${flag.severity}): ${flag.explanation}`).join('\n')}
+
+Generated by LeaseWise | University of Chicago Law School AI Lab
+    `;
+
+    const blob = new Blob([fallbackContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `LeaseWise_Report_${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+}
+
+/**
+ * Alternative method using Puppeteer (server-side)
+ * This would be more reliable but requires server-side rendering
+ */
+export async function exportLeaseReportServer(data: AnalysisData): Promise<void> {
+  // This would require setting up Puppeteer on the server
+  // For now, we'll use the client-side approach above
+  console.log('Server-side PDF export not implemented yet');
+  await exportLeaseReportHTML(data);
+}

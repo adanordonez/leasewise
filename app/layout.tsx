@@ -11,7 +11,45 @@ const comfortaa = Comfortaa({
 
 export const metadata: Metadata = {
   title: "LeaseWise - AI Lease Analysis",
-  description: "Know your lease, know your rights",
+  description: "Know your lease, know your rights. Upload your lease PDF and get instant AI analysis of terms, rights, and red flags.",
+  keywords: ["lease analysis", "tenant rights", "AI legal analysis", "lease review", "rental agreement"],
+  authors: [{ name: "University of Chicago Law School AI Lab" }],
+  creator: "University of Chicago Law School AI Lab",
+  publisher: "LeaseWise",
+  
+  // Open Graph tags for social media sharing
+  openGraph: {
+    title: "LeaseWise - AI Lease Analysis",
+    description: "Upload your lease PDF and get instant AI analysis of terms, rights, and red flags. Know your lease, know your rights.",
+    url: "https://leasewise.app",
+    siteName: "LeaseWise",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 2552,
+        height: 1200,
+        alt: "LeaseWise - AI Lease Analysis",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  
+  // Twitter Card tags
+  twitter: {
+    card: "summary_large_image",
+    title: "LeaseWise - AI Lease Analysis",
+    description: "Upload your lease PDF and get instant AI analysis of terms, rights, and red flags.",
+    images: ["/og-image.png"],
+    creator: "@UChicagoLaw",
+  },
+  
+  // Additional meta tags
+  robots: {
+    index: true,
+    follow: true,
+  },
+  // Icons are auto-detected from app/icon.svg
 };
 
 export default function RootLayout({
@@ -21,7 +59,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} ${comfortaa.variable}`}>{children}</body>
+      <body className={`${inter.className} ${comfortaa.variable}`} suppressHydrationWarning>{children}</body>
     </html>
   );
 }

@@ -35,16 +35,36 @@ export interface StructuredLeaseData {
     issue: string;
     severity: string;
     explanation: string;
+    source?: string;
+    page_number?: number;
   }>;
   tenant_rights: Array<{
     right: string;
     law: string;
+    source?: string;
+    page_number?: number;
   }>;
   key_dates: Array<{
     event: string;
     date: string;
     description: string;
+    source?: string;
+    page_number?: number;
   }>;
+  sources?: {
+    monthly_rent?: string;
+    security_deposit?: string;
+    lease_start_date?: string;
+    lease_end_date?: string;
+    notice_period?: string;
+  };
+  page_numbers?: {
+    monthly_rent?: number;
+    security_deposit?: number;
+    lease_start_date?: number;
+    lease_end_date?: number;
+    notice_period?: number;
+  };
 }
 
 export async function analyzeLeaseStructured(leaseText: string, address: string): Promise<StructuredLeaseData> {
@@ -55,7 +75,9 @@ ${leaseText}
 
 TENANT ADDRESS: ${address}
 
-Extract and structure the following data into a comprehensive JSON format. Be as specific and accurate as possible:
+Extract and structure the following data into a comprehensive JSON format. Be as specific and accurate as possible.
+
+CRITICAL: For each piece of information you extract (especially red flags, tenant rights, and key dates), also provide the EXACT TEXT from the lease document where you found this information. This will be shown to users so they can verify the accuracy of the extraction.
 
 {
   "building_name": "Name of the building or complex",
@@ -88,22 +110,32 @@ Extract and structure the following data into a comprehensive JSON format. Be as
     {
       "issue": "Description of potential issue",
       "severity": "high|medium|low",
-      "explanation": "Why this is problematic"
+      "explanation": "Why this is problematic",
+      "source": "Exact text from the lease that shows this issue (1-3 sentences)"
     }
   ],
   "tenant_rights": [
     {
       "right": "Specific tenant right",
-      "law": "Relevant law or statute"
+      "law": "Relevant law or statute",
+      "source": "Exact text from the lease that mentions this right (1-3 sentences)"
     }
   ],
   "key_dates": [
     {
       "event": "Important event or deadline",
       "date": "YYYY-MM-DD",
-      "description": "What needs to happen"
+      "description": "What needs to happen",
+      "source": "Exact text from the lease that specifies this date (1-2 sentences)"
     }
-  ]
+  ],
+  "sources": {
+    "monthly_rent": "Exact text from lease showing the monthly rent amount",
+    "security_deposit": "Exact text from lease showing the security deposit amount",
+    "lease_start_date": "Exact text from lease showing the start date",
+    "lease_end_date": "Exact text from lease showing the end date",
+    "notice_period": "Exact text from lease showing the notice period requirements"
+  }
 }
 
 IMPORTANT:
@@ -113,7 +145,14 @@ IMPORTANT:
 - Include all financial terms and conditions
 - Focus on data that would be valuable for property management companies
 - Ensure all dates are in YYYY-MM-DD format
-- Make sure all monetary amounts are numbers, not strings`;
+- Make sure all monetary amounts are numbers, not strings
+
+SOURCE TEXT REQUIREMENTS:
+- For every source field, provide the EXACT text as it appears in the lease document
+- Keep source excerpts concise (1-3 sentences maximum)
+- Include enough context to be meaningful but not the entire section
+- If multiple sections relate to the same item, choose the most relevant excerpt
+- Do not paraphrase - use the exact wording from the lease`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",

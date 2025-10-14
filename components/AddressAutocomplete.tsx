@@ -43,6 +43,7 @@ export default function AddressAutocomplete({ onAddressSelect, value }: AddressA
           }}
           placeholder="Start typing your address..."
           className="w-full px-4 py-2 pl-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+          required
         />
       </div>
       

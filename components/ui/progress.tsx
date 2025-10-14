@@ -8,7 +8,7 @@ interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
 const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
   ({ className, value = 0, ...props }, ref) => (
     <div ref={ref} className={cn("relative h-2 w-full overflow-hidden rounded-full bg-gray-200", className)} {...props}>
-      <div className="h-full bg-purple-600 transition-all duration-500 ease-out" style={{ width: `${value}%` }} />
+      <div className="h-full bg-uchicago-maroon transition-all duration-500 ease-out" style={{ width: `${value}%` }} />
     </div>
   )
 )

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Loading Modal</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; background: #6039B3; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #5030A0; }
+    </style>
+</head>
+<body>
+    <h1>Test Loading Modal</h1>
+    <p>Click the button below to test if the loading modal appears:</p>
+    <button onclick="testModal()">Test Loading Modal</button>
+    
+    <script>
+        function testModal() {
+            // Simulate the modal state
+            console.log('Testing modal...');
+            
+            // Check if the modal component exists
+            const modal = document.querySelector('[data-testid="loading-modal"]');
+            if (modal) {
+                console.log('✅ Modal found!');
+                modal.style.display = 'block';
+            } else {
+                console.log('❌ Modal not found');
+            }
+        }
+    </script>
+</body>
+</html>
