@@ -11,9 +11,116 @@ import { analyzeRedFlagsWithRAG } from '@/lib/red-flags-analysis';
 import OpenAI from 'openai';
 // import { generateRAGScenarios } from '@/lib/rag-scenarios';
 
+// Set maximum duration for Vercel serverless functions
+export const maxDuration = 300; // 5 minutes (maximum for Pro plan)
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+// Helper function to add timeout to promises
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, errorMessage: string): Promise<T> {
+  const timeout = new Promise<never>((_, reject) => 
+    setTimeout(() => reject(new Error(errorMessage)), timeoutMs)
+  );
+  return Promise.race([promise, timeout]);
+}
+
+// Helper function to generate advice
+async function generateAdvice(question: string, leaseText: string): Promise<string> {
+  const advicePrompt = `You are a helpful assistant that explains lease terms in clear, professional language that's easy to understand.
+
+QUESTION: ${question}
+LEASE TEXT: ${leaseText}
+
+INSTRUCTIONS:
+1. Read the lease text carefully and identify the key terms
+2. Explain what this means for the tenant in clear, professional language
+3. Keep your answer to 2-3 sentences maximum
+4. Use clear, everyday language that any adult can understand
+5. Focus on practical implications and what the tenant should know
+6. Avoid legal jargon but don't oversimplify
+
+Write a clear explanation:`;
+
+  const adviceCompletion = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [
+      {
+        role: 'system',
+        content: 'You are a knowledgeable assistant who explains lease terms in clear, professional language. Use everyday language that any adult can understand, but don\'t oversimplify or use childish language. Be informative and practical.'
+      },
+      {
+        role: 'user',
+        content: advicePrompt
+      }
+    ],
+    temperature: 0.3,
+    max_tokens: 150
+  });
+
+  return adviceCompletion.choices[0].message.content?.trim() || `Here's what you should know about ${question.toLowerCase()}. Check your lease for specific details.`;
+}
+
+// Helper function to create fallback scenario
+function createFallbackScenario(question: string) {
+  return {
+    title: question,
+    advice: `Here's what you should know about ${question.toLowerCase()}. Check your lease and local laws for specific details.`,
+    leaseRelevantText: '',
+    pageNumber: 0,
+    severity: 'medium' as const,
+    actionableSteps: [
+      'Check your lease for specific terms',
+      'Contact your landlord if needed',
+      'Keep records of all communication',
+      'Know your local tenant rights'
+    ]
+  };
+}
+
+// Helper function to get scenario-specific action steps
+function getActionableSteps(question: string): string[] {
+  const lowerQuestion = question.toLowerCase();
+  
+  if (lowerQuestion.includes('something breaks') || lowerQuestion.includes('broken')) {
+    return [
+      'Report the problem to your landlord immediately',
+      'Take photos of the damage',
+      'Keep records of your request',
+      'Follow up if not fixed quickly'
+    ];
+  } else if (lowerQuestion.includes('security deposit')) {
+    return [
+      'Clean the apartment thoroughly before moving out',
+      'Take photos of the condition',
+      'Give proper notice to your landlord',
+      'Request a written list of any deductions'
+    ];
+  } else if (lowerQuestion.includes('entry') || lowerQuestion.includes('privacy')) {
+    return [
+      'Know your privacy rights in your state',
+      'Ask for proper notice before entry',
+      'Document any unauthorized entries',
+      'Contact local housing authority if needed'
+    ];
+  } else if (lowerQuestion.includes('breaking') || lowerQuestion.includes('early')) {
+    return [
+      'Check your lease for early termination fees',
+      'Give proper written notice',
+      'Try to find a replacement tenant',
+      'Understand the financial consequences'
+    ];
+  }
+  
+  // Default action steps
+  return [
+    'Check your lease for specific terms',
+    'Contact your landlord if needed',
+    'Keep records of all communication',
+    'Know your local tenant rights'
+  ];
+}
 
 // Helper function to chunk large text
 function chunkText(text: string, maxChunkSize: number = 50000): string[] {
@@ -46,6 +153,28 @@ function chunkText(text: string, maxChunkSize: number = 50000): string[] {
 }
 
 export async function POST(request: NextRequest) {
+  // Set a global timeout for the entire operation
+  const globalTimeout = new Promise<never>((_, reject) => 
+    setTimeout(() => reject(new Error('Analysis timeout - please try with a smaller file')), 240000) // 4 minutes
+  );
+  
+  const analysisPromise = performAnalysis(request);
+  
+  try {
+    return await Promise.race([analysisPromise, globalTimeout]);
+  } catch (error) {
+    console.error('Analysis failed:', error);
+    return NextResponse.json(
+      { 
+        error: error instanceof Error ? error.message : 'Analysis failed',
+        details: 'The lease analysis timed out. Please try with a smaller PDF file or contact support if the issue persists.'
+      },
+      { status: 504 }
+    );
+  }
+}
+
+async function performAnalysis(request: NextRequest) {
   try {
     const contentType = request.headers.get('content-type');
     let pdfUrl: string | null = null;
@@ -121,22 +250,25 @@ export async function POST(request: NextRequest) {
     const ragStats = rag.getStats();
     console.log('✅ RAG system ready:', ragStats);
     
-    // Analyze lease using RAG (no more hallucinations!)
+    // Analyze lease using RAG (no more hallucinations!) - with timeout protection
     console.log('🔍 Analyzing lease with RAG...');
-    const structuredData = await analyzeLeaseWithRAG(rag, address);
+    const structuredDataPromise = analyzeLeaseWithRAG(rag, address);
+    const structuredData = await withTimeout(structuredDataPromise, 60000, 'Lease analysis timeout');
     
     // Enrich with exact sources from chunks
     console.log('📄 Enriching with exact sources...');
-    const enrichedData = await enrichWithSources(structuredData, rag);
+    const enrichPromise = enrichWithSources(structuredData, rag);
+    const enrichedData = await withTimeout(enrichPromise, 30000, 'Source enrichment timeout');
     console.log('✨ Source attribution complete');
     
     // Analyze red flags with dedicated RAG system
     console.log('🚩 Analyzing red flags with RAG...');
-    const redFlags = await analyzeRedFlagsWithRAG(rag, {
+    const redFlagsPromise = analyzeRedFlagsWithRAG(rag, {
       monthlyRent: basicInfo.monthly_rent?.toString(),
       securityDeposit: basicInfo.security_deposit?.toString(),
       address: address
     });
+    const redFlags = await withTimeout(redFlagsPromise, 45000, 'Red flags analysis timeout');
     console.log(`✅ Found ${redFlags.length} red flags`);
     
     // Replace enrichedData red flags with the new RAG-based analysis
@@ -167,7 +299,7 @@ export async function POST(request: NextRequest) {
       console.error('❌ RAG Test Failed:', testError);
     }
     
-    // Generate scenarios with RAG
+    // Generate scenarios with RAG - optimized with timeout
     console.log('🔍 Generating scenarios with RAG...');
     const scenarioQuestions = [
       "What if something breaks?",
@@ -178,145 +310,44 @@ export async function POST(request: NextRequest) {
     
     const enhancedScenarios = [];
     
+    // Process scenarios with timeout protection
     for (const question of scenarioQuestions) {
       console.log(`🔍 Processing scenario: ${question}`);
       
       try {
-        // Use RAG to find relevant lease content
-        console.log(`   🔍 Searching RAG for: "${question}"`);
-        const relevantChunks = await rag.retrieve(question, 5);
-        console.log(`   📄 Found ${relevantChunks.length} chunks for: "${question}"`);
+        // Use RAG to find relevant lease content with timeout
+        const ragPromise = rag.retrieve(question, 3); // Reduced from 5 to 3 chunks
+        const relevantChunks = await withTimeout(ragPromise, 10000, `RAG timeout for ${question}`);
         
         if (relevantChunks.length === 0) {
           console.log(`   ❌ No relevant chunks found for: ${question}`);
-          enhancedScenarios.push({
-            title: question,
-            advice: `Here's what you should know about ${question.toLowerCase()}. Check your lease and local laws for specific details.`,
-            leaseRelevantText: '',
-            pageNumber: 0,
-            severity: 'medium',
-            actionableSteps: [
-              'Check your lease for specific terms',
-              'Contact your landlord if needed',
-              'Keep records of all communication',
-              'Know your local tenant rights'
-            ]
-          });
+          enhancedScenarios.push(createFallbackScenario(question));
           continue;
         }
 
         // Get the most relevant chunk
         const topChunk = relevantChunks[0];
         console.log(`   ✅ Found relevant chunk on page ${topChunk.pageNumber}`);
-        console.log(`   📝 Chunk text preview: "${topChunk.text.substring(0, 100)}..."`);
 
-        // Generate clear, professional advice using LLM
-        const advicePrompt = `You are a helpful assistant that explains lease terms in clear, professional language that's easy to understand.
-
-QUESTION: ${question}
-LEASE TEXT: ${topChunk.text}
-
-INSTRUCTIONS:
-1. Read the lease text carefully and identify the key terms
-2. Explain what this means for the tenant in clear, professional language
-3. Keep your answer to 2-3 sentences maximum
-4. Use clear, everyday language that any adult can understand
-5. Focus on practical implications and what the tenant should know
-6. Avoid legal jargon but don't oversimplify
-
-Write a clear explanation:`;
-
-        let simpleAdvice = `Here's what you should know about ${question.toLowerCase()}. Check your lease for specific details.`;
-
-        try {
-          const adviceCompletion = await openai.chat.completions.create({
-            model: 'gpt-4o',
-            messages: [
-              {
-                role: 'system',
-                content: 'You are a knowledgeable assistant who explains lease terms in clear, professional language. Use everyday language that any adult can understand, but don\'t oversimplify or use childish language. Be informative and practical.'
-              },
-              {
-                role: 'user',
-                content: advicePrompt
-              }
-            ],
-            temperature: 0.3,
-            max_tokens: 150
-          });
-
-          simpleAdvice = adviceCompletion.choices[0].message.content?.trim() || simpleAdvice;
-          
-          console.log(`   💡 Generated advice: "${simpleAdvice}"`);
-          
-        } catch (adviceError) {
-          console.error(`   ❌ Error generating advice:`, adviceError);
-        }
+        // Generate advice with timeout
+        const advicePromise = generateAdvice(question, topChunk.text);
+        const simpleAdvice = await withTimeout(advicePromise, 15000, `Advice generation timeout for ${question}`);
         
-        // Generate specific actionable steps based on the scenario
-        let actionableSteps = [
-          'Check your lease for specific terms',
-          'Contact your landlord if needed',
-          'Keep records of all communication'
-        ];
-
-        // Add scenario-specific steps
-        if (question.toLowerCase().includes('something breaks') || question.toLowerCase().includes('broken')) {
-          actionableSteps = [
-            'Report the problem to your landlord immediately',
-            'Take photos of the damage',
-            'Keep records of your request',
-            'Follow up if not fixed quickly'
-          ];
-        } else if (question.toLowerCase().includes('security deposit')) {
-          actionableSteps = [
-            'Clean the apartment thoroughly before moving out',
-            'Take photos of the condition',
-            'Give proper notice to your landlord',
-            'Request a written list of any deductions'
-          ];
-        } else if (question.toLowerCase().includes('entry') || question.toLowerCase().includes('privacy')) {
-          actionableSteps = [
-            'Know your privacy rights in your state',
-            'Ask for proper notice before entry',
-            'Document any unauthorized entries',
-            'Contact local housing authority if needed'
-          ];
-        } else if (question.toLowerCase().includes('breaking') || question.toLowerCase().includes('early')) {
-          actionableSteps = [
-            'Check your lease for early termination fees',
-            'Give proper written notice',
-            'Try to find a replacement tenant',
-            'Understand the financial consequences'
-          ];
-        }
+        // Get scenario-specific action steps
+        const actionableSteps = getActionableSteps(question);
 
         enhancedScenarios.push({
           title: question,
           advice: simpleAdvice,
           leaseRelevantText: topChunk.text,
           pageNumber: topChunk.pageNumber,
-          severity: 'medium',
+          severity: 'medium' as const,
           actionableSteps: actionableSteps
         });
         
       } catch (scenarioError) {
         console.error(`❌ Error processing scenario "${question}":`, scenarioError);
-        
-        // Fallback scenario
-        enhancedScenarios.push({
-          title: question,
-          advice: `Here's what you should know about ${question.toLowerCase()}. Check your lease and local laws for specific details.`,
-          leaseRelevantText: '',
-          pageNumber: 0,
-          severity: 'medium',
-          actionableSteps: [
-            'Check your lease for specific terms',
-            'Contact your landlord if needed',
-            'Keep records of all communication',
-            'Know your local tenant rights'
-          ]
-        });
+        enhancedScenarios.push(createFallbackScenario(question));
       }
     }
     
