@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     siteName: "LeaseWise",
     images: [
       {
-        url: "/api/og",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "LeaseWise - AI Lease Analysis",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "LeaseWise - AI Lease Analysis",
     description: "Upload your lease PDF and get instant AI analysis of terms, rights, and red flags.",
-    images: ["/api/og"],
+    images: ["/og-image.png"],
     creator: "@UChicagoLaw",
   },
   
