@@ -50,19 +50,39 @@ export default function DashboardMapboxMap({ leases }: DashboardMapboxMapProps) 
   const [hoveredLease, setHoveredLease] = useState<LeaseData | null>(null);
   const [hoverStats, setHoverStats] = useState<HoverStats | null>(null);
   const [zoom, setZoom] = useState(4);
-  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+  const [mapboxToken, setMapboxToken] = useState<string | null>(null);
 
-  // Geocoding function using Mapbox Geocoding API
+  // Get Mapbox token from server
+  useEffect(() => {
+    const getToken = async () => {
+      try {
+        const response = await fetch('/api/mapbox-token');
+        if (response.ok) {
+          const data = await response.json();
+          setMapboxToken(data.token);
+        }
+      } catch (error) {
+        console.error('Failed to get Mapbox token:', error);
+      }
+    };
+    getToken();
+  }, []);
+
+  // Geocoding function using server-side API
   const geocodeAddress = async (address: string): Promise<Coordinates | null> => {
     try {
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${mapboxToken}&limit=1`
-      );
-      const data = await response.json();
+      const response = await fetch('/api/geocode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address })
+      });
       
-      if (data.features && data.features.length > 0) {
-        const [lng, lat] = data.features[0].center;
-        return { lat, lng };
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          const [lng, lat] = data.coordinates;
+          return { lat, lng };
+        }
       }
       return null;
     } catch (error) {

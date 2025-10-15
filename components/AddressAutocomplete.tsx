@@ -19,14 +19,32 @@ export default function AddressAutocomplete({ onAddressSelect, value }: AddressA
     }
 
     try {
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}&country=US&types=address`
-      );
-      const data = await response.json();
-      setSuggestions(data.features || []);
-      setShowSuggestions(true);
+      const response = await fetch('/api/geocode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address: query })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          // For autocomplete, we'll create a mock feature structure
+          setSuggestions([{
+            place_name: data.placeName,
+            text: data.placeName.split(',')[0], // First part of address
+            center: data.coordinates
+          }]);
+          setShowSuggestions(true);
+        } else {
+          setSuggestions([]);
+        }
+      } else {
+        console.error('Geocoding failed:', response.statusText);
+        setSuggestions([]);
+      }
     } catch (error) {
       console.error('Address search error:', error);
+      setSuggestions([]);
     }
   };
 

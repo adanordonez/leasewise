@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin } from 'lucide-react';
 import Map, { Source, Layer } from 'react-map-gl';
 import usStatesGeoJSON from '@/lib/us-states-complete.json';
@@ -11,7 +11,23 @@ interface MapboxMapProps {
 
 export default function MapboxMap({ onStateSelect }: MapboxMapProps) {
   const [hoveredState, setHoveredState] = useState<any>(null);
-  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+  const [mapboxToken, setMapboxToken] = useState<string | null>(null);
+
+  // Get Mapbox token from server
+  useEffect(() => {
+    const getToken = async () => {
+      try {
+        const response = await fetch('/api/mapbox-token');
+        if (response.ok) {
+          const data = await response.json();
+          setMapboxToken(data.token);
+        }
+      } catch (error) {
+        console.error('Failed to get Mapbox token:', error);
+      }
+    };
+    getToken();
+  }, []);
 
   if (!mapboxToken) {
     return (

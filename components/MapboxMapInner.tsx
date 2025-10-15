@@ -86,29 +86,28 @@ export default function MapboxMapInner({ leases }: MapboxMapInnerProps) {
   const [selectedLease, setSelectedLease] = useState<LeaseData | null>(null);
   const [popupLocation, setPopupLocation] = useState<{ lat: number; lng: number } | null>(null);
 
-  // Geocoding function using Mapbox Geocoding API
+  // Geocoding function using server-side API
   const geocodeAddress = async (address: string): Promise<Coordinates | null> => {
     try {
-      const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-      if (!mapboxToken) {
-        console.warn('Mapbox token not found - using fallback coordinates');
-        // Return a fallback coordinate for Chicago (you can change this)
-        return { lat: 41.8781, lng: -87.6298 };
-      }
-
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${mapboxToken}&limit=1`
-      );
-      const data = await response.json();
+      const response = await fetch('/api/geocode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address })
+      });
       
-      if (data.features && data.features.length > 0) {
-        const [lng, lat] = data.features[0].center;
-        return { lat, lng };
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          const [lng, lat] = data.coordinates;
+          return { lat, lng };
+        }
       }
-      return null;
+      // Return a fallback coordinate for Chicago if geocoding fails
+      return { lat: 41.8781, lng: -87.6298 };
     } catch (error) {
       console.error('Geocoding error:', error);
-      return null;
+      // Return a fallback coordinate for Chicago if geocoding fails
+      return { lat: 41.8781, lng: -87.6298 };
     }
   };
 
@@ -183,7 +182,23 @@ export default function MapboxMapInner({ leases }: MapboxMapInnerProps) {
     return sum + (coords?.lng || 0);
   }, 0) / validLeases.length;
 
-  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+  const [mapboxToken, setMapboxToken] = useState<string | null>(null);
+
+  // Get Mapbox token from server
+  useEffect(() => {
+    const getToken = async () => {
+      try {
+        const response = await fetch('/api/mapbox-token');
+        if (response.ok) {
+          const data = await response.json();
+          setMapboxToken(data.token);
+        }
+      } catch (error) {
+        console.error('Failed to get Mapbox token:', error);
+      }
+    };
+    getToken();
+  }, []);
   
   if (!mapboxToken) {
     return (
