@@ -21,13 +21,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: "LeaseWise - AI Lease Analysis",
     description: "Upload your lease PDF and get instant AI analysis of terms, rights, and red flags. Know your lease, know your rights.",
-    url: "https://leasewise.app",
+    url: "https://getleasewise.com",
     siteName: "LeaseWise",
     images: [
       {
-        url: "/og-image.png",
-        width: 2552,
-        height: 1200,
+        url: "/api/og",
+        width: 1200,
+        height: 630,
         alt: "LeaseWise - AI Lease Analysis",
       },
     ],
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "LeaseWise - AI Lease Analysis",
     description: "Upload your lease PDF and get instant AI analysis of terms, rights, and red flags.",
-    images: ["/og-image.png"],
+    images: ["/api/og"],
     creator: "@UChicagoLaw",
   },
   
@@ -50,6 +50,16 @@ export const metadata: Metadata = {
     follow: true,
   },
   // Icons are auto-detected from app/icon.svg
+  
+  // Additional social media meta tags
+  other: {
+    'og:image:width': '1200',
+    'og:image:height': '630',
+    'og:image:type': 'image/png',
+    'twitter:image:alt': 'LeaseWise - AI Lease Analysis Platform',
+    'twitter:site': '@LeaseWiseApp',
+    'twitter:domain': 'getleasewise.com',
+  },
 };
 
 export default function RootLayout({
