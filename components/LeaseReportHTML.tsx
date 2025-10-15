@@ -14,6 +14,11 @@ interface AnalysisData {
   redFlags: Array<{ issue: string; severity: string; explanation: string }>;
   rights: Array<{ right: string; law: string }>;
   keyDates: Array<{ event: string; date: string; description: string }>;
+  scenarios: Array<{ 
+    title: string; 
+    advice: string; 
+    actionableSteps: string[];
+  }>;
   address: string;
   userName: string;
   userEmail: string;
@@ -85,7 +90,7 @@ export default function LeaseReportHTML({ data, className = '', isPDF = false }:
         </div>
       </div>
 
-      <div className={isPDF ? 'w-full px-4 py-6' : 'max-w-4xl mx-auto px-8 py-8'}>
+      <div className={isPDF ? 'w-full max-w-4xl mx-auto px-6 py-6' : 'max-w-4xl mx-auto px-8 py-8'}>
         {/* Tenant Information */}
         <div className="mb-12">
           <div className="flex items-center mb-6">
@@ -156,35 +161,35 @@ export default function LeaseReportHTML({ data, className = '', isPDF = false }:
             <h3 className={`${isPDF ? 'text-xl' : 'text-2xl'} font-bold text-slate-900`}>Lease Summary</h3>
           </div>
           
-          <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+          <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm table-container">
             <div className={isPDF ? '' : 'overflow-x-auto'}>
-              <table className="w-full">
+              <table className="w-full" style={{ tableLayout: 'auto' }}>
                 <thead>
                   <tr className="bg-slate-700 text-white">
-                    <th className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} text-left font-semibold text-sm`}>Item</th>
-                    <th className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} text-left font-semibold text-sm`}>Details</th>
+                    <th className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} text-left font-semibold text-sm`} style={{ width: '30%' }}>Item</th>
+                    <th className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} text-left font-semibold text-sm`} style={{ width: '70%' }}>Details</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="border-b border-slate-100 hover:bg-slate-50">
-                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} font-medium text-slate-700 text-sm`}>Monthly Rent</td>
-                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} text-slate-900 text-sm`}>{data.summary.monthlyRent || 'Not specified'}</td>
+                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} font-medium text-slate-700 text-sm align-top`} style={{ verticalAlign: 'top' }}>Monthly Rent</td>
+                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} text-slate-900 text-sm align-top`} style={{ verticalAlign: 'top', lineHeight: '1.5' }}>{data.summary.monthlyRent || 'Not specified'}</td>
                   </tr>
                   <tr className="border-b border-slate-100 hover:bg-slate-50 bg-slate-50">
-                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} font-medium text-slate-700 text-sm`}>Security Deposit</td>
-                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} text-slate-900 text-sm`}>{data.summary.securityDeposit || 'Not specified'}</td>
+                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} font-medium text-slate-700 text-sm align-top`} style={{ verticalAlign: 'top' }}>Security Deposit</td>
+                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} text-slate-900 text-sm align-top`} style={{ verticalAlign: 'top', lineHeight: '1.5' }}>{data.summary.securityDeposit || 'Not specified'}</td>
                   </tr>
                   <tr className="border-b border-slate-100 hover:bg-slate-50">
-                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} font-medium text-slate-700 text-sm`}>Lease Start</td>
-                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} text-slate-900 text-sm`}>{formatDate(data.summary.leaseStart)}</td>
+                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} font-medium text-slate-700 text-sm align-top`} style={{ verticalAlign: 'top' }}>Lease Start</td>
+                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} text-slate-900 text-sm align-top`} style={{ verticalAlign: 'top', lineHeight: '1.5' }}>{formatDate(data.summary.leaseStart)}</td>
                   </tr>
                   <tr className="border-b border-slate-100 hover:bg-slate-50 bg-slate-50">
-                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} font-medium text-slate-700 text-sm`}>Lease End</td>
-                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} text-slate-900 text-sm`}>{formatDate(data.summary.leaseEnd)}</td>
+                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} font-medium text-slate-700 text-sm align-top`} style={{ verticalAlign: 'top' }}>Lease End</td>
+                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} text-slate-900 text-sm align-top`} style={{ verticalAlign: 'top', lineHeight: '1.5' }}>{formatDate(data.summary.leaseEnd)}</td>
                   </tr>
                   <tr className="hover:bg-slate-50">
-                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} font-medium text-slate-700 text-sm`}>Notice Period</td>
-                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} text-slate-900 text-sm`}>{data.summary.noticePeriod || 'Not specified'}</td>
+                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} font-medium text-slate-700 text-sm align-top`} style={{ verticalAlign: 'top' }}>Notice Period</td>
+                    <td className={`${isPDF ? 'px-4 py-3' : 'px-6 py-4'} text-slate-900 text-sm align-top`} style={{ verticalAlign: 'top', lineHeight: '1.5' }}>{data.summary.noticePeriod || 'Not specified'}</td>
                   </tr>
                 </tbody>
               </table>
@@ -226,25 +231,31 @@ export default function LeaseReportHTML({ data, className = '', isPDF = false }:
               <h3 className="text-xl font-bold text-slate-900">Know Your Renter Rights</h3>
             </div>
             
-            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm table-container">
               <div className="">
-                <table className="w-full">
+                <table className="w-full" style={{ tableLayout: 'auto' }}>
                   <thead>
                     <tr className="bg-slate-700 text-white">
-                      <th className="px-3 py-2 text-left font-semibold text-sm">Law Type</th>
-                      <th className="px-3 py-2 text-left font-semibold text-sm">Explanation</th>
-                      <th className="px-3 py-2 text-left font-semibold text-sm">How It Applies to You</th>
-                      <th className="px-3 py-2 text-left font-semibold text-sm">Reference</th>
+                      <th className="px-3 py-2 text-left font-semibold text-sm" style={{ width: '20%' }}>Law Type</th>
+                      <th className="px-3 py-2 text-left font-semibold text-sm" style={{ width: '35%' }}>Explanation</th>
+                      <th className="px-3 py-2 text-left font-semibold text-sm" style={{ width: '35%' }}>How It Applies to You</th>
+                      <th className="px-3 py-2 text-left font-semibold text-sm" style={{ width: '10%' }}>Reference</th>
                     </tr>
                   </thead>
                   <tbody>
                     {data.comprehensiveLegalInfo && data.comprehensiveLegalInfo.length > 0 ? (
                       data.comprehensiveLegalInfo.map((item, index) => (
                         <tr key={index} className={`border-b border-slate-100 hover:bg-slate-50 ${index % 2 === 1 ? 'bg-slate-50' : ''}`}>
-                          <td className="px-3 py-2 font-medium text-slate-700 text-sm">{item.lawType}</td>
-                          <td className="px-3 py-2 text-slate-900 text-sm">{item.explanation}</td>
-                          <td className="px-3 py-2 text-slate-700 italic text-sm">{item.example}</td>
-                          <td className="px-3 py-2 text-slate-600 text-xs">
+                          <td className="px-3 py-3 font-medium text-slate-700 text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto' }}>
+                            {item.lawType}
+                          </td>
+                          <td className="px-3 py-3 text-slate-900 text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto', lineHeight: '1.5' }}>
+                            {item.explanation}
+                          </td>
+                          <td className="px-3 py-3 text-slate-700 italic text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto', lineHeight: '1.5' }}>
+                            {item.example}
+                          </td>
+                          <td className="px-3 py-3 text-slate-600 text-xs align-top" style={{ verticalAlign: 'top', minHeight: 'auto' }}>
                             {item.sourceTitle || 'Legal Reference'}
                           </td>
                         </tr>
@@ -253,34 +264,34 @@ export default function LeaseReportHTML({ data, className = '', isPDF = false }:
                       // Fallback content if no data available
                       <>
                         <tr className="border-b border-slate-100 hover:bg-slate-50">
-                          <td className="px-3 py-2 font-medium text-slate-700 text-sm">Security Deposit Terms</td>
-                          <td className="px-3 py-2 text-slate-900 text-sm">State laws regulate how landlords handle security deposits, including return timelines and interest requirements.</td>
-                          <td className="px-3 py-2 text-slate-700 italic text-sm">Your security deposit must be returned within the state-mandated timeframe, typically 30-45 days after lease end.</td>
-                          <td className="px-3 py-2 text-slate-600 text-xs">State Landlord-Tenant Law</td>
+                          <td className="px-3 py-3 font-medium text-slate-700 text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto' }}>Security Deposit Terms</td>
+                          <td className="px-3 py-3 text-slate-900 text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto', lineHeight: '1.5' }}>State laws regulate how landlords handle security deposits, including return timelines and interest requirements.</td>
+                          <td className="px-3 py-3 text-slate-700 italic text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto', lineHeight: '1.5' }}>Your security deposit must be returned within the state-mandated timeframe, typically 30-45 days after lease end.</td>
+                          <td className="px-3 py-3 text-slate-600 text-xs align-top" style={{ verticalAlign: 'top', minHeight: 'auto' }}>State Landlord-Tenant Law</td>
                         </tr>
                         <tr className="border-b border-slate-100 hover:bg-slate-50 bg-slate-50">
-                          <td className="px-3 py-2 font-medium text-slate-700 text-sm">Rent Amount and Increases</td>
-                          <td className="px-3 py-2 text-slate-900 text-sm">Laws govern when and how landlords can increase rent, including notice requirements.</td>
-                          <td className="px-3 py-2 text-slate-700 italic text-sm">Your landlord must provide proper notice before any rent increase, typically 30-60 days depending on state law.</td>
-                          <td className="px-3 py-2 text-slate-600 text-xs">State Landlord-Tenant Law</td>
+                          <td className="px-3 py-3 font-medium text-slate-700 text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto' }}>Rent Amount and Increases</td>
+                          <td className="px-3 py-3 text-slate-900 text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto', lineHeight: '1.5' }}>Laws govern when and how landlords can increase rent, including notice requirements.</td>
+                          <td className="px-3 py-3 text-slate-700 italic text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto', lineHeight: '1.5' }}>Your landlord must provide proper notice before any rent increase, typically 30-60 days depending on state law.</td>
+                          <td className="px-3 py-3 text-slate-600 text-xs align-top" style={{ verticalAlign: 'top', minHeight: 'auto' }}>State Landlord-Tenant Law</td>
                         </tr>
                         <tr className="border-b border-slate-100 hover:bg-slate-50">
-                          <td className="px-3 py-2 font-medium text-slate-700 text-sm">Maintenance and Repairs</td>
-                          <td className="px-3 py-2 text-slate-900 text-sm">Landlords have legal obligations to maintain habitable living conditions and make necessary repairs.</td>
-                          <td className="px-3 py-2 text-slate-700 italic text-sm">Your landlord must maintain essential services like heat, plumbing, and structural integrity. Document all repair requests.</td>
-                          <td className="px-3 py-2 text-slate-600 text-xs">State Landlord-Tenant Law</td>
+                          <td className="px-3 py-3 font-medium text-slate-700 text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto' }}>Maintenance and Repairs</td>
+                          <td className="px-3 py-3 text-slate-900 text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto', lineHeight: '1.5' }}>Landlords have legal obligations to maintain habitable living conditions and make necessary repairs.</td>
+                          <td className="px-3 py-3 text-slate-700 italic text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto', lineHeight: '1.5' }}>Your landlord must maintain essential services like heat, plumbing, and structural integrity. Document all repair requests.</td>
+                          <td className="px-3 py-3 text-slate-600 text-xs align-top" style={{ verticalAlign: 'top', minHeight: 'auto' }}>State Landlord-Tenant Law</td>
                         </tr>
                         <tr className="border-b border-slate-100 hover:bg-slate-50 bg-slate-50">
-                          <td className="px-3 py-2 font-medium text-slate-700 text-sm">Entry and Privacy Rights</td>
-                          <td className="px-3 py-2 text-slate-900 text-sm">Tenants have privacy rights that limit when and how landlords can enter rental units.</td>
-                          <td className="px-3 py-2 text-slate-700 italic text-sm">Your landlord must provide reasonable notice (usually 24-48 hours) before entering, except in emergencies.</td>
-                          <td className="px-3 py-2 text-slate-600 text-xs">State Landlord-Tenant Law</td>
+                          <td className="px-3 py-3 font-medium text-slate-700 text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto' }}>Entry and Privacy Rights</td>
+                          <td className="px-3 py-3 text-slate-900 text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto', lineHeight: '1.5' }}>Tenants have privacy rights that limit when and how landlords can enter rental units.</td>
+                          <td className="px-3 py-3 text-slate-700 italic text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto', lineHeight: '1.5' }}>Your landlord must provide reasonable notice (usually 24-48 hours) before entering, except in emergencies.</td>
+                          <td className="px-3 py-3 text-slate-600 text-xs align-top" style={{ verticalAlign: 'top', minHeight: 'auto' }}>State Landlord-Tenant Law</td>
                         </tr>
                         <tr className="border-b border-slate-100 hover:bg-slate-50">
-                          <td className="px-3 py-2 font-medium text-slate-700 text-sm">Eviction Procedures</td>
-                          <td className="px-3 py-2 text-slate-900 text-sm">Strict legal procedures govern how landlords can terminate tenancies and evict tenants.</td>
-                          <td className="px-3 py-2 text-slate-700 italic text-sm">Your landlord must follow proper legal procedures and cannot lock you out or remove belongings without court order.</td>
-                          <td className="px-3 py-2 text-slate-600 text-xs">State Landlord-Tenant Law</td>
+                          <td className="px-3 py-3 font-medium text-slate-700 text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto' }}>Eviction Procedures</td>
+                          <td className="px-3 py-3 text-slate-900 text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto', lineHeight: '1.5' }}>Strict legal procedures govern how landlords can terminate tenancies and evict tenants.</td>
+                          <td className="px-3 py-3 text-slate-700 italic text-sm align-top" style={{ verticalAlign: 'top', minHeight: 'auto', lineHeight: '1.5' }}>Your landlord must follow proper legal procedures and cannot lock you out or remove belongings without court order.</td>
+                          <td className="px-3 py-3 text-slate-600 text-xs align-top" style={{ verticalAlign: 'top', minHeight: 'auto' }}>State Landlord-Tenant Law</td>
                         </tr>
                       </>
                     )}
@@ -302,27 +313,104 @@ export default function LeaseReportHTML({ data, className = '', isPDF = false }:
               </h3>
             </div>
             
-            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm table-container">
               <div className="">
-                <table className="w-full">
+                <table className="w-full" style={{ tableLayout: 'auto' }}>
                   <thead>
                     <tr className="bg-slate-700 text-white">
-                      <th className={`${isPDF ? 'px-3 py-2' : 'px-6 py-4'} text-left font-semibold text-sm`}>Event</th>
-                      <th className={`${isPDF ? 'px-3 py-2' : 'px-6 py-4'} text-left font-semibold text-sm`}>Date</th>
-                      <th className={`${isPDF ? 'px-3 py-2' : 'px-6 py-4'} text-left font-semibold text-sm`}>Description</th>
+                      <th className={`${isPDF ? 'px-3 py-2' : 'px-6 py-4'} text-left font-semibold text-sm`} style={{ width: '25%' }}>Event</th>
+                      <th className={`${isPDF ? 'px-3 py-2' : 'px-6 py-4'} text-left font-semibold text-sm`} style={{ width: '20%' }}>Date</th>
+                      <th className={`${isPDF ? 'px-3 py-2' : 'px-6 py-4'} text-left font-semibold text-sm`} style={{ width: '55%' }}>Description</th>
                     </tr>
                   </thead>
                   <tbody>
                     {data.keyDates.map((date, index) => (
                       <tr key={index} className={`border-b border-slate-100 hover:bg-slate-50 ${index % 2 === 1 ? 'bg-slate-50' : ''}`}>
-                        <td className={`${isPDF ? 'px-3 py-2' : 'px-6 py-4'} font-medium text-slate-700 text-sm`}>{date.event}</td>
-                        <td className={`${isPDF ? 'px-3 py-2' : 'px-6 py-4'} text-slate-900 text-sm`}>{formatDate(date.date)}</td>
-                        <td className={`${isPDF ? 'px-3 py-2' : 'px-6 py-4'} text-slate-700 text-sm`}>{date.description}</td>
+                        <td className={`${isPDF ? 'px-3 py-2' : 'px-6 py-4'} font-medium text-slate-700 text-sm align-top`} style={{ verticalAlign: 'top' }}>{date.event}</td>
+                        <td className={`${isPDF ? 'px-3 py-2' : 'px-6 py-4'} text-slate-900 text-sm align-top`} style={{ verticalAlign: 'top' }}>{formatDate(date.date)}</td>
+                        <td className={`${isPDF ? 'px-3 py-2' : 'px-6 py-4'} text-slate-700 text-sm align-top`} style={{ verticalAlign: 'top', lineHeight: '1.5' }}>{date.description}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Common Scenarios */}
+        {data.scenarios && data.scenarios.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center mb-6">
+              <FileText className={`${isPDF ? 'w-5 h-5' : 'w-6 h-6'} text-slate-600 mr-3`} />
+              <h3 className={`${isPDF ? 'text-xl' : 'text-2xl'} font-bold text-slate-900`}>
+                Common Scenarios ({data.scenarios.length})
+              </h3>
+            </div>
+            
+            <div className="space-y-6">
+              {data.scenarios.map((scenario, index) => (
+                <div key={index} className="bg-white rounded-lg border border-slate-200 p-6 shadow-sm">
+                  {/* Scenario Title */}
+                  <h4 className={`${isPDF ? 'text-lg' : 'text-xl'} font-semibold text-slate-900 mb-4`}>
+                    {index + 1}. {scenario.title}
+                  </h4>
+                  
+                  {/* Scenario Advice */}
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 mb-4 border border-blue-200">
+                    <p 
+                      className={`${isPDF ? 'text-sm' : 'text-base'} text-slate-800 leading-relaxed`}
+                      style={isPDF ? { 
+                        wordBreak: 'break-word',
+                        hyphens: 'auto',
+                        pageBreakInside: 'avoid',
+                        orphans: 3,
+                        widows: 3
+                      } : {}}
+                    >
+                      {scenario.advice}
+                    </p>
+                  </div>
+                  
+                  {/* Action Steps */}
+                  {scenario.actionableSteps && scenario.actionableSteps.length > 0 && (
+                    <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                      <div className="flex items-center mb-3">
+                        <Shield className="w-4 h-4 text-green-600 mr-2" />
+                        <span className={`${isPDF ? 'text-sm' : 'text-base'} font-semibold text-green-700`}>
+                          What to do:
+                        </span>
+                      </div>
+                      <ol className="space-y-2">
+                        {scenario.actionableSteps.map((step, stepIndex) => (
+                          <li 
+                            key={stepIndex} 
+                            className="flex items-start gap-3"
+                            style={isPDF ? { 
+                              pageBreakInside: 'avoid',
+                              orphans: 2,
+                              widows: 2
+                            } : {}}
+                          >
+                            <span className="flex-shrink-0 w-6 h-6 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-sm font-semibold">
+                              {stepIndex + 1}
+                            </span>
+                            <span 
+                              className={`${isPDF ? 'text-sm' : 'text-base'} text-green-900 leading-relaxed`}
+                              style={isPDF ? { 
+                                wordBreak: 'break-word',
+                                hyphens: 'auto'
+                              } : {}}
+                            >
+                              {step}
+                            </span>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         )}

@@ -23,7 +23,7 @@ export class LeaseRAGSystem {
     
     // Step 1: Chunk the text with page tracking
     console.log('Creating chunks from', pages.length, 'pages...');
-    this.chunks = chunkTextWithPages(pages, 800, 150); // Increased chunk size from 500 to 800, overlap from 100 to 150
+    this.chunks = chunkTextWithPages(pages, 1500, 250); // Increased chunk size to 1500 for even better context, overlap to 250
     console.log('Created', this.chunks.length, 'chunks');
 
     // Step 2: Create index for fast keyword search (fallback)

@@ -11,6 +11,7 @@ export interface RedFlag {
   explanation: string;
   source: string;
   page_number?: number;
+  chunk_index?: string;
 }
 
 /**
@@ -27,16 +28,39 @@ export async function analyzeRedFlagsWithRAG(
 ): Promise<RedFlag[]> {
   console.log('🚩 Starting dedicated red flags analysis with RAG...');
 
-  // STEP 1: Use RAG to find potentially problematic clauses
+  // STEP 1: Use RAG to find potentially problematic clauses with more specific queries
   const problematicQueries = [
-    'excessive fees, penalties, or charges beyond standard rent',
-    'unusual restrictions on tenant behavior or property use',
-    'landlord rights to enter property without proper notice',
-    'clauses about repairs, maintenance, or property damage liability',
-    'security deposit terms, deductions, or return conditions',
-    'lease termination, eviction, or notice requirements',
-    'clauses about rent increases or additional payments',
-    'liability waivers or hold harmless agreements',
+    // Financial issues
+    'excessive fees penalties charges beyond standard rent monthly payment',
+    'late fees interest charges additional payments beyond rent',
+    'security deposit deductions cleaning fees damage charges',
+    'rent increases rent adjustments additional rent charges',
+    
+    // Tenant restrictions and obligations
+    'tenant restrictions property use behavior rules limitations',
+    'guest policies visitor restrictions occupancy limits',
+    'pet policies animal restrictions pet fees deposits',
+    'maintenance responsibilities tenant obligations repairs',
+    
+    // Landlord rights and access
+    'landlord entry property access without notice emergency',
+    'landlord rights property inspection maintenance access',
+    'property inspection entry rights landlord access',
+    
+    // Legal and liability issues
+    'liability waivers hold harmless agreements tenant liability',
+    'indemnification clauses tenant responsibility damage liability',
+    'insurance requirements tenant insurance liability coverage',
+    
+    // Termination and eviction
+    'lease termination early termination penalties fees',
+    'eviction procedures notice requirements termination rights',
+    'default breach lease termination conditions',
+    
+    // Special clauses
+    'waiver rights tenant rights waiver legal rights',
+    'modification alterations property changes tenant improvements',
+    'assignment subletting lease transfer tenant rights',
   ];
 
   console.log('🔍 Searching for problematic clauses...');
@@ -48,7 +72,7 @@ export async function analyzeRedFlagsWithRAG(
   }> = [];
 
   for (const query of problematicQueries) {
-    const chunks = await rag.retrieve(query, 5); // Top 5 for each query (increased from 3)
+    const chunks = await rag.retrieve(query, 7); // Top 7 for each query (increased for better coverage)
     chunks.forEach(chunk => {
       relevantChunks.push({
         text: chunk.text,
@@ -86,9 +110,10 @@ ${chunk.text}
 CRITICAL INSTRUCTIONS:
 1. Only flag clauses that are ACTUALLY problematic (unfair fees, illegal restrictions, unfair liability, etc.)
 2. Do NOT flag standard, reasonable lease terms (normal rent, standard deposits, reasonable rules)
-3. For each red flag, quote the EXACT problematic text from the clause
+3. For each red flag, use the ENTIRE relevant chunk text as the source (not just a small excerpt)
 4. Explain WHY it's problematic and what the fair alternative should be
 5. Rate severity: HIGH (likely illegal/very unfair), MEDIUM (unfair but common), LOW (potentially problematic)
+6. IMPORTANT: Use the full chunk text provided below - don't extract just a small portion
 
 Return JSON array:
 {
@@ -96,9 +121,10 @@ Return JSON array:
     {
       "issue": "Brief title of the problem",
       "severity": "high" | "medium" | "low",
-      "explanation": "Why this is problematic and what's fair",
-      "source": "EXACT text from the lease clause (20-50 words)",
-      "page_number": page number where found
+      "explanation": "Detailed explanation of why this is problematic and what the fair alternative should be. Include legal context and tenant rights implications.",
+      "source": "Use the COMPLETE chunk text from the lease clause above (the entire text block, not just a small excerpt)",
+      "page_number": page number where found,
+      "chunk_index": "Reference the chunk number from above (e.g., 'Clause 1')"
     }
   ]
 }
@@ -128,11 +154,36 @@ ONLY RETURN JSON. Be strict - only flag GENUINE problems.`;
 
   console.log(`✅ Identified ${redFlags.length} red flags`);
   
-  // Log each red flag for debugging
-  redFlags.forEach((flag: RedFlag, i: number) => {
-    console.log(`   ${i + 1}. [${flag.severity.toUpperCase()}] ${flag.issue}`);
+  // Post-process to ensure we use full chunk text instead of short excerpts
+  const enhancedRedFlags = redFlags.map((flag: RedFlag) => {
+    if (flag.chunk_index) {
+      // Extract chunk number from "Clause X" format
+      const chunkMatch = flag.chunk_index.match(/Clause (\d+)/);
+      if (chunkMatch) {
+        const chunkNumber = parseInt(chunkMatch[1]) - 1; // Convert to 0-based index
+        if (chunkNumber >= 0 && chunkNumber < uniqueChunks.length) {
+          const fullChunk = uniqueChunks[chunkNumber];
+          console.log(`📝 Replacing short excerpt with full chunk text for: ${flag.issue}`);
+          console.log(`   Original: "${flag.source.slice(0, 50)}..."`);
+          console.log(`   Full chunk: "${fullChunk.text.slice(0, 50)}..."`);
+          
+          return {
+            ...flag,
+            source: fullChunk.text, // Use the complete chunk text
+            page_number: fullChunk.pageNumber
+          };
+        }
+      }
+    }
+    return flag;
   });
 
-  return redFlags;
+  // Log each red flag for debugging
+  enhancedRedFlags.forEach((flag: RedFlag, i: number) => {
+    console.log(`   ${i + 1}. [${flag.severity.toUpperCase()}] ${flag.issue}`);
+    console.log(`      Source length: ${flag.source.length} characters`);
+  });
+
+  return enhancedRedFlags;
 }
 

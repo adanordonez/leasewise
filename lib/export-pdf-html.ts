@@ -15,6 +15,11 @@ interface AnalysisData {
   redFlags: Array<{ issue: string; severity: string; explanation: string }>;
   rights: Array<{ right: string; law: string }>;
   keyDates: Array<{ event: string; date: string; description: string }>;
+  scenarios: Array<{ 
+    title: string; 
+    advice: string; 
+    actionableSteps: string[];
+  }>;
   address: string;
   userName: string;
   userEmail: string;
@@ -33,24 +38,75 @@ interface AnalysisData {
  */
 export async function exportLeaseReportHTML(data: AnalysisData): Promise<void> {
   try {
-    console.log('🎨 Starting HTML-to-PDF export...');
 
-    // Create a temporary container
+    // Create a temporary container optimized for portrait A4
     const tempContainer = document.createElement('div');
     tempContainer.style.position = 'absolute';
     tempContainer.style.left = '-9999px';
     tempContainer.style.top = '0';
-    tempContainer.style.width = '1400px'; // Extra wide for full content display
+    tempContainer.style.width = '1000px'; // Optimized for A4 portrait (210mm)
     tempContainer.style.backgroundColor = 'white';
     tempContainer.style.fontFamily = 'system-ui, -apple-system, sans-serif';
     document.body.appendChild(tempContainer);
 
     // Render the HTML component with PDF flag
     const htmlElement = createElement(LeaseReportHTML, { data, isPDF: true });
-    tempContainer.innerHTML = renderToStaticMarkup(htmlElement);
+    const htmlContent = renderToStaticMarkup(htmlElement);
+    
+    // Add CSS to ensure proper table rendering and page breaks
+    const cssStyles = `
+      <style>
+        table { 
+          border-collapse: separate !important;
+          border-spacing: 0 !important;
+          width: 100% !important;
+          page-break-inside: auto !important;
+        }
+        thead { 
+          display: table-header-group !important;
+          page-break-after: avoid !important;
+          page-break-inside: avoid !important;
+        }
+        tbody { 
+          page-break-inside: auto !important;
+        }
+        tr { 
+          page-break-inside: avoid !important;
+          page-break-after: auto !important;
+        }
+        td, th { 
+          padding: 8px 12px !important;
+          vertical-align: top !important;
+          word-wrap: break-word !important;
+          white-space: normal !important;
+          line-height: 1.5 !important;
+          page-break-inside: avoid !important;
+        }
+        .align-top { 
+          vertical-align: top !important; 
+        }
+        .table-container {
+          page-break-inside: auto !important;
+        }
+        @media print {
+          table {
+            page-break-inside: auto !important;
+          }
+          tr {
+            page-break-inside: avoid !important;
+            page-break-after: auto !important;
+          }
+          thead {
+            display: table-header-group !important;
+          }
+        }
+      </style>
+    `;
+    
+    tempContainer.innerHTML = cssStyles + htmlContent;
 
-    // Wait for fonts and images to load
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Increased for Street View image
+    // Wait for fonts and images to load, and ensure proper layout calculation
+    await new Promise(resolve => setTimeout(resolve, 3000)); // Increased for proper table height calculation
     
     // Ensure all images are loaded
     const images = tempContainer.querySelectorAll('img');
@@ -86,36 +142,70 @@ export async function exportLeaseReportHTML(data: AnalysisData): Promise<void> {
     // Clean up
     document.body.removeChild(tempContainer);
 
-    // Create PDF
-    const imgData = canvas.toDataURL('image/png');
+    // Create PDF with portrait orientation for better multi-page layout
     const pdf = new jsPDF({
-      orientation: 'landscape', // Landscape for wider content
+      orientation: 'portrait',
       unit: 'mm',
       format: 'a4',
     });
 
-    // Calculate dimensions
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
+    
+    // Convert canvas to image data
+    const imgData = canvas.toDataURL('image/png');
     const imgWidth = canvas.width;
     const imgHeight = canvas.height;
-    const ratio = imgWidth / imgHeight;
-    
-    let finalWidth = pdfWidth;
-    let finalHeight = pdfWidth / ratio;
 
-    // If the content is taller than one page, scale it down
-    if (finalHeight > pdfHeight) {
-      finalHeight = pdfHeight;
-      finalWidth = pdfHeight * ratio;
+    // Calculate how to fit the content width-wise
+    // We want the content to fit the page width
+    const ratio = pdfWidth / (imgWidth / 2); // Divide by 2 because of scale: 2
+    const scaledHeight = (imgHeight / 2) * ratio; // Height after scaling
+    const scaledWidth = pdfWidth;
+
+    // Calculate how many pages we need
+    const pageCount = Math.ceil(scaledHeight / pdfHeight);
+    
+    console.log(`📄 Generating ${pageCount} page(s) for PDF...`);
+
+    // Add pages and split content across them
+    for (let i = 0; i < pageCount; i++) {
+      if (i > 0) {
+        pdf.addPage();
+      }
+
+      // Calculate the portion of the image to show on this page
+      const sourceY = (i * pdfHeight) / ratio * 2; // Source Y position in canvas
+      const sourceHeight = Math.min((pdfHeight / ratio) * 2, imgHeight - sourceY); // Height of slice
+      
+      // Create a temporary canvas for this page's content
+      const pageCanvas = document.createElement('canvas');
+      pageCanvas.width = imgWidth;
+      pageCanvas.height = sourceHeight;
+      
+      const pageCtx = pageCanvas.getContext('2d');
+      if (pageCtx) {
+        // Draw the slice of the original canvas
+        pageCtx.drawImage(
+          canvas,
+          0, sourceY, // Source X, Y
+          imgWidth, sourceHeight, // Source width, height
+          0, 0, // Destination X, Y
+          imgWidth, sourceHeight // Destination width, height
+        );
+        
+        // Convert page canvas to image
+        const pageImgData = pageCanvas.toDataURL('image/png');
+        
+        // Calculate the height for this page (might be less on last page)
+        const pageHeight = Math.min(pdfHeight, scaledHeight - (i * pdfHeight));
+        
+        // Add this slice to the PDF
+        pdf.addImage(pageImgData, 'PNG', 0, 0, scaledWidth, pageHeight);
+      }
     }
 
-    // Center the content
-    const xOffset = (pdfWidth - finalWidth) / 2;
-    const yOffset = (pdfHeight - finalHeight) / 2;
-
-    // Add the image to PDF
-    pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+    console.log(`✅ ${pageCount} page(s) added to PDF`);
 
     // Generate filename
     const timestamp = new Date().toISOString().split('T')[0];

@@ -16,8 +16,8 @@ export interface ChunkWithMetadata {
  */
 export function chunkTextWithPages(
   pages: PageText[],
-  chunkSize: number = 500, // ~500 chars per chunk
-  overlap: number = 100 // 100 char overlap between chunks
+  chunkSize: number = 1500, // ~1500 chars per chunk (increased for even better context)
+  overlap: number = 250 // 250 char overlap between chunks (increased for even better context)
 ): ChunkWithMetadata[] {
   const chunks: ChunkWithMetadata[] = [];
   let globalChunkIndex = 0;

@@ -27,10 +27,28 @@ export async function analyzeHowLawAppliesToLease(
   try {
     console.log(`🔍 Analyzing how "${lawType}" applies to the lease...`);
     
-    // Step 1: Use RAG to find relevant parts of the lease
-    const query = `Find lease terms related to: ${lawType}. Include any clauses about ${lawType.toLowerCase()}, requirements, timelines, or conditions.`;
+    // Step 1: Use RAG to find relevant parts of the lease with more specific queries
+    const specificQueries = [
+      `Find lease terms related to: ${lawType}`,
+      `lease clauses about ${lawType.toLowerCase()}`,
+      `tenant obligations for ${lawType.toLowerCase()}`,
+      `landlord requirements for ${lawType.toLowerCase()}`,
+      `timeline requirements for ${lawType.toLowerCase()}`,
+      `conditions related to ${lawType.toLowerCase()}`
+    ];
     
-    const relevantChunks = await leaseRAG.retrieveRelevant(query, 5); // Increased from 3 to 5 for more context
+    const allChunks: any[] = [];
+    for (const query of specificQueries) {
+      const chunks = await leaseRAG.retrieveRelevant(query, 4); // 4 chunks per query
+      allChunks.push(...chunks);
+    }
+    
+    // Remove duplicates and get top chunks
+    const uniqueChunks = allChunks.filter((chunk, index, self) =>
+      index === self.findIndex(c => c.text === chunk.text)
+    );
+    
+    const relevantChunks = uniqueChunks.slice(0, 8); // Top 8 most relevant chunks
     
     if (relevantChunks.length === 0) {
       console.log('⚠️ No relevant lease clauses found');
@@ -58,9 +76,10 @@ IMPORTANT:
 - Use the tenant's actual numbers (rent, deposit, dates) when relevant
 - If lease is silent on something the law requires, point that out
 - If lease violates the law, clearly state that
-- Keep it under 50 words
+- Provide detailed explanation (80-120 words) with full context
 - Write in second person ("Your lease says...", "You are entitled to...")
-- Be direct and clear`
+- Include specific examples from the lease text
+- Explain the practical implications for the tenant`
         },
         {
           role: 'user',
@@ -79,11 +98,11 @@ ${leaseContext ? `
 RELEVANT LEASE TEXT:
 "${leaseText}"
 
-Explain in under 50 words how this law specifically applies to THIS tenant's lease. Focus on what it means for them.`
+Explain in 80-120 words how this law specifically applies to THIS tenant's lease. Include specific examples from the lease text and explain the practical implications for the tenant. Be thorough and provide full context.`
         }
       ],
       temperature: 0.3,
-      max_tokens: 150
+      max_tokens: 200 // Increased for longer explanations
     });
 
     const application = completion.choices[0].message.content || 
@@ -93,7 +112,7 @@ Explain in under 50 words how this law specifically applies to THIS tenant's lea
     
     return {
       application: application.trim(),
-      relevantLeaseText: leaseText.slice(0, 500), // First 500 chars for reference
+      relevantLeaseText: leaseText.slice(0, 800), // First 800 chars for reference (increased for more context)
       hasMatch: true
     };
     

@@ -26,6 +26,11 @@ interface AnalysisData {
   redFlags: Array<{ issue: string; severity: string; explanation: string }>;
   rights: Array<{ right: string; law: string }>;
   keyDates: Array<{ event: string; date: string; description: string }>;
+  scenarios: Array<{ 
+    title: string; 
+    advice: string; 
+    actionableSteps: string[];
+  }>;
   address: string;
   userName: string;
   userEmail: string;
@@ -254,6 +259,53 @@ export async function exportLeaseReport(data: AnalysisData): Promise<void> {
     });
 
     yPosition = (doc as any).lastAutoTable.finalY + 10;
+  }
+
+  // === COMMON SCENARIOS ===
+  if (data.scenarios && data.scenarios.length > 0) {
+    checkPageBreak(20);
+    addSectionHeader(`Common Scenarios (${data.scenarios.length})`, '📋', primaryPurple);
+    
+    data.scenarios.forEach((scenario, index) => {
+      checkPageBreak(40);
+      
+      // Scenario title
+      doc.setTextColor(...darkGray);
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`${index + 1}. ${scenario.title}`, 18, yPosition);
+      yPosition += 8;
+      
+      // Scenario advice
+      doc.setTextColor(...darkGray);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      const adviceLines = doc.splitTextToSize(scenario.advice, pageWidth - 36);
+      doc.text(adviceLines, 18, yPosition);
+      yPosition += adviceLines.length * 4 + 5;
+      
+      // Action steps
+      if (scenario.actionableSteps && scenario.actionableSteps.length > 0) {
+        doc.setTextColor(...mediumGray);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.text('What to do:', 18, yPosition);
+        yPosition += 5;
+        
+        scenario.actionableSteps.forEach((step, stepIndex) => {
+          checkPageBreak(15);
+          doc.setTextColor(...darkGray);
+          doc.setFontSize(8);
+          doc.setFont('helvetica', 'normal');
+          doc.text(`  ${stepIndex + 1}. ${step}`, 18, yPosition);
+          yPosition += 4;
+        });
+      }
+      
+      yPosition += 10;
+    });
+    
+    yPosition += 5;
   }
 
   // === FOOTER ON LAST PAGE ===

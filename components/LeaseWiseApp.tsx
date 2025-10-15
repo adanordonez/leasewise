@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, AlertCircle, CheckCircle, FileText, Calendar, Download, Plus, X, BarChart3, ArrowRight, Menu, Loader2 } from 'lucide-react';
+import { Upload, AlertCircle, CheckCircle, FileText, Calendar, Download, Plus, X, BarChart3, ArrowRight, Menu, Loader2, ExternalLink } from 'lucide-react';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { SmartExtractionIcon, RedFlagDetectionIcon, KnowYourRightsIcon } from './AnimatedIcons';
 import { Button } from '@/components/ui/button';
@@ -46,7 +46,20 @@ interface AnalysisResult {
 }
 
 interface Scenarios {
-  scenarios: Array<{ title: string; advice: string }>;
+  scenarios: Array<{ 
+    title: string; 
+    advice: string;
+    stateLaw?: {
+      lawType: string;
+      explanation: string;
+      statute?: string;
+      sourceUrl?: string;
+    };
+    leaseRelevantText?: string;
+    pageNumber?: number;
+    severity?: 'high' | 'medium' | 'low';
+    actionableSteps?: string[];
+  }>;
 }
 
 export default function LeaseWiseApp() {
@@ -241,7 +254,11 @@ export default function LeaseWiseApp() {
       setTimeout(() => addLog('Structuring lease data...'), 12000);
       
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes timeout
+      const timeoutId = setTimeout(() => {
+        if (!controller.signal.aborted) {
+          controller.abort('timeout');
+        }
+      }, 180000); // 3 minutes timeout for complex analysis
       
       // Simulate progress during API call
       const progressInterval = setInterval(() => {
@@ -270,13 +287,22 @@ export default function LeaseWiseApp() {
           }),
           signal: controller.signal,
         });
+        
+        // Clear timeout and interval only after successful response
         clearTimeout(timeoutId);
         clearInterval(progressInterval);
       } catch (error: unknown) {
+        // Clear timeout and interval on error
         clearTimeout(timeoutId);
         clearInterval(progressInterval);
+        
+        // Only throw timeout error if it's actually an AbortError due to timeout
         if (error instanceof Error && error.name === 'AbortError') {
-          throw new Error('Request timed out. Please try with a smaller file or configure Supabase for better performance.');
+          // Check if this was due to our timeout or a network issue
+          const wasTimeout = controller.signal.aborted && controller.signal.reason === 'timeout';
+          if (wasTimeout) {
+            throw new Error('Request timed out. Please try with a smaller file or configure Supabase for better performance.');
+          }
         }
         throw error;
       }
@@ -325,8 +351,8 @@ export default function LeaseWiseApp() {
     }
   };
 
-  return (
-    <div className="min-h-screen gradient-bg-modern">
+    return (
+      <div className="min-h-screen gradient-bg-modern">
       {/* Analysis Loading Modal - Always rendered */}
       <SimpleLoadingModal
         isOpen={isAnalyzing}
@@ -944,7 +970,7 @@ export default function LeaseWiseApp() {
         <div className="mb-8 flex items-center justify-end gap-3">
           <button 
             onClick={async () => {
-              if (analysisResult && !isExportingPDF) {
+              if (analysisResult && address && userName && userEmail && !isExportingPDF) {
                 setIsExportingPDF(true);
                 try {
                   // Fetch comprehensive legal information for PDF
@@ -973,11 +999,18 @@ export default function LeaseWiseApp() {
                     console.error('Failed to fetch comprehensive legal info for PDF:', error);
                   }
 
+                  const scenariosForPDF = scenarios?.scenarios?.map(s => ({
+                    title: s.title,
+                    advice: s.advice,
+                    actionableSteps: s.actionableSteps || []
+                  })) || [];
+                  
                   await exportLeaseReportHTML({
                     summary: analysisResult.summary,
                     redFlags: analysisResult.redFlags,
                     rights: analysisResult.rights,
                     keyDates: analysisResult.keyDates,
+                    scenarios: scenariosForPDF,
                     address,
                     userName,
                     userEmail,
@@ -991,8 +1024,15 @@ export default function LeaseWiseApp() {
                 }
               }
             }}
-            disabled={isExportingPDF}
+            disabled={isExportingPDF || !analysisResult || !address || !userName || !userEmail || !scenarios || !scenarios.scenarios || scenarios.scenarios.length === 0}
             className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium hover:bg-slate-50 transition-all duration-200 flex items-center gap-2 bg-white disabled:bg-slate-100 disabled:cursor-not-allowed"
+            title={
+              !analysisResult ? "Analysis must be completed first" :
+              !address ? "Address is required" :
+              !userName ? "Name is required" :
+              !userEmail ? "Email is required" :
+              !scenarios || !scenarios.scenarios || scenarios.scenarios.length === 0 ? "Common Scenarios must be loaded before exporting PDF" : ""
+            }
           >
             {isExportingPDF ? (
               <>
@@ -1005,7 +1045,7 @@ export default function LeaseWiseApp() {
                 Export PDF
               </>
             )}
-          </button>
+              </button>
               <button 
                 onClick={() => { 
                   setCurrentPage('landing'); 
@@ -1193,7 +1233,22 @@ export default function LeaseWiseApp() {
             </div>
           </div>
 
-          {/* Common Scenarios */}
+          {/* Enhanced Common Scenarios */}
+          {scenarios && (() => {
+            console.log('📋 Scenarios data received:', scenarios);
+            console.log('📋 First scenario:', scenarios.scenarios[0]);
+            scenarios.scenarios.forEach((s, i) => {
+              console.log(`📋 Scenario ${i + 1}:`, {
+                title: s.title,
+                hasLeaseText: !!s.leaseRelevantText,
+                leaseTextLength: s.leaseRelevantText?.length || 0,
+                pageNumber: s.pageNumber,
+                severity: s.severity,
+                hasActionSteps: !!s.actionableSteps?.length
+              });
+            });
+            return null;
+          })()}
           {scenarios && (
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60">
               <div className="border-b border-slate-200/60 px-6 py-5">
@@ -1207,20 +1262,65 @@ export default function LeaseWiseApp() {
               <div className="divide-y divide-slate-200/60">
                 {scenarios.scenarios.map((scenario, i) => (
                   <div key={i} className="px-6 py-5 hover:bg-slate-50/50 transition-colors duration-200">
-                    <h3 className="font-semibold text-slate-900 mb-2">{scenario.title}</h3>
-                    <p className="text-sm text-slate-600 leading-relaxed">{scenario.advice}</p>
+                    {/* Simple Header */}
+                    <div className="mb-3">
+                      <h3 className="text-lg font-semibold text-slate-900">{scenario.title}</h3>
                   </div>
-                ))}
-              </div>
+                    
+                    {/* Simple Main Advice - Big and Clear */}
+                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 mb-4 border border-blue-200">
+                      <p className="text-base text-slate-800 leading-relaxed font-medium">
+                        {scenario.advice}
+                      </p>
+                      {/* Source Attribution for Advice - Always show if available */}
+                      {scenario.leaseRelevantText && scenario.leaseRelevantText.length > 0 && (
+                        <div className="mt-3 flex items-center gap-2">
+                          <span className="text-xs text-slate-600 font-medium">Source:</span>
+                          <SourceCitation
+                            sourceText={scenario.leaseRelevantText}
+                            pageNumber={scenario.pageNumber}
+                            pdfUrl={analysisResult?.pdfUrl}
+                            label="From your lease"
+                          />
             </div>
           )}
         </div>
+
+                    {/* Simple Action Steps - Always Show */}
+                    {scenario.actionableSteps && scenario.actionableSteps.length > 0 && (
+                      <div className="bg-green-50 rounded-lg p-4 mb-4 border border-green-200">
+                        <div className="flex items-center gap-2 mb-3">
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                          <span className="text-sm font-semibold text-green-700">
+                            What to do:
+                          </span>
+                </div>
+                        <ol className="space-y-2">
+                          {scenario.actionableSteps.map((step, stepIndex) => (
+                            <li key={stepIndex} className="flex items-start gap-3">
+                              <span className="flex-shrink-0 w-6 h-6 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-sm font-semibold">
+                                {stepIndex + 1}
+                              </span>
+                              <div className="flex-1">
+                                <span className="text-sm text-green-900 leading-relaxed">{step}</span>
+              </div>
+                            </li>
+                          ))}
+                        </ol>
+            </div>
+                    )}
+              </div>
+                ))}
+              </div>
+            </div>
+        )}
+          </div>
 
       </main>
       
       <Footer showDisclaimer />
         </>
-      )}
+        )}
     </div>
   );
 }
