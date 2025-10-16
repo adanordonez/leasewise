@@ -176,7 +176,18 @@ export async function POST(request: NextRequest) {
 
 async function performAnalysis(request: NextRequest) {
   try {
+    console.log('🔍 Starting lease analysis...');
+    
+    // Validate request headers
     const contentType = request.headers.get('content-type');
+    if (!contentType) {
+      console.error('🚨 Missing content-type header');
+      return NextResponse.json(
+        { error: 'Invalid request format', code: 'INVALID_REQUEST' },
+        { status: 400 }
+      );
+    }
+    
     let pdfUrl: string | null = null;
     let address: string | null = null;
     let userName: string | null = null;
@@ -237,39 +248,117 @@ async function performAnalysis(request: NextRequest) {
       }
     }
 
-    // Extract text from PDF with page tracking
-    const pdfData = await extractTextWithPageNumbers(uint8Array);
+    // Extract text from PDF with page tracking and retry logic
+    console.log('📄 Extracting text from PDF...');
+    let pdfData;
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    while (retryCount < maxRetries) {
+      try {
+        pdfData = await extractTextWithPageNumbers(uint8Array);
+        break;
+      } catch (extractError) {
+        retryCount++;
+        console.error(`🚨 PDF extraction attempt ${retryCount} failed:`, extractError);
+        
+        if (retryCount >= maxRetries) {
+          throw new Error(`PDF extraction failed after ${maxRetries} attempts: ${extractError instanceof Error ? extractError.message : 'Unknown error'}`);
+        }
+        
+        // Wait before retry (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+      }
+    }
+    
+    if (!pdfData) {
+      throw new Error('PDF extraction failed - no data returned');
+    }
+    
     const leaseText = pdfData.fullText;
+    
+    // Validate extracted text
+    if (!leaseText || leaseText.trim().length === 0) {
+      throw new Error('PDF appears to be empty or contains no readable text. Please ensure the PDF has selectable text.');
+    }
+    
+    if (leaseText.length < 100) {
+      console.warn('⚠️ Very short lease text extracted:', leaseText.length, 'characters');
+    }
+    
+    console.log('✅ PDF text extracted successfully:', {
+      textLength: leaseText.length,
+      pageCount: pdfData.pages.length,
+      avgPageLength: Math.round(leaseText.length / pdfData.pages.length)
+    });
 
     // Extract basic lease info first (for map data)
     const basicInfo = await extractBasicLeaseInfo(leaseText, address);
     
     // Initialize RAG system for accurate source attribution
     console.log('🚀 Initializing RAG system...');
-    const rag = await createLeaseRAG(pdfData.pages, true); // true = use embeddings
-    const ragStats = rag.getStats();
-    console.log('✅ RAG system ready:', ragStats);
+    let rag;
+    let ragStats = null;
+    try {
+      rag = await createLeaseRAG(pdfData.pages, true); // true = use embeddings
+      ragStats = rag.getStats();
+      console.log('✅ RAG system ready:', ragStats);
+    } catch (ragError) {
+      console.error('🚨 RAG initialization failed:', ragError);
+      // Continue without RAG if it fails
+      console.warn('⚠️ Continuing analysis without RAG system');
+      rag = null;
+    }
     
     // Analyze lease using RAG (no more hallucinations!) - with timeout protection
     console.log('🔍 Analyzing lease with RAG...');
-    const structuredDataPromise = analyzeLeaseWithRAG(rag, address);
-    const structuredData = await withTimeout(structuredDataPromise, 60000, 'Lease analysis timeout');
+    let structuredData;
+    try {
+      const structuredDataPromise = analyzeLeaseWithRAG(rag, address);
+      structuredData = await withTimeout(structuredDataPromise, 60000, 'Lease analysis timeout');
+    } catch (analysisError) {
+      console.error('🚨 Lease analysis failed:', analysisError);
+      // Fallback to basic analysis without RAG
+      console.warn('⚠️ Falling back to basic analysis...');
+      try {
+        structuredData = await analyzeLeaseStructured(leaseText, address);
+      } catch (fallbackError) {
+        console.error('🚨 Fallback analysis also failed:', fallbackError);
+        throw new Error(`Lease analysis failed: ${analysisError instanceof Error ? analysisError.message : 'Unknown error'}`);
+      }
+    }
     
     // Enrich with exact sources from chunks
     console.log('📄 Enriching with exact sources...');
-    const enrichPromise = enrichWithSources(structuredData, rag);
-    const enrichedData = await withTimeout(enrichPromise, 30000, 'Source enrichment timeout');
+    let enrichedData;
+    try {
+      const enrichPromise = enrichWithSources(structuredData, rag);
+      enrichedData = await withTimeout(enrichPromise, 30000, 'Source enrichment timeout');
+    } catch (enrichError) {
+      console.error('🚨 Source enrichment failed:', enrichError);
+      console.warn('⚠️ Continuing without source enrichment...');
+      // Use original data without enrichment
+      enrichedData = structuredData;
+    }
     console.log('✨ Source attribution complete');
     
     // Analyze red flags with dedicated RAG system
     console.log('🚩 Analyzing red flags with RAG...');
-    const redFlagsPromise = analyzeRedFlagsWithRAG(rag, {
-      monthlyRent: basicInfo.monthly_rent?.toString(),
-      securityDeposit: basicInfo.security_deposit?.toString(),
-      address: address
-    });
-    const redFlags = await withTimeout(redFlagsPromise, 45000, 'Red flags analysis timeout');
-    console.log(`✅ Found ${redFlags.length} red flags`);
+    let redFlags = [];
+    try {
+      const redFlagsPromise = analyzeRedFlagsWithRAG(rag, {
+        monthlyRent: basicInfo.monthly_rent?.toString(),
+        securityDeposit: basicInfo.security_deposit?.toString(),
+        address: address
+      });
+      redFlags = await withTimeout(redFlagsPromise, 45000, 'Red flags analysis timeout');
+      console.log(`✅ Found ${redFlags.length} red flags`);
+    } catch (redFlagsError) {
+      console.error('🚨 Red flags analysis failed:', redFlagsError);
+      console.warn('⚠️ Continuing without red flags analysis...');
+      // Use empty array as fallback
+      redFlags = [];
+    }
     
     // Replace enrichedData red flags with the new RAG-based analysis
     enrichedData.red_flags = redFlags.map(flag => ({
@@ -316,8 +405,19 @@ async function performAnalysis(request: NextRequest) {
       
       try {
         // Use RAG to find relevant lease content with timeout
-        const ragPromise = rag.retrieve(question, 3); // Reduced from 5 to 3 chunks
-        const relevantChunks = await withTimeout(ragPromise, 10000, `RAG timeout for ${question}`);
+        let relevantChunks = [];
+        if (rag) {
+          try {
+            const ragPromise = rag.retrieve(question, 3); // Reduced from 5 to 3 chunks
+            relevantChunks = await withTimeout(ragPromise, 10000, `RAG timeout for ${question}`);
+          } catch (ragError) {
+            console.error(`   🚨 RAG retrieval failed for "${question}":`, ragError);
+            relevantChunks = [];
+          }
+        } else {
+          console.log(`   ⚠️ No RAG system available for "${question}"`);
+          relevantChunks = [];
+        }
         
         if (relevantChunks.length === 0) {
           console.log(`   ❌ No relevant chunks found for: ${question}`);
@@ -330,8 +430,14 @@ async function performAnalysis(request: NextRequest) {
         console.log(`   ✅ Found relevant chunk on page ${topChunk.pageNumber}`);
 
         // Generate advice with timeout
-        const advicePromise = generateAdvice(question, topChunk.text);
-        const simpleAdvice = await withTimeout(advicePromise, 15000, `Advice generation timeout for ${question}`);
+        let simpleAdvice;
+        try {
+          const advicePromise = generateAdvice(question, topChunk.text);
+          simpleAdvice = await withTimeout(advicePromise, 15000, `Advice generation timeout for ${question}`);
+        } catch (adviceError) {
+          console.error(`   🚨 Advice generation failed for "${question}":`, adviceError);
+          simpleAdvice = `Here's what you should know about ${question.toLowerCase()}. Check your lease for specific details.`;
+        }
         
         // Get scenario-specific action steps
         const actionableSteps = getActionableSteps(question);
@@ -363,6 +469,7 @@ async function performAnalysis(request: NextRequest) {
     // Save structured data to Supabase
     let leaseDataId = null;
     try {
+      console.log('💾 Saving lease data to Supabase...');
       const { data: leaseData, error: leaseError } = await supabase
         .from('lease_data')
         .insert({
@@ -401,10 +508,18 @@ async function performAnalysis(request: NextRequest) {
         .single();
 
       if (leaseError) {
-        console.error('Error saving lease data:', leaseError);
+        console.error('🚨 Error saving lease data:', leaseError);
+        console.error('🚨 Lease error details:', {
+          message: leaseError.message,
+          details: leaseError.details,
+          hint: leaseError.hint,
+          code: leaseError.code
+        });
+        // Continue without saving to database
+        console.warn('⚠️ Continuing analysis without database save...');
       } else {
         leaseDataId = leaseData.id;
-        console.log('Lease data saved with ID:', leaseDataId);
+        console.log('✅ Lease data saved with ID:', leaseDataId);
         
         // Save PDF upload metadata to pdf_uploads table if we have a URL
         if (pdfUrl) {
@@ -425,17 +540,29 @@ async function performAnalysis(request: NextRequest) {
               });
 
             if (uploadError) {
-              console.error('Error saving PDF upload metadata:', uploadError);
+              console.error('🚨 Error saving PDF upload metadata:', uploadError);
+              console.error('🚨 Upload error details:', {
+                message: uploadError.message,
+                details: uploadError.details,
+                hint: uploadError.hint,
+                code: uploadError.code
+              });
             } else {
-              console.log('PDF upload metadata saved for lease:', leaseDataId);
+              console.log('✅ PDF upload metadata saved for lease:', leaseDataId);
             }
           } catch (uploadError) {
-            console.error('Error saving PDF metadata:', uploadError);
+            console.error('🚨 Error saving PDF metadata:', uploadError);
+            console.warn('⚠️ Continuing without PDF metadata save...');
           }
         }
       }
     } catch (error) {
-      console.error('Error saving to database:', error);
+      console.error('🚨 Error saving to database:', error);
+      console.error('🚨 Database error details:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack?.split('\n').slice(0, 5).join('\n') : 'No stack trace'
+      });
+      console.warn('⚠️ Continuing analysis without database save...');
     }
 
     // Convert enriched data to the format expected by the frontend
@@ -467,20 +594,112 @@ async function performAnalysis(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Analysis error:', error);
+    console.error('🚨 Analysis error:', error);
+    console.error('🚨 Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('🚨 Error name:', error instanceof Error ? error.name : 'Unknown');
+    console.error('🚨 Error message:', error instanceof Error ? error.message : String(error));
     
-    // Handle specific error types
+    // Handle specific error types with detailed logging
     if (error instanceof Error) {
-      if (error.message.includes('payload') || error.message.includes('too large')) {
+      console.error('🚨 Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack?.split('\n').slice(0, 5).join('\n')
+      });
+      
+      // OpenAI API errors
+      if (error.message.includes('API key') || error.message.includes('authentication')) {
+        console.error('🚨 OpenAI API key issue');
         return NextResponse.json(
-          { error: 'File too large. Please try with a smaller PDF file.' },
+          { 
+            error: 'AI service configuration error. Please contact support.',
+            code: 'AI_CONFIG_ERROR'
+          },
+          { status: 500 }
+        );
+      }
+      
+      // Rate limiting
+      if (error.message.includes('rate limit') || error.message.includes('quota')) {
+        console.error('🚨 Rate limit exceeded');
+        return NextResponse.json(
+          { 
+            error: 'Service temporarily unavailable due to high demand. Please try again in a few minutes.',
+            code: 'RATE_LIMIT'
+          },
+          { status: 429 }
+        );
+      }
+      
+      // File size errors
+      if (error.message.includes('payload') || error.message.includes('too large') || error.message.includes('413')) {
+        console.error('🚨 File too large');
+        return NextResponse.json(
+          { 
+            error: 'File too large. Please try with a smaller PDF file (under 20MB).',
+            code: 'FILE_TOO_LARGE'
+          },
+          { status: 413 }
+        );
+      }
+      
+      // PDF processing errors
+      if (error.message.includes('PDF') || error.message.includes('extract') || error.message.includes('unpdf')) {
+        console.error('🚨 PDF processing error');
+        return NextResponse.json(
+          { 
+            error: 'Unable to process PDF file. Please ensure it\'s a valid PDF and try again.',
+            code: 'PDF_PROCESSING_ERROR'
+          },
+          { status: 400 }
+        );
+      }
+      
+      // Supabase errors
+      if (error.message.includes('supabase') || error.message.includes('database') || error.message.includes('storage')) {
+        console.error('🚨 Database/Storage error');
+        return NextResponse.json(
+          { 
+            error: 'Database service temporarily unavailable. Please try again.',
+            code: 'DATABASE_ERROR'
+          },
+          { status: 503 }
+        );
+      }
+      
+      // Timeout errors
+      if (error.message.includes('timeout') || error.message.includes('TIMEOUT')) {
+        console.error('🚨 Timeout error');
+        return NextResponse.json(
+          { 
+            error: 'Analysis timed out. Please try with a smaller file or try again later.',
+            code: 'TIMEOUT'
+          },
+          { status: 504 }
+        );
+      }
+      
+      // Memory errors
+      if (error.message.includes('memory') || error.message.includes('heap') || error.message.includes('allocation')) {
+        console.error('🚨 Memory error');
+        return NextResponse.json(
+          { 
+            error: 'File too complex to process. Please try with a simpler PDF.',
+            code: 'MEMORY_ERROR'
+          },
           { status: 413 }
         );
       }
     }
     
+    // Generic error fallback with more context
+    console.error('🚨 Unhandled error type:', typeof error);
     return NextResponse.json(
-      { error: 'Failed to analyze lease. Please try again.' },
+      { 
+        error: 'An unexpected error occurred during analysis. Please try again or contact support if the issue persists.',
+        code: 'UNKNOWN_ERROR',
+        timestamp: new Date().toISOString()
+      },
       { status: 500 }
     );
   }
