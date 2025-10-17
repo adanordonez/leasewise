@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { FileText, X, ExternalLink, MessageCircle } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 
 // Dynamically import PDFViewer to avoid SSR issues
 const PDFViewer = dynamic(() => import('./PDFViewer'), {
@@ -20,11 +21,12 @@ interface SourceCitationProps {
 
 export default function SourceCitation({ 
   sourceText, 
-  label = "Source", 
+  label, 
   pageNumber,
   pdfUrl,
   searchText 
 }: SourceCitationProps) {
+  const t = useTranslations();
   const [isOpen, setIsOpen] = useState(false);
   const [showFullPdf, setShowFullPdf] = useState(false);
   const [plainEnglish, setPlainEnglish] = useState<string | null>(null);
@@ -62,7 +64,7 @@ export default function SourceCitation({
       setPlainEnglish(data.plainEnglish);
     } catch (error) {
       console.error('❌ Error translating text:', error);
-      setPlainEnglish('Sorry, we couldn\'t translate this text. Please try again or contact support if the issue persists.');
+      setPlainEnglish(t('SourceCitation.translationError'));
     } finally {
       setIsTranslating(false);
     }
@@ -112,10 +114,10 @@ export default function SourceCitation({
               {/* Legal Text */}
               <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-slate-600">Excerpt from your lease:</p>
+                  <p className="text-sm font-medium text-slate-600">{t('SourceCitation.excerptFromLease')}</p>
                   {pageNumber && (
                     <span className="text-xs font-semibold text-purple-600 bg-purple-50 px-2 py-1 rounded">
-                      Page {pageNumber}
+                      {t('SourceCitation.page')} {pageNumber}
                     </span>
                   )}
                 </div>
@@ -129,7 +131,7 @@ export default function SourceCitation({
                 <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <MessageCircle className="w-4 h-4 text-green-600" />
-                    <p className="text-sm font-medium text-green-800">Plain English Translation:</p>
+                    <p className="text-sm font-medium text-green-800">{t('SourceCitation.plainTranslation')}</p>
                   </div>
                   <p className="text-green-900 leading-relaxed">
                     {plainEnglish}
@@ -149,10 +151,10 @@ export default function SourceCitation({
                 >
                   <MessageCircle className="w-4 h-4" />
                   {isTranslating 
-                    ? 'Translating...' 
+                    ? t('SourceCitation.translating')
                     : plainEnglish 
-                      ? 'Hide Translation' 
-                      : 'Explain in Plain English'}
+                      ? t('SourceCitation.hideTranslation')
+                      : t('SourceCitation.explainInPlainEnglish')}
                 </button>
                 
                 {pdfUrl && (
@@ -161,13 +163,13 @@ export default function SourceCitation({
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors"
                   >
                     <ExternalLink className="w-4 h-4" />
-                    View in Original PDF
+                    {t('SourceCitation.viewOriginalPDF')}
                   </button>
                 )}
               </div>
               
               <div className="mt-4 text-xs text-slate-500">
-                <p>This is the exact text from your lease document that was used to extract this information.</p>
+                <p>{t('SourceCitation.exactText')}</p>
               </div>
             </div>
 
@@ -177,7 +179,7 @@ export default function SourceCitation({
                 onClick={() => setIsOpen(false)}
                 className="w-full sm:w-auto px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors"
               >
-                Close
+                {t('SourceCitation.close')}
               </button>
             </div>
           </div>

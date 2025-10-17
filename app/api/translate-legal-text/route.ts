@@ -13,6 +13,10 @@ export async function POST(request: NextRequest) {
     console.log('📝 Request body received:', { hasLegalText: !!body.legalText, textLength: body.legalText?.length });
     
     const { legalText } = body;
+    
+    // Get locale from cookies
+    const locale = request.cookies.get('locale')?.value || 'en';
+    console.log(`🌐 Detected locale: ${locale}`);
 
     if (!legalText) {
       console.error('❌ No legal text provided');
@@ -24,13 +28,23 @@ export async function POST(request: NextRequest) {
 
     console.log('🤖 Calling OpenAI for translation...');
     
-    // Translate legal text to plain English using OpenAI
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: `You are a helpful assistant that translates complex legal language into plain, easy-to-understand English for tenants. 
+    const systemContent = locale === 'es' 
+      ? `Eres un asistente útil que traduce lenguaje legal complejo a español sencillo y fácil de entender para inquilinos.
+
+Reglas:
+1. Use lenguaje sencillo y cotidiano
+2. Evite jerga legal
+3. Explique qué significa esto en la práctica para un inquilino
+4. Sea conciso pero completo
+5. Concéntrese en lo que el inquilino necesita saber y entender
+6. Use segunda persona ("usted" o "tú") para hacerlo personal
+7. Si hay implicaciones importantes, establézcalas claramente
+8. Manténgalo en 3-4 oraciones
+
+Ejemplo:
+Legal: "El inquilino deberá remitir el pago del alquiler en o antes del primer día de cada mes calendario, de lo contrario se evaluará una tarifa por pago atrasado de $50.00 después de un período de gracia de cinco (5) días."
+Español Sencillo: "Necesita pagar su alquiler antes del día 1 de cada mes. Si paga después del día 5, se le cobrará una tarifa de $50 por pago atrasado."`
+      : `You are a helpful assistant that translates complex legal language into plain, easy-to-understand English for tenants. 
 
 Rules:
 1. Use simple, everyday language
@@ -44,11 +58,23 @@ Rules:
 
 Example:
 Legal: "Tenant shall remit payment of rent on or before the first day of each calendar month, failing which a late fee of $50.00 shall be assessed after a grace period of five (5) days."
-Plain English: "You need to pay your rent by the 1st of each month. If you pay after the 5th, you'll be charged a $50 late fee."`,
+Plain English: "You need to pay your rent by the 1st of each month. If you pay after the 5th, you'll be charged a $50 late fee."`;
+
+    const userContent = locale === 'es'
+      ? `Traduce este texto legal a español sencillo:\n\n"${legalText}"`
+      : `Translate this legal text into plain English:\n\n"${legalText}"`;
+    
+    // Translate legal text to plain language using OpenAI
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: systemContent,
         },
         {
           role: 'user',
-          content: `Translate this legal text into plain English:\n\n"${legalText}"`,
+          content: userContent,
         },
       ],
       temperature: 0.3,

@@ -24,7 +24,8 @@ export async function analyzeRedFlagsWithRAG(
     monthlyRent?: string;
     securityDeposit?: string;
     address?: string;
-  }
+  },
+  locale: string = 'en'
 ): Promise<RedFlag[]> {
   console.log('🚩 Starting dedicated red flags analysis with RAG...');
 
@@ -92,6 +93,10 @@ export async function analyzeRedFlagsWithRAG(
   // STEP 2: Analyze each chunk for red flags with GPT-4o
   console.log('🔍 Analyzing clauses for red flags...');
   
+  const languageInstruction = locale === 'es' 
+    ? '\n\nThis output is for a Spanish speaking tenant. Please output in simple spanish terms so that tenants can understand.' 
+    : '';
+  
   const prompt = `You are an expert tenant rights attorney analyzing a residential lease agreement.
 
 YOUR TASK: Identify ONLY clauses that are GENUINELY problematic, unfair, or potentially illegal for tenants.
@@ -131,7 +136,7 @@ Return JSON array:
 
 If NO red flags found, return: {"redFlags": []}
 
-ONLY RETURN JSON. Be strict - only flag GENUINE problems.`;
+ONLY RETURN JSON. Be strict - only flag GENUINE problems.${languageInstruction}`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o',

@@ -27,6 +27,7 @@
     "lucide-react": "^0.544.0",
     "mapbox-gl": "^2.15.0",
     "next": "15.5.4",
+    "next-intl": "^4.3.12",
     "openai": "^6.1.0",
     "pdfjs-dist": "^5.4.296",
     "react": "19.1.0",

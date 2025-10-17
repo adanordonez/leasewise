@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 // Note: CSS imports removed as they may not be available in all react-pdf versions
 // The component will still work without them, just with slightly different styling
@@ -26,6 +27,7 @@ export default function PDFViewer({
   searchText,
   onClose 
 }: PDFViewerProps) {
+  const t = useTranslations();
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(initialPage);
   const [scale, setScale] = useState<number>(1.0);
@@ -87,7 +89,7 @@ export default function PDFViewer({
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
           <div className="flex items-center gap-4">
             <h3 className="text-lg font-semibold text-slate-900">
-              Lease Document
+              {t('PDFViewer.title')}
             </h3>
             {searchText && (
               <span className="text-sm text-slate-600 bg-yellow-50 px-3 py-1 rounded-full">
@@ -118,7 +120,7 @@ export default function PDFViewer({
             </button>
             
             <span className="text-sm text-slate-700 min-w-[100px] text-center">
-              Page {pageNumber} of {numPages || '...'}
+              {t('PDFViewer.page')} {pageNumber} {t('PDFViewer.of')} {numPages || '...'}
             </span>
             
             <button
@@ -158,7 +160,7 @@ export default function PDFViewer({
           {isLoading && (
             <div className="text-center py-12">
               <div className="inline-block w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-slate-600">Loading PDF...</p>
+              <p className="text-slate-600">{t('PDFViewer.loadingPDF')}</p>
             </div>
           )}
           
@@ -184,7 +186,7 @@ export default function PDFViewer({
         {/* Footer */}
         <div className="px-6 py-3 border-t border-slate-200 bg-slate-50">
           <p className="text-xs text-slate-500 text-center">
-            The PDF has been opened to page {pageNumber} where the source text is located. Use the controls above to navigate and zoom.
+            {t('PDFViewer.footerText', { pageNumber })}
           </p>
         </div>
       </div>

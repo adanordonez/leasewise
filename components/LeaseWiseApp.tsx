@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Upload, AlertCircle, CheckCircle, FileText, Calendar, Download, Plus, X, BarChart3, ArrowRight, Menu, Loader2, ExternalLink } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { SmartExtractionIcon, RedFlagDetectionIcon, KnowYourRightsIcon } from './AnimatedIcons';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import ComprehensiveLegalTable from '@/components/ComprehensiveLegalTable';
 import EnhancedLegalSources from '@/components/EnhancedLegalSources';
 import SimpleLoadingModal from '@/components/SimpleLoadingModal';
 import PropertyStreetView from '@/components/PropertyStreetView';
+import LanguageToggle from '@/components/LanguageToggle';
 import { exportLeaseReportHTML } from '@/lib/export-pdf-html';
 import Image from 'next/image';
 
@@ -63,6 +65,7 @@ interface Scenarios {
 }
 
 export default function LeaseWiseApp() {
+  const t = useTranslations();
   const [currentPage, setCurrentPage] = useState<Page>('landing');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [address, setAddress] = useState('');
@@ -179,9 +182,9 @@ export default function LeaseWiseApp() {
       }
 
       // Stage 1: Upload (0-20%)
-      setAnalysisStage('Uploading your lease document...');
+      setAnalysisStage(t('LoadingModal.stages.uploadingDocument'));
       setAnalysisProgress(5);
-      addLog('Uploading lease document to secure storage...');
+      addLog(t('LoadingModal.logs.uploadingToStorage'));
       console.log('Uploading file directly to Supabase...');
       
       const { createClient } = await import('@supabase/supabase-js');
@@ -209,8 +212,8 @@ export default function LeaseWiseApp() {
       }
 
       setAnalysisProgress(20);
-      addLog('Upload complete!');
-      setAnalysisStage('Processing document...');
+      addLog(t('LoadingModal.logs.uploadComplete'));
+      setAnalysisStage(t('LoadingModal.stages.processingDocument'));
 
       // Get public URL
       const { data: urlData } = supabase.storage
@@ -243,15 +246,15 @@ export default function LeaseWiseApp() {
 
       // Now analyze the file
       // Stage 2: Analyzing (20-90%)
-      setAnalysisStage('Extracting text from your lease...');
+      setAnalysisStage(t('LoadingModal.stages.extractingText'));
       setAnalysisProgress(30);
-      addLog('Extracting text from PDF document...');
+      addLog(t('LoadingModal.logs.extractingText'));
       
-      setTimeout(() => addLog('Initializing RAG system for accurate analysis...'), 1000);
-      setTimeout(() => addLog('Analyzing lease clauses with AI...'), 3000);
-      setTimeout(() => addLog('Identifying potential red flags...'), 6000);
-      setTimeout(() => addLog('Extracting tenant rights and obligations...'), 9000);
-      setTimeout(() => addLog('Structuring lease data...'), 12000);
+      setTimeout(() => addLog(t('LoadingModal.logs.initializingRAG')), 1000);
+      setTimeout(() => addLog(t('LoadingModal.logs.analyzingClauses')), 3000);
+      setTimeout(() => addLog(t('LoadingModal.logs.identifyingRedFlags')), 6000);
+      setTimeout(() => addLog(t('LoadingModal.logs.extractingRights')), 9000);
+      setTimeout(() => addLog(t('LoadingModal.logs.structuringData')), 12000);
       
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
@@ -269,11 +272,11 @@ export default function LeaseWiseApp() {
       }, 800); // Update every 800ms
 
       // Update stages during analysis
-      setTimeout(() => setAnalysisStage('Analyzing lease terms and conditions...'), 3000);
-      setTimeout(() => setAnalysisStage('Detecting potential red flags...'), 10000);
-      setTimeout(() => setAnalysisStage('Identifying your tenant rights...'), 20000);
-      setTimeout(() => setAnalysisStage('Extracting important dates...'), 30000);
-      setTimeout(() => setAnalysisStage('Finalizing comprehensive analysis...'), 45000);
+      setTimeout(() => setAnalysisStage(t('LoadingModal.stages.analyzingTerms')), 3000);
+      setTimeout(() => setAnalysisStage(t('LoadingModal.stages.detectingRedFlags')), 10000);
+      setTimeout(() => setAnalysisStage(t('LoadingModal.stages.identifyingRights')), 20000);
+      setTimeout(() => setAnalysisStage(t('LoadingModal.stages.extractingDates')), 30000);
+      setTimeout(() => setAnalysisStage(t('LoadingModal.stages.finalizingAnalysis')), 45000);
       
       try {
         response = await fetch('/api/analyze-lease', { 
@@ -390,11 +393,12 @@ export default function LeaseWiseApp() {
                 Laws
               </a>
               */}
+              <LanguageToggle />
               <button 
                 onClick={() => setCurrentPage('upload')}
                 className="inline-flex h-9 items-center justify-center gap-2 px-4 rounded-[10px] bg-[#6039B3] text-white font-semibold text-sm hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
               >
-                Get Started
+                {t('Nav.getStarted')}
               </button>
             </div>
 
@@ -410,15 +414,17 @@ export default function LeaseWiseApp() {
             <div className="max-w-2xl flex flex-col items-center gap-8">
               <div className="w-full flex flex-col items-center gap-6">
                 <div className="inline-flex h-10 px-8 py-2 items-center gap-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
-                  <p className="text-sm font-medium text-foreground">AI-Powered Lease Analysis</p>
+                  <p className="text-sm font-medium text-foreground">{t('Hero.badge')}</p>
               </div>
               
                 <h1 className="text-5xl sm:text-6xl font-bold text-center text-slate-900 leading-tight">
-                  Understand your lease in <span className="text-[#6039B3]">minutes</span>
+                  {t.rich('Hero.title', {
+                    minutes: (chunks) => <span className="text-[#6039B3] font-bold">{chunks}</span>
+                  })}
               </h1>
               
                 <p className="text-lg text-center text-slate-600 leading-7 max-w-xl">
-                  Upload your lease PDF and get instant AI analysis of terms, rights, and red flags. Make informed rental decisions with confidence and clarity.
+                  {t('Hero.description')}
               </p>
               </div>
               
@@ -426,13 +432,13 @@ export default function LeaseWiseApp() {
                   onClick={() => setCurrentPage('upload')}
                 className="inline-flex h-12 items-center justify-center gap-2 px-8 rounded-[10px] bg-[#6039B3] text-white font-semibold text-base hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
                 >
-                Analyze your lease
+                {t('Hero.cta')}
                 <ArrowRight className="w-4 h-4" />
                 </button>
               
               <div className="flex flex-col items-center gap-3">
                 <p className="text-sm font-medium text-center" style={{ color: '#737373', fontFamily: 'Georgia, serif' }}>
-                  Created by
+                  {t('Creator.createdBy')}
                 </p>
                 <div className="relative h-8 w-auto">
                   <Image
@@ -444,7 +450,7 @@ export default function LeaseWiseApp() {
                   />
                 </div>
                 <p className="text-sm font-medium text-center" style={{ color: '#800000', fontFamily: 'Georgia, serif' }}>
-                  University of Chicago Law School • AI Lab
+                  {t('Creator.institution')}
                 </p>
               </div>
             </div>
@@ -459,25 +465,25 @@ export default function LeaseWiseApp() {
                 <div className="flex flex-col items-start justify-start gap-10 w-full">
                   <div className="flex flex-col items-start justify-start gap-6 w-full">
                     <h1 className="text-3xl font-bold text-foreground">
-                      Get instant AI analysis of your lease
+                      {t('Features.aiAnalysis.title')}
                     </h1>
                     <p className="text-base text-muted-foreground">
-                      Upload your lease PDF and receive comprehensive analysis in minutes. Our AI detects red flags, explains complex terms, identifies important dates, and provides actionable insights about your rental agreement.
+                      {t('Features.aiAnalysis.description')}
                     </p>
                     </div>
                   
                   <div className="flex flex-col items-start justify-start gap-6 w-full">
                     <div className="flex flex-col items-start justify-start gap-4 w-full">
-                      <h3 className="text-xl font-bold text-foreground">Under 2 min</h3>
+                      <h3 className="text-xl font-bold text-foreground">{t('Features.aiAnalysis.stat1Label')}</h3>
                       <p className="text-base text-muted-foreground">
-                        Fast analysis that examines every clause, identifies potential issues, and explains what matters most in plain English.
+                        {t('Features.aiAnalysis.stat1Description')}
                       </p>
                   </div>
                     
                     <div className="flex flex-col items-start justify-start gap-4 w-full">
-                      <h3 className="text-xl font-bold text-foreground">Free</h3>
+                      <h3 className="text-xl font-bold text-foreground">{t('Features.aiAnalysis.stat2Label')}</h3>
                       <p className="text-base text-muted-foreground">
-                        No signup required. Upload your lease and get instant analysis with detailed breakdowns and personalized insights.
+                        {t('Features.aiAnalysis.stat2Description')}
                       </p>
                 </div>
                   </div>
@@ -487,7 +493,7 @@ export default function LeaseWiseApp() {
                       onClick={() => setCurrentPage('upload')}
                       className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
                     >
-                      Analyze your lease now
+                      {t('Features.aiAnalysis.cta')}
                     </button>
             </div>
           </div>
@@ -508,24 +514,24 @@ export default function LeaseWiseApp() {
                 <div className="flex flex-col gap-8 flex-1 max-w-xl">
                   <div className="flex flex-col gap-6">
                     <h1 className="text-4xl font-bold text-foreground">
-                      Get instant AI analysis of your lease
+                      {t('Features.aiAnalysis.title')}
                     </h1>
                     <p className="text-base text-muted-foreground">
-                      Upload your lease PDF and receive comprehensive analysis in minutes. Our AI detects red flags, explains complex terms, identifies important dates, and provides actionable insights about your rental agreement.
+                      {t('Features.aiAnalysis.description')}
                     </p>
       </div>
                   
                   <div className="flex gap-8">
                     <div className="flex flex-col gap-2 flex-1">
-                      <h2 className="text-3xl font-bold text-foreground">Under 2 min</h2>
+                      <h2 className="text-3xl font-bold text-foreground">{t('Features.aiAnalysis.stat1Label')}</h2>
                       <p className="text-base text-muted-foreground">
-                        Fast analysis that examines every clause, identifies potential issues, and explains what matters most in plain English.
+                        {t('Features.aiAnalysis.stat1Description')}
                       </p>
                 </div>
                     <div className="flex flex-col gap-2 flex-1">
-                      <h2 className="text-3xl font-bold text-foreground">Free</h2>
+                      <h2 className="text-3xl font-bold text-foreground">{t('Features.aiAnalysis.stat2Label')}</h2>
                       <p className="text-base text-muted-foreground">
-                        No signup required. Upload your lease and get instant analysis with detailed breakdowns and personalized insights.
+                        {t('Features.aiAnalysis.stat2Description')}
                       </p>
               </div>
                   </div>
@@ -535,7 +541,7 @@ export default function LeaseWiseApp() {
                       onClick={() => setCurrentPage('upload')}
                       className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
               >
-                      Analyze your lease now
+                      {t('Features.aiAnalysis.cta')}
               </button>
             </div>
           </div>
@@ -561,32 +567,32 @@ export default function LeaseWiseApp() {
                 <div className="flex flex-col items-start justify-start gap-10 w-full">
                   <div className="flex flex-col items-start justify-start gap-6 w-full">
                     <h1 className="text-3xl font-bold text-foreground">
-                      Understand your state's landlord-renter laws
+                      {t('Features.stateLaws.title')}
                     </h1>
                     <p className="text-base text-muted-foreground">
-                      Access comprehensive information about your rights as a renter. Learn about security deposits, lease terminations, maintenance obligations, and legal protections specific to your state and city.
+                      {t('Features.stateLaws.description')}
                     </p>
                   </div>
                   
                   <div className="flex flex-col items-start justify-start gap-6 w-full">
                     <div className="flex flex-col items-start justify-start gap-4 w-full">
-                      <h3 className="text-xl font-bold text-foreground">50 States</h3>
+                      <h3 className="text-xl font-bold text-foreground">{t('Features.stateLaws.stat1Label')}</h3>
                       <p className="text-base text-muted-foreground">
-                        Complete coverage of landlord-renter laws across all US states with city-specific regulations and requirements.
+                        {t('Features.stateLaws.stat1Description')}
                       </p>
                     </div>
                     
                     <div className="flex flex-col items-start justify-start gap-4 w-full">
-                      <h3 className="text-xl font-bold text-foreground">Updated</h3>
+                      <h3 className="text-xl font-bold text-foreground">{t('Features.stateLaws.stat2Label')}</h3>
                       <p className="text-base text-muted-foreground">
-                        Current legal information with sources cited, so you always have accurate and reliable renter law guidance.
+                        {t('Features.stateLaws.stat2Description')}
                       </p>
                     </div>
                   </div>
                   
                   <div>
                     <div className="inline-flex h-10 items-center justify-center gap-2 px-6 py-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
-                      <p className="text-sm font-medium text-[#800000]">Coming Soon</p>
+                      <p className="text-sm font-medium text-[#800000]">{t('Features.stateLaws.status')}</p>
                     </div>
                   </div>
                 </div>
@@ -607,31 +613,31 @@ export default function LeaseWiseApp() {
                 <div className="flex flex-col gap-8 flex-1 max-w-xl">
                   <div className="flex flex-col gap-6">
                     <h1 className="text-4xl font-bold text-foreground">
-                      Understand your state's landlord-renter laws
+                      {t('Features.stateLaws.title')}
                     </h1>
                     <p className="text-base text-muted-foreground">
-                      Access comprehensive information about your rights as a renter. Learn about security deposits, lease terminations, maintenance obligations, and legal protections specific to your state and city.
+                      {t('Features.stateLaws.description')}
                     </p>
                   </div>
                   
                   <div className="flex gap-8">
                     <div className="flex flex-col gap-2 flex-1">
-                      <h2 className="text-3xl font-bold text-foreground">50 States</h2>
+                      <h2 className="text-3xl font-bold text-foreground">{t('Features.stateLaws.stat1Label')}</h2>
                       <p className="text-base text-muted-foreground">
-                        Complete coverage of landlord-renter laws across all US states with city-specific regulations and requirements.
+                        {t('Features.stateLaws.stat1Description')}
                       </p>
                     </div>
                     <div className="flex flex-col gap-2 flex-1">
-                      <h2 className="text-3xl font-bold text-foreground">Updated</h2>
+                      <h2 className="text-3xl font-bold text-foreground">{t('Features.stateLaws.stat2Label')}</h2>
                       <p className="text-base text-muted-foreground">
-                        Current legal information with sources cited, so you always have accurate and reliable renter law guidance.
+                        {t('Features.stateLaws.stat2Description')}
                       </p>
                     </div>
                   </div>
                   
                   <div>
                     <div className="inline-flex h-10 items-center justify-center gap-2 px-6 py-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
-                      <p className="text-sm font-medium text-[#800000]">Coming Soon</p>
+                      <p className="text-sm font-medium text-[#800000]">{t('Features.stateLaws.status')}</p>
                     </div>
                   </div>
                 </div>
@@ -657,32 +663,32 @@ export default function LeaseWiseApp() {
                 <div className="flex flex-col items-start justify-start gap-10 w-full">
                   <div className="flex flex-col items-start justify-start gap-6 w-full">
                     <h1 className="text-3xl font-bold text-foreground">
-                      Compare your rental data with market trends
+                      {t('Features.marketData.title')}
                     </h1>
                     <p className="text-base text-muted-foreground">
-                      See how your lease compares to thousands of rentals in your area. Get instant insights on market rates, price percentiles, and whether you're getting a fair deal on your rental agreement.
+                      {t('Features.marketData.description')}
                     </p>
                   </div>
                   
                   <div className="flex flex-col items-start justify-start gap-6 w-full">
                     <div className="flex flex-col items-start justify-start gap-4 w-full">
-                      <h3 className="text-xl font-bold text-foreground">3,200+</h3>
+                      <h3 className="text-xl font-bold text-foreground">{t('Features.marketData.stat1Label')}</h3>
                       <p className="text-base text-muted-foreground">
-                        Active leases analyzed to provide you with accurate market comparisons and pricing insights for your area.
+                        {t('Features.marketData.stat1Description')}
                       </p>
                     </div>
                     
                     <div className="flex flex-col items-start justify-start gap-4 w-full">
-                      <h3 className="text-xl font-bold text-foreground">Real-time</h3>
+                      <h3 className="text-xl font-bold text-foreground">{t('Features.marketData.stat2Label')}</h3>
                       <p className="text-base text-muted-foreground">
-                        Up-to-date market data helps you understand if your rent is competitive and make informed decisions.
+                        {t('Features.marketData.stat2Description')}
                       </p>
                     </div>
                   </div>
                   
                   <div>
                     <div className="inline-flex h-10 items-center justify-center gap-2 px-6 py-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
-                      <p className="text-sm font-medium text-[#800000]">Coming Soon</p>
+                      <p className="text-sm font-medium text-[#800000]">{t('Features.marketData.status')}</p>
                     </div>
                   </div>
                 </div>
@@ -703,31 +709,31 @@ export default function LeaseWiseApp() {
                 <div className="flex flex-col gap-8 flex-1 max-w-xl">
                   <div className="flex flex-col gap-6">
                     <h1 className="text-4xl font-bold text-foreground">
-                      Compare your rental data with market trends
+                      {t('Features.marketData.title')}
                     </h1>
                     <p className="text-base text-muted-foreground">
-                      See how your lease compares to thousands of rentals in your area. Get instant insights on market rates, price percentiles, and whether you're getting a fair deal on your rental agreement.
+                      {t('Features.marketData.description')}
                     </p>
                   </div>
                   
                   <div className="flex gap-8">
                     <div className="flex flex-col gap-2 flex-1">
-                      <h2 className="text-3xl font-bold text-foreground">3,200+</h2>
+                      <h2 className="text-3xl font-bold text-foreground">{t('Features.marketData.stat1Label')}</h2>
                       <p className="text-base text-muted-foreground">
-                        Active leases analyzed to provide you with accurate market comparisons and pricing insights for your area.
+                        {t('Features.marketData.stat1Description')}
                       </p>
                     </div>
                     <div className="flex flex-col gap-2 flex-1">
-                      <h2 className="text-3xl font-bold text-foreground">Real-time</h2>
+                      <h2 className="text-3xl font-bold text-foreground">{t('Features.marketData.stat2Label')}</h2>
                       <p className="text-base text-muted-foreground">
-                        Up-to-date market data helps you understand if your rent is competitive and make informed decisions.
+                        {t('Features.marketData.stat2Description')}
                       </p>
             </div>
           </div>
 
                   <div>
                     <div className="inline-flex h-10 items-center justify-center gap-2 px-6 py-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
-                      <p className="text-sm font-medium text-[#800000]">Coming Soon</p>
+                      <p className="text-sm font-medium text-[#800000]">{t('Features.marketData.status')}</p>
                     </div>
                   </div>
                 </div>
@@ -758,9 +764,9 @@ export default function LeaseWiseApp() {
 
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
           <div className="text-center mb-12">
-            <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">Analyze your lease</h2>
+            <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">{t('AnalyzePage.title')}</h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Upload your lease PDF and enter your property address to get instant AI-powered analysis
+              {t('AnalyzePage.subtitle')}
             </p>
           </div>
 
@@ -783,7 +789,7 @@ export default function LeaseWiseApp() {
                 <div className="flex items-center justify-center w-8 h-8 bg-slate-100 rounded-lg">
                   <FileText className="h-5 w-5 text-slate-700" />
                 </div>
-                <label className="text-lg font-semibold text-slate-900">Lease Document</label>
+                <label className="text-lg font-semibold text-slate-900">{t('AnalyzePage.documentUpload.title')}</label>
               </div>
               
               <input 
@@ -816,13 +822,13 @@ export default function LeaseWiseApp() {
                 }`} />
                 <p className="text-lg font-medium text-slate-900 mb-2">
                   {isDragging 
-                    ? 'Drop your PDF here' 
+                    ? t('AnalyzePage.documentUpload.dropHere')
                     : uploadedFile 
                       ? uploadedFile.name 
-                      : 'Click to upload or drag & drop PDF'}
+                      : t('AnalyzePage.documentUpload.dragDrop')}
                 </p>
                 <p className="text-sm text-slate-500">
-                  {isDragging ? 'Release to upload' : 'Maximum file size: 50MB (Supabase upload)'}
+                  {isDragging ? t('AnalyzePage.documentUpload.releaseToUpload') : t('AnalyzePage.documentUpload.maxSize')}
                 </p>
               </label>
               
@@ -841,7 +847,7 @@ export default function LeaseWiseApp() {
               {uploadedFile && uploadProgress === 100 && (
                 <div className="mt-4 flex items-center justify-center gap-2 text-green-700">
                   <CheckCircle className="h-5 w-5" />
-                  <span className="text-sm font-medium">Upload complete</span>
+                  <span className="text-sm font-medium">{t('AnalyzePage.documentUpload.uploadComplete')}</span>
                 </div>
               )}
             </div>
@@ -852,13 +858,13 @@ export default function LeaseWiseApp() {
                 <div className="flex items-center justify-center w-8 h-8 bg-slate-100 rounded-lg">
                   <FileText className="h-5 w-5 text-slate-700" />
                 </div>
-                <label className="text-lg font-semibold text-slate-900">Your Information</label>
+                <label className="text-lg font-semibold text-slate-900">{t('AnalyzePage.userInfo.title')}</label>
               </div>
               
               <div className="space-y-4">
                 <div>
                   <label htmlFor="userName" className="block text-sm font-medium text-slate-700 mb-2">
-                    Full Name <span className="text-red-500">*</span>
+                    {t('AnalyzePage.userInfo.fullName')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -873,7 +879,7 @@ export default function LeaseWiseApp() {
                 
                 <div>
                   <label htmlFor="userEmail" className="block text-sm font-medium text-slate-700 mb-2">
-                    Email Address <span className="text-red-500">*</span>
+                    {t('AnalyzePage.userInfo.email')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
@@ -894,7 +900,7 @@ export default function LeaseWiseApp() {
                 <div className="flex items-center justify-center w-8 h-8 bg-slate-100 rounded-lg">
                   <Calendar className="h-5 w-5 text-slate-700" />
                 </div>
-                <label className="text-lg font-semibold text-slate-900">Property Address</label>
+                <label className="text-lg font-semibold text-slate-900">{t('AnalyzePage.userInfo.address')}</label>
               </div>
               
               <AddressAutocomplete value={address} onAddressSelect={setAddress} />
@@ -917,10 +923,10 @@ export default function LeaseWiseApp() {
                 {isAnalyzing ? (
                   <>
                     <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Analyzing...
+                    {t('AnalyzePage.analyzing')}
                   </>
                 ) : (
-                  'Analyze Lease'
+                  t('AnalyzePage.cta')
                 )}
               </button>
               
@@ -934,7 +940,7 @@ export default function LeaseWiseApp() {
                 <div className="w-8 h-8 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-medium">
                   1
                 </div>
-                <span className="text-sm font-medium text-slate-700">Upload</span>
+                <span className="text-sm font-medium text-slate-700">{t('AnalyzePage.steps.upload')}</span>
               </div>
               <div className="w-8 h-px bg-slate-300"></div>
               <div className="flex items-center gap-2">
@@ -943,14 +949,14 @@ export default function LeaseWiseApp() {
                 }`}>
                   2
                 </div>
-                <span className="text-sm font-medium text-slate-700">Address</span>
+                <span className="text-sm font-medium text-slate-700">{t('AnalyzePage.steps.address')}</span>
               </div>
               <div className="w-8 h-px bg-slate-300"></div>
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-slate-200 text-slate-500 rounded-full flex items-center justify-center text-sm font-medium">
                   3
                 </div>
-                <span className="text-sm font-medium text-slate-500">Results</span>
+                <span className="text-sm font-medium text-slate-500">{t('AnalyzePage.steps.results')}</span>
               </div>
             </div>
           </div>
@@ -1042,7 +1048,7 @@ export default function LeaseWiseApp() {
             ) : (
               <>
                 <Download className="h-4 w-4" />
-                Export PDF
+                {t('ResultsPage.navigation.exportPDF')}
               </>
             )}
               </button>
@@ -1058,19 +1064,19 @@ export default function LeaseWiseApp() {
                 className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-all duration-200 flex items-center gap-2"
               >
                 <Plus className="h-4 w-4" />
-                New Analysis
+                {t('ResultsPage.navigation.newAnalysis')}
               </button>
             </div>
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">Lease Analysis Complete</h1>
+          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">{t('ResultsPage.header.title')}</h1>
           <p className="text-xl text-slate-600">{address}</p>
         </div>
 
         {/* Property Street View */}
         {address && (
           <div className="mb-12">
-            <PropertyStreetView address={address} />
+            <PropertyStreetView address={address} title={t('ResultsPage.propertyInfo.streetView')} />
           </div>
         )}
 
@@ -1078,7 +1084,7 @@ export default function LeaseWiseApp() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-md transition-shadow duration-200">
             <div className="text-sm font-medium text-slate-500 mb-2 flex items-center">
-              Monthly Rent
+              {t('ResultsPage.propertyInfo.monthlyRent')}
               <SourceCitation 
                 sourceText={analysisResult.summary.sources?.monthlyRent} 
                 label="Monthly Rent Source"
@@ -1091,7 +1097,7 @@ export default function LeaseWiseApp() {
           </div>
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-md transition-shadow duration-200">
             <div className="text-sm font-medium text-slate-500 mb-2 flex items-center">
-              Security Deposit
+              {t('ResultsPage.propertyInfo.securityDeposit')}
               <SourceCitation 
                 sourceText={analysisResult.summary.sources?.securityDeposit} 
                 label="Security Deposit Source"
@@ -1104,7 +1110,7 @@ export default function LeaseWiseApp() {
           </div>
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-md transition-shadow duration-200">
             <div className="text-sm font-medium text-slate-500 mb-2 flex items-center">
-              Lease Start
+              {t('ResultsPage.propertyInfo.leaseStart')}
               <SourceCitation 
                 sourceText={analysisResult.summary.sources?.leaseStart} 
                 label="Lease Start Date Source"
@@ -1117,7 +1123,7 @@ export default function LeaseWiseApp() {
           </div>
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-md transition-shadow duration-200">
             <div className="text-sm font-medium text-slate-500 mb-2 flex items-center">
-              Lease End
+              {t('ResultsPage.propertyInfo.leaseEnd')}
               <SourceCitation 
                 sourceText={analysisResult.summary.sources?.leaseEnd} 
                 label="Lease End Date Source"
@@ -1139,10 +1145,10 @@ export default function LeaseWiseApp() {
                   <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg">
                     <AlertCircle className="h-5 w-5 text-red-600" />
                   </div>
-                  <h2 className="text-xl font-semibold text-slate-900">Red Flags</h2>
+                  <h2 className="text-xl font-semibold text-slate-900">{t('ResultsPage.propertyInfo.redFlags')}</h2>
                 </div>
                 <span className="px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-full">
-                  {analysisResult.redFlags.length} detected
+                  {analysisResult.redFlags.length} {t('ResultsPage.propertyInfo.detected')}
                 </span>
               </div>
             </div>
@@ -1156,7 +1162,7 @@ export default function LeaseWiseApp() {
                         <h3 className="font-semibold text-slate-900">{flag.issue}</h3>
                         <SourceCitation 
                           sourceText={flag.source} 
-                          label={`Red Flag: ${flag.issue}`}
+                          label={`${t('SourceCitation.redFlag')}: ${flag.issue}`}
                           pageNumber={flag.page_number}
                           pdfUrl={analysisResult.pdfUrl}
                           searchText={flag.source}
@@ -1166,7 +1172,7 @@ export default function LeaseWiseApp() {
                           flag.severity === 'medium' ? 'bg-yellow-100 text-yellow-700' : 
                           'bg-slate-100 text-slate-700'
                         }`}>
-                          {flag.severity}
+                          {t(`ResultsPage.severity.${flag.severity}`)}
                         </span>
                       </div>
                       <p className="text-slate-600 leading-relaxed">{flag.explanation}</p>
@@ -1201,7 +1207,7 @@ export default function LeaseWiseApp() {
                 <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg">
                   <Calendar className="h-5 w-5 text-blue-600" />
                 </div>
-                <h2 className="text-xl font-semibold text-slate-900">Key Dates</h2>
+                <h2 className="text-xl font-semibold text-slate-900">{t('ResultsPage.keyDates.title')}</h2>
               </div>
             </div>
             <div className="divide-y divide-slate-200/60">
@@ -1256,7 +1262,7 @@ export default function LeaseWiseApp() {
                   <div className="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-lg">
                     <FileText className="h-5 w-5 text-purple-600" />
                   </div>
-                  <h2 className="text-xl font-semibold text-slate-900">Common Scenarios</h2>
+                  <h2 className="text-xl font-semibold text-slate-900">{t('ResultsPage.scenarios.title')}</h2>
                 </div>
               </div>
               <div className="divide-y divide-slate-200/60">
@@ -1275,7 +1281,7 @@ export default function LeaseWiseApp() {
                       {/* Source Attribution for Advice - Always show if available */}
                       {scenario.leaseRelevantText && scenario.leaseRelevantText.length > 0 && (
                         <div className="mt-3 flex items-center gap-2">
-                          <span className="text-xs text-slate-600 font-medium">Source:</span>
+                          <span className="text-xs text-slate-600 font-medium">{t('ResultsPage.scenarios.source')}</span>
                           <SourceCitation
                             sourceText={scenario.leaseRelevantText}
                             pageNumber={scenario.pageNumber}
@@ -1292,9 +1298,9 @@ export default function LeaseWiseApp() {
                         <div className="flex items-center gap-2 mb-3">
                           <CheckCircle className="w-4 h-4 text-green-600" />
                           <span className="text-sm font-semibold text-green-700">
-                            What to do:
+                            {t('ResultsPage.scenarios.whatToDo')}
                           </span>
-                </div>
+                        </div>
                         <ol className="space-y-2">
                           {scenario.actionableSteps.map((step, stepIndex) => (
                             <li key={stepIndex} className="flex items-start gap-3">

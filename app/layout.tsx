@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Comfortaa } from "next/font/google";
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -120,14 +122,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const messages = await getMessages();
+  
   return (
     <html lang="en">
-      <body className={`${inter.className} ${comfortaa.variable}`} suppressHydrationWarning>{children}</body>
+      <body className={`${inter.className} ${comfortaa.variable}`} suppressHydrationWarning>
+        <NextIntlClientProvider messages={messages}>
+          {children}
+        </NextIntlClientProvider>
+      </body>
     </html>
   );
 }

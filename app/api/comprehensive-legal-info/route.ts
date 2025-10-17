@@ -13,6 +13,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { userAddress, leaseContext, pdfUrl } = body;
     
+    // Get locale from cookies (for Spanish output)
+    const locale = request.cookies.get('locale')?.value || 'en';
+    console.log(`🌐 Detected locale: ${locale}`);
+    
     if (!userAddress) {
       return NextResponse.json(
         { error: 'User address is required' },
@@ -25,7 +29,7 @@ export async function POST(request: NextRequest) {
     console.log(`📄 PDF URL:`, pdfUrl ? 'Provided' : 'Not provided');
     
     // Use Google search URLs for statutes (more reliable than Justia)
-    const result = await searchLegalInfoWithGoogleSearch(userAddress, leaseContext);
+    const result = await searchLegalInfoWithGoogleSearch(userAddress, leaseContext, locale);
     
     console.log(`✅ Got ${result.legalInfo.length} legal categories with Google search URLs`);
     console.log(`📊 Search stats: ${result.searchMetadata.totalSources} total sources`);
@@ -59,7 +63,8 @@ export async function POST(request: NextRequest) {
         const applications = await analyzeLawApplications(
           lawsToAnalyze,
           leaseRAG,
-          leaseContext
+          leaseContext,
+          locale
         );
         
         console.log(`✅ RAG analysis complete!`);

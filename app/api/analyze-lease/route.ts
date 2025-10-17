@@ -27,7 +27,11 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, errorMessa
 }
 
 // Helper function to generate advice
-async function generateAdvice(question: string, leaseText: string): Promise<string> {
+async function generateAdvice(question: string, leaseText: string, locale: string = 'en'): Promise<string> {
+  const languageInstruction = locale === 'es' 
+    ? '\n\nThis output is for a Spanish speaking tenant. Please output in simple spanish terms so that tenants can understand.' 
+    : '';
+    
   const advicePrompt = `You are a helpful assistant that explains lease terms in clear, professional language that's easy to understand.
 
 QUESTION: ${question}
@@ -39,7 +43,7 @@ INSTRUCTIONS:
 3. Keep your answer to 2-3 sentences maximum
 4. Use clear, everyday language that any adult can understand
 5. Focus on practical implications and what the tenant should know
-6. Avoid legal jargon but don't oversimplify
+6. Avoid legal jargon but don't oversimplify${languageInstruction}
 
 Write a clear explanation:`;
 
@@ -63,49 +67,86 @@ Write a clear explanation:`;
 }
 
 // Helper function to create fallback scenario
-function createFallbackScenario(question: string) {
+function createFallbackScenario(question: string, locale: string = 'en') {
+  const advice = locale === 'es'
+    ? `Esto es lo que debe saber sobre ${question.toLowerCase()}. Verifique su contrato y las leyes locales para obtener detalles específicos.`
+    : `Here's what you should know about ${question.toLowerCase()}. Check your lease and local laws for specific details.`;
+  
+  const actionableSteps = locale === 'es' ? [
+    'Verifique su contrato para términos específicos',
+    'Contacte a su propietario si es necesario',
+    'Mantenga registros de toda comunicación',
+    'Conozca sus derechos locales como inquilino'
+  ] : [
+    'Check your lease for specific terms',
+    'Contact your landlord if needed',
+    'Keep records of all communication',
+    'Know your local tenant rights'
+  ];
+  
   return {
     title: question,
-    advice: `Here's what you should know about ${question.toLowerCase()}. Check your lease and local laws for specific details.`,
+    advice,
     leaseRelevantText: '',
     pageNumber: 0,
     severity: 'medium' as const,
-    actionableSteps: [
-      'Check your lease for specific terms',
-      'Contact your landlord if needed',
-      'Keep records of all communication',
-      'Know your local tenant rights'
-    ]
+    actionableSteps
   };
 }
 
 // Helper function to get scenario-specific action steps
-function getActionableSteps(question: string): string[] {
+function getActionableSteps(question: string, locale: string = 'en'): string[] {
   const lowerQuestion = question.toLowerCase();
   
-  if (lowerQuestion.includes('something breaks') || lowerQuestion.includes('broken')) {
-    return [
+  // Check for Spanish keywords
+  const isBreaks = lowerQuestion.includes('something breaks') || lowerQuestion.includes('broken') || lowerQuestion.includes('rompe') || lowerQuestion.includes('se rompe');
+  const isDeposit = lowerQuestion.includes('security deposit') || lowerQuestion.includes('depósito');
+  const isEntry = lowerQuestion.includes('entry') || lowerQuestion.includes('privacy') || lowerQuestion.includes('entrada') || lowerQuestion.includes('privacidad');
+  const isBreaking = lowerQuestion.includes('breaking') || lowerQuestion.includes('early') || lowerQuestion.includes('romper') || lowerQuestion.includes('anticipadamente');
+  
+  if (isBreaks) {
+    return locale === 'es' ? [
+      'Reporte el problema a su propietario inmediatamente',
+      'Tome fotos del daño',
+      'Mantenga registros de su solicitud',
+      'Haga seguimiento si no se arregla rápidamente'
+    ] : [
       'Report the problem to your landlord immediately',
       'Take photos of the damage',
       'Keep records of your request',
       'Follow up if not fixed quickly'
     ];
-  } else if (lowerQuestion.includes('security deposit')) {
-    return [
+  } else if (isDeposit) {
+    return locale === 'es' ? [
+      'Limpie el apartamento a fondo antes de mudarse',
+      'Tome fotos de la condición',
+      'Dé aviso apropiado a su propietario',
+      'Solicite una lista escrita de cualquier deducción'
+    ] : [
       'Clean the apartment thoroughly before moving out',
       'Take photos of the condition',
       'Give proper notice to your landlord',
       'Request a written list of any deductions'
     ];
-  } else if (lowerQuestion.includes('entry') || lowerQuestion.includes('privacy')) {
-    return [
+  } else if (isEntry) {
+    return locale === 'es' ? [
+      'Conozca sus derechos de privacidad en su estado',
+      'Solicite aviso apropiado antes de la entrada',
+      'Documente cualquier entrada no autorizada',
+      'Contacte a la autoridad de vivienda local si es necesario'
+    ] : [
       'Know your privacy rights in your state',
       'Ask for proper notice before entry',
       'Document any unauthorized entries',
       'Contact local housing authority if needed'
     ];
-  } else if (lowerQuestion.includes('breaking') || lowerQuestion.includes('early')) {
-    return [
+  } else if (isBreaking) {
+    return locale === 'es' ? [
+      'Verifique su contrato para tarifas de terminación anticipada',
+      'Dé aviso escrito apropiado',
+      'Intente encontrar un inquilino de reemplazo',
+      'Entienda las consecuencias financieras'
+    ] : [
       'Check your lease for early termination fees',
       'Give proper written notice',
       'Try to find a replacement tenant',
@@ -114,7 +155,12 @@ function getActionableSteps(question: string): string[] {
   }
   
   // Default action steps
-  return [
+  return locale === 'es' ? [
+    'Verifique su contrato para términos específicos',
+    'Contacte a su propietario si es necesario',
+    'Mantenga registros de toda comunicación',
+    'Conozca sus derechos locales como inquilino'
+  ] : [
     'Check your lease for specific terms',
     'Contact your landlord if needed',
     'Keep records of all communication',
@@ -177,6 +223,10 @@ export async function POST(request: NextRequest) {
 async function performAnalysis(request: NextRequest) {
   try {
     console.log('🔍 Starting lease analysis...');
+    
+    // Get locale from cookies (for Spanish output)
+    const locale = request.cookies.get('locale')?.value || 'en';
+    console.log(`🌐 Detected locale: ${locale}`);
     
     // Validate request headers
     const contentType = request.headers.get('content-type');
@@ -314,7 +364,7 @@ async function performAnalysis(request: NextRequest) {
     console.log('🔍 Analyzing lease with RAG...');
     let structuredData;
     try {
-      const structuredDataPromise = analyzeLeaseWithRAG(rag, address);
+      const structuredDataPromise = analyzeLeaseWithRAG(rag, address, locale);
       structuredData = await withTimeout(structuredDataPromise, 60000, 'Lease analysis timeout');
     } catch (analysisError) {
       console.error('🚨 Lease analysis failed:', analysisError);
@@ -350,7 +400,7 @@ async function performAnalysis(request: NextRequest) {
         monthlyRent: basicInfo.monthly_rent?.toString(),
         securityDeposit: basicInfo.security_deposit?.toString(),
         address: address
-      });
+      }, locale);
       redFlags = await withTimeout(redFlagsPromise, 45000, 'Red flags analysis timeout');
       console.log(`✅ Found ${redFlags.length} red flags`);
     } catch (redFlagsError) {
@@ -390,7 +440,12 @@ async function performAnalysis(request: NextRequest) {
     
     // Generate scenarios with RAG - optimized with timeout
     console.log('🔍 Generating scenarios with RAG...');
-    const scenarioQuestions = [
+    const scenarioQuestions = locale === 'es' ? [
+      "¿Qué pasa si algo se rompe?",
+      "Recuperar mi depósito de seguridad",
+      "Derechos de entrada del propietario y privacidad",
+      "Romper mi contrato anticipadamente"
+    ] : [
       "What if something breaks?",
       "Getting my security deposit back", 
       "Landlord entry and privacy rights",
@@ -421,7 +476,7 @@ async function performAnalysis(request: NextRequest) {
         
         if (relevantChunks.length === 0) {
           console.log(`   ❌ No relevant chunks found for: ${question}`);
-          enhancedScenarios.push(createFallbackScenario(question));
+          enhancedScenarios.push(createFallbackScenario(question, locale));
           continue;
         }
 
@@ -432,15 +487,17 @@ async function performAnalysis(request: NextRequest) {
         // Generate advice with timeout
         let simpleAdvice;
         try {
-          const advicePromise = generateAdvice(question, topChunk.text);
+          const advicePromise = generateAdvice(question, topChunk.text, locale);
           simpleAdvice = await withTimeout(advicePromise, 15000, `Advice generation timeout for ${question}`);
         } catch (adviceError) {
           console.error(`   🚨 Advice generation failed for "${question}":`, adviceError);
-          simpleAdvice = `Here's what you should know about ${question.toLowerCase()}. Check your lease for specific details.`;
+          simpleAdvice = locale === 'es' 
+            ? `Esto es lo que debe saber sobre ${question.toLowerCase()}. Verifique su contrato para obtener detalles específicos.`
+            : `Here's what you should know about ${question.toLowerCase()}. Check your lease for specific details.`;
         }
         
         // Get scenario-specific action steps
-        const actionableSteps = getActionableSteps(question);
+        const actionableSteps = getActionableSteps(question, locale);
 
         enhancedScenarios.push({
           title: question,
@@ -453,7 +510,7 @@ async function performAnalysis(request: NextRequest) {
         
       } catch (scenarioError) {
         console.error(`❌ Error processing scenario "${question}":`, scenarioError);
-        enhancedScenarios.push(createFallbackScenario(question));
+        enhancedScenarios.push(createFallbackScenario(question, locale));
       }
     }
     

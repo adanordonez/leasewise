@@ -18,7 +18,8 @@ export async function analyzeHowLawAppliesToLease(
     leaseStart?: string;
     leaseEnd?: string;
     address?: string;
-  }
+  },
+  locale: string = 'en'
 ): Promise<{
   application: string;
   relevantLeaseText?: string;
@@ -64,6 +65,10 @@ export async function analyzeHowLawAppliesToLease(
     console.log(`✅ Found ${relevantChunks.length} relevant lease sections`);
     
     // Step 2: Use LLM to analyze how the law applies to the lease
+    const languageInstruction = locale === 'es' 
+      ? '\n\nThis output is for a Spanish speaking tenant. Please output in simple spanish terms so that tenants can understand.' 
+      : '';
+    
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
@@ -98,7 +103,7 @@ ${leaseContext ? `
 RELEVANT LEASE TEXT:
 "${leaseText}"
 
-Explain in 80-120 words how this law specifically applies to THIS tenant's lease. Include specific examples from the lease text and explain the practical implications for the tenant. Be thorough and provide full context.`
+Explain in 80-120 words how this law specifically applies to THIS tenant's lease. Include specific examples from the lease text and explain the practical implications for the tenant. Be thorough and provide full context.${languageInstruction}`
         }
       ],
       temperature: 0.3,
@@ -141,7 +146,8 @@ export async function analyzeLawApplications(
     leaseStart?: string;
     leaseEnd?: string;
     address?: string;
-  }
+  },
+  locale: string = 'en'
 ): Promise<Array<{
   lawType: string;
   lawText: string;
@@ -158,7 +164,8 @@ export async function analyzeLawApplications(
         law.lawText,
         law.lawType,
         leaseRAG,
-        leaseContext
+        leaseContext,
+        locale
       );
       
       return {

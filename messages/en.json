@@ -1,0 +1,213 @@
+{
+  "Nav": {
+    "brand": "LeaseWise",
+    "getStarted": "Get Started",
+    "home": "Home",
+    "analyze": "Analyze",
+    "back": "Back"
+  },
+  "Hero": {
+    "badge": "AI-Powered Lease Analysis",
+    "title": "Understand your lease in <minutes>minutes</minutes>",
+    "titleHighlight": "minutes",
+    "description": "Upload your lease PDF and get instant AI analysis of terms, rights, and red flags. Make informed rental decisions with confidence and clarity.",
+    "cta": "Analyze your lease"
+  },
+  "Creator": {
+    "createdBy": "Created by",
+    "institution": "University of Chicago Law School • AI Lab"
+  },
+  "Features": {
+    "aiAnalysis": {
+      "title": "Get instant AI analysis of your lease",
+      "description": "Upload your lease PDF and receive comprehensive analysis in minutes. Our AI detects red flags, explains complex terms, identifies important dates, and provides actionable insights about your rental agreement.",
+      "stat1Label": "Under 2 min",
+      "stat1Description": "Fast analysis that examines every clause, identifies potential issues, and explains what matters most in plain English.",
+      "stat2Label": "Free",
+      "stat2Description": "No signup required. Upload your lease and get instant analysis with detailed breakdowns and personalized insights.",
+      "cta": "Analyze your lease now"
+    },
+    "stateLaws": {
+      "title": "Understand your state's landlord-renter laws",
+      "description": "Access comprehensive information about your rights as a renter. Learn about security deposits, lease terminations, maintenance obligations, and legal protections specific to your state and city.",
+      "stat1Label": "50 States",
+      "stat1Description": "Complete coverage of landlord-renter laws across all US states with city-specific regulations and requirements.",
+      "stat2Label": "Updated",
+      "stat2Description": "Current legal information with sources cited, so you always have accurate and reliable renter law guidance.",
+      "status": "Coming Soon"
+    },
+    "marketData": {
+      "title": "Compare your rental data with market trends",
+      "description": "See how your lease compares to thousands of rentals in your area. Get instant insights on market rates, price percentiles, and whether you're getting a fair deal on your rental agreement.",
+      "stat1Label": "3,200+",
+      "stat1Description": "Active leases analyzed to provide you with accurate market comparisons and pricing insights for your area.",
+      "stat2Label": "Real-time",
+      "stat2Description": "Up-to-date market data helps you understand if your rent is competitive and make informed decisions.",
+      "status": "Coming Soon"
+    }
+  },
+  "Disclaimer": {
+    "text": "This is a beta product. It uses AI and may provide wrong information. Anything you upload will be shared with ChatGPT. LeaseWise provides legal information, not legal advice. Using LeaseWise does not create an attorney-client relationship. LeaseWise is not your attorney."
+  },
+  "Footer": {
+    "copyright": "© 2025 LeaseWise. All rights reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
+  },
+  "AnalyzePage": {
+    "title": "Analyze your lease",
+    "subtitle": "Upload your lease PDF and enter your property address to get instant AI-powered analysis",
+    "documentUpload": {
+      "title": "Lease Document",
+      "dragDrop": "Click to upload or drag & drop PDF",
+      "maxSize": "Maximum file size: 50MB (Supabase upload)",
+      "dropHere": "Drop your PDF here",
+      "releaseToUpload": "Release to upload",
+      "uploadComplete": "Upload complete"
+    },
+    "userInfo": {
+      "title": "Your Information",
+      "fullName": "Full Name",
+      "email": "Email Address",
+      "address": "Property Address"
+    },
+    "cta": "Analyze Lease",
+    "analyzing": "Analyzing...",
+    "steps": {
+      "upload": "Upload",
+      "address": "Address",
+      "results": "Results"
+    }
+  },
+  "LoadingModal": {
+    "title": "Analyzing Your Lease",
+    "progress": "Progress",
+    "footerMessage": "This may take 30-60 seconds depending on lease complexity",
+    "stages": {
+      "uploadingDocument": "Uploading your lease document...",
+      "processingDocument": "Processing document...",
+      "extractingText": "Extracting text from your lease...",
+      "analyzingTerms": "Analyzing lease terms and conditions...",
+      "detectingRedFlags": "Detecting potential red flags...",
+      "identifyingRights": "Identifying your tenant rights...",
+      "extractingDates": "Extracting important dates...",
+      "finalizingAnalysis": "Finalizing comprehensive analysis..."
+    },
+    "logs": {
+      "uploadingToStorage": "Uploading lease document to secure storage...",
+      "uploadComplete": "Upload complete!",
+      "extractingText": "Extracting text from PDF document...",
+      "initializingRAG": "Initializing RAG system for accurate analysis...",
+      "analyzingClauses": "Analyzing lease clauses with AI...",
+      "identifyingRedFlags": "Identifying potential red flags...",
+      "extractingRights": "Extracting tenant rights and obligations...",
+      "structuringData": "Structuring lease data..."
+    }
+  },
+  "ResultsPage": {
+    "navigation": {
+      "back": "Back",
+      "analyze": "Analyze",
+      "exportPDF": "Export PDF",
+      "newAnalysis": "New Analysis"
+    },
+    "header": {
+      "title": "Lease Analysis Complete"
+    },
+    "propertyInfo": {
+      "streetView": "Property Street View",
+      "streetViewOf": "Street view of",
+      "poweredBy": "Powered by Google Street View",
+      "monthlyRent": "Monthly Rent",
+      "securityDeposit": "Security Deposit",
+      "leaseStart": "Lease Start",
+      "leaseEnd": "Lease End",
+      "redFlags": "Red Flags",
+      "detected": "detected"
+    },
+    "severity": {
+      "high": "high",
+      "medium": "medium",
+      "low": "low"
+    },
+    "rights": {
+      "title": "Know Your Renter Rights",
+      "keyCategories": "key categories",
+      "refresh": "Refresh",
+      "searchPlaceholder": "Search by law type, explanation, or statute..."
+    },
+    "table": {
+      "headers": {
+        "lawType": "Law Type",
+        "whatItSays": "What It Says",
+        "example": "Example",
+        "statute": "Statute",
+        "source": "Source"
+      },
+      "categories": {
+        "securityDeposit": "Security Deposit Terms",
+        "rentAmount": "Rent Amount and Increase Provisions",
+        "maintenance": "Maintenance and Repair Responsibilities",
+        "entryPrivacy": "Entry and Privacy Rights",
+        "leaseTerm": "Lease Term and Renewal Options",
+        "petPolicies": "Pet Policies and Fees",
+        "subletting": "Subletting and Assignment Rights",
+        "eviction": "Eviction Procedures and Protections",
+        "utilities": "Utilities and Service Responsibilities",
+        "modifications": "Modifications and Alterations"
+      },
+      "footer": {
+        "showing": "Showing",
+        "of": "of",
+        "lawCategories": "law categories",
+        "disclaimer": "⚠️ Legal Information Only: Not legal advice. Consult an attorney."
+      }
+    },
+    "keyDates": {
+      "title": "Key Dates",
+      "leaseStartDate": "Lease Start Date",
+      "leaseStartDesc": "The date the lease begins.",
+      "leaseEndDate": "Lease End Date",
+      "leaseEndDesc": "The date the lease ends.",
+      "noticeForRenewal": "Notice to Owner for Lease Renewal",
+      "noticeForRenewalDesc": "Resident must notify Owner at least 60 days prior to the expiration of the lease."
+    },
+      "scenarios": {
+        "title": "Common Scenarios",
+        "scenario1": "What if something breaks?",
+        "scenario2": "Getting my security deposit back",
+        "scenario3": "Landlord entry and privacy rights",
+        "scenario4": "Breaking my lease early",
+        "whatToDo": "What to do:",
+        "source": "Source:"
+      }
+    }
+  },
+  "SourceCitation": {
+    "source": "Source",
+    "redFlag": "Red Flag",
+    "translating": "Translating...",
+    "hideTranslation": "Hide Translation",
+    "explainInPlainEnglish": "Explain in Plain English",
+    "viewOriginalPDF": "View in Original PDF",
+    "exactText": "This is the exact text from your lease document that was used to extract this information.",
+    "close": "Close",
+    "translationError": "Sorry, we couldn't translate this text. Please try again or contact support if the issue persists.",
+    "excerptFromLease": "Excerpt from your lease:",
+    "plainTranslation": "Plain English Translation:",
+    "page": "Page"
+  },
+  "PDFViewer": {
+    "title": "Lease PDF Viewer",
+    "loadingPDF": "Loading PDF...",
+    "page": "Page",
+    "of": "of",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "previousPage": "Previous Page",
+    "nextPage": "Next Page",
+    "close": "Close",
+    "footerText": "The PDF has been opened to page {pageNumber} where the source text is located. Use the controls above to navigate and zoom."
+  }
+}
+

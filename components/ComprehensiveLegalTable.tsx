@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ExternalLink, Search, BookOpen, AlertCircle, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { VerifiedLegalInfo } from '@/lib/verified-legal-search-simple';
 
 interface ComprehensiveLegalTableProps {
@@ -19,6 +20,7 @@ interface ComprehensiveLegalTableProps {
 }
 
 export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseContext }: ComprehensiveLegalTableProps) {
+  const t = useTranslations();
   const [legalInfo, setLegalInfo] = useState<VerifiedLegalInfo[]>([]);
   const [filteredInfo, setFilteredInfo] = useState<VerifiedLegalInfo[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -110,11 +112,11 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
             <BookOpen className="w-5 h-5 text-purple-600 flex-shrink-0" />
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-slate-900">
-                Know Your Renter Rights
+                {t('ResultsPage.rights.title')}
               </h3>
               {metadata && (
                 <p className="text-sm text-slate-600">
-                  {metadata.city && `${metadata.city}, `}{metadata.state} · 10 key categories
+                  {metadata.city && `${metadata.city}, `}{metadata.state} · 10 {t('ResultsPage.rights.keyCategories')}
                 </p>
               )}
               {!legalInfo.length && !isLoading && (
@@ -144,10 +146,10 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Refreshing...
+                  {t('ResultsPage.rights.refresh')}...
                 </>
               ) : (
-                'Refresh'
+                t('ResultsPage.rights.refresh')
               )}
             </Button>
           )}
@@ -162,7 +164,7 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <Input
-                placeholder="Search by law type, explanation, or statute..."
+                placeholder={t('ResultsPage.rights.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -203,19 +205,19 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
                 <TableHeader>
                   <TableRow className="bg-slate-50">
                     <TableHead className="text-slate-900 font-semibold w-[150px]">
-                      Law Type
+                      {t('ResultsPage.table.headers.lawType')}
                     </TableHead>
                     <TableHead className="text-slate-900 font-semibold min-w-[200px]">
-                      What It Says
+                      {t('ResultsPage.table.headers.whatItSays')}
                     </TableHead>
                     <TableHead className="text-slate-900 font-semibold min-w-[200px]">
-                      Example
+                      {t('ResultsPage.table.headers.example')}
                     </TableHead>
                     <TableHead className="text-slate-900 font-semibold w-[120px]">
-                      Statute
+                      {t('ResultsPage.table.headers.statute')}
                     </TableHead>
                     <TableHead className="text-slate-900 font-semibold w-[150px]">
-                      Source
+                      {t('ResultsPage.table.headers.source')}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -278,7 +280,7 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
                 {/* Explanation */}
                 <div>
                   <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1">
-                    What It Says
+                    {t('ResultsPage.table.headers.whatItSays')}
                   </p>
                   <p className="text-sm text-slate-800">{item.explanation}</p>
                 </div>
@@ -334,12 +336,12 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
           {!isLoading && filteredInfo.length > 0 && (
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-200">
               <p className="text-sm text-slate-600">
-                Showing <strong>{filteredInfo.length}</strong> of <strong>{legalInfo.length}</strong> law categories
+                {t('ResultsPage.table.footer.showing')} <strong>{filteredInfo.length}</strong> {t('ResultsPage.table.footer.of')} <strong>{legalInfo.length}</strong> {t('ResultsPage.table.footer.lawCategories')}
               </p>
               
               <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
                 <p className="text-xs text-amber-900">
-                  ⚠️ <strong>Legal Information Only:</strong> Not legal advice. Consult an attorney.
+                  {t('ResultsPage.table.footer.disclaimer')}
                 </p>
               </div>
             </div>

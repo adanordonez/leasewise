@@ -1,0 +1,212 @@
+{
+  "Nav": {
+    "brand": "LeaseWise",
+    "getStarted": "Comenzar",
+    "home": "Inicio",
+    "analyze": "Analiza",
+    "back": "Volver"
+  },
+  "Hero": {
+    "badge": "Análisis de Contratos con IA",
+    "title": "Entiende tu contrato en <minutes>minutos</minutes>",
+    "titleHighlight": "minutos",
+    "description": "Sube tu contrato de alquiler en PDF y obtén análisis instantáneo con IA de los términos, derechos y señales de alerta. Toma decisiones informadas de alquiler con confianza y claridad.",
+    "cta": "Analiza tu contrato"
+  },
+  "Creator": {
+    "createdBy": "Creado por",
+    "institution": "Universidad de Chicago Facultad de Derecho • Laboratorio de IA"
+  },
+  "Features": {
+    "aiAnalysis": {
+      "title": "Obtén análisis instantáneo con IA de tu contrato",
+      "description": "Sube tu contrato de alquiler en PDF y recibe un análisis completo en minutos. Nuestra IA detecta señales de alerta, explica términos complejos, identifica fechas importantes y proporciona información práctica sobre tu acuerdo de alquiler.",
+      "stat1Label": "Menos de 2 min",
+      "stat1Description": "Análisis rápido que examina cada cláusula, identifica problemas potenciales y explica lo más importante en lenguaje sencillo.",
+      "stat2Label": "Gratis",
+      "stat2Description": "No requiere registro. Sube tu contrato y obtén análisis instantáneo con desglose detallado e información personalizada.",
+      "cta": "Analiza tu contrato ahora"
+    },
+    "stateLaws": {
+      "title": "Comprende las leyes de alquiler de tu estado",
+      "description": "Accede a información completa sobre tus derechos como inquilino. Aprende sobre depósitos de seguridad, terminaciones de contrato, obligaciones de mantenimiento y protecciones legales específicas de tu estado y ciudad.",
+      "stat1Label": "50 Estados",
+      "stat1Description": "Cobertura completa de leyes de alquiler en todos los estados de EE.UU. con regulaciones y requisitos específicos de cada ciudad.",
+      "stat2Label": "Actualizado",
+      "stat2Description": "Información legal actualizada con fuentes citadas, para que siempre tengas orientación precisa y confiable sobre leyes de alquiler.",
+      "status": "Próximamente"
+    },
+    "marketData": {
+      "title": "Compara tu alquiler con las tendencias del mercado",
+      "description": "Ve cómo se compara tu contrato con miles de alquileres en tu área. Obtén información instantánea sobre tarifas de mercado, percentiles de precios y si estás obteniendo un trato justo en tu acuerdo de alquiler.",
+      "stat1Label": "3,200+",
+      "stat1Description": "Contratos activos analizados para brindarte comparaciones precisas del mercado e información sobre precios en tu área.",
+      "stat2Label": "Tiempo real",
+      "stat2Description": "Datos de mercado actualizados te ayudan a entender si tu alquiler es competitivo y tomar decisiones informadas.",
+      "status": "Próximamente"
+    }
+  },
+  "Disclaimer": {
+    "text": "Este es un producto en fase beta. Utiliza IA y puede proporcionar información incorrecta. Todo lo que subas se compartirá con ChatGPT. LeaseWise proporciona información legal, no asesoramiento legal. Usar LeaseWise no crea una relación abogado-cliente. LeaseWise no es tu abogado."
+  },
+  "Footer": {
+    "copyright": "© 2025 LeaseWise. Todos los derechos reservados.",
+    "privacyPolicy": "Política de Privacidad",
+    "termsOfService": "Términos de Servicio"
+  },
+  "AnalyzePage": {
+    "title": "Analiza tu contrato",
+    "subtitle": "Sube tu contrato de alquiler en PDF e ingresa la dirección de tu propiedad para obtener análisis instantáneo con IA",
+    "documentUpload": {
+      "title": "Documento de Alquiler",
+      "dragDrop": "Haz clic para subir o arrastra y suelta el PDF",
+      "maxSize": "Tamaño máximo de archivo: 50MB (carga en Supabase)",
+      "dropHere": "Suelta tu PDF aquí",
+      "releaseToUpload": "Suelta para subir",
+      "uploadComplete": "¡Carga completa!"
+    },
+    "userInfo": {
+      "title": "Tu Información",
+      "fullName": "Nombre Completo",
+      "email": "Correo Electrónico",
+      "address": "Dirección de la Propiedad"
+    },
+    "cta": "Analizar Contrato",
+    "analyzing": "Analizando...",
+    "steps": {
+      "upload": "Subir",
+      "address": "Dirección",
+      "results": "Resultados"
+    }
+  },
+  "LoadingModal": {
+    "title": "Analizando Tu Contrato",
+    "progress": "Progreso",
+    "footerMessage": "Esto puede tomar de 30 a 60 segundos dependiendo de la complejidad del contrato",
+    "stages": {
+      "uploadingDocument": "Subiendo tu documento de alquiler...",
+      "processingDocument": "Procesando documento...",
+      "extractingText": "Extrayendo texto de tu contrato...",
+      "analyzingTerms": "Analizando términos y condiciones del contrato...",
+      "detectingRedFlags": "Detectando posibles señales de alerta...",
+      "identifyingRights": "Identificando tus derechos como inquilino...",
+      "extractingDates": "Extrayendo fechas importantes...",
+      "finalizingAnalysis": "Finalizando análisis completo..."
+    },
+    "logs": {
+      "uploadingToStorage": "Subiendo documento de alquiler a almacenamiento seguro...",
+      "uploadComplete": "¡Carga completa!",
+      "extractingText": "Extrayendo texto del documento PDF...",
+      "initializingRAG": "Inicializando sistema RAG para análisis preciso...",
+      "analyzingClauses": "Analizando cláusulas del contrato con IA...",
+      "identifyingRedFlags": "Identificando posibles señales de alerta...",
+      "extractingRights": "Extrayendo derechos y obligaciones del inquilino...",
+      "structuringData": "Estructurando datos del contrato..."
+    }
+  },
+  "ResultsPage": {
+    "navigation": {
+      "back": "Volver",
+      "analyze": "Analizar",
+      "exportPDF": "Exportar PDF",
+      "newAnalysis": "Nuevo Análisis"
+    },
+    "header": {
+      "title": "Análisis de Contrato Completo"
+    },
+    "propertyInfo": {
+      "streetView": "Vista de la Propiedad",
+      "streetViewOf": "Vista de calle de",
+      "poweredBy": "Empoderado por Google Street View",
+      "monthlyRent": "Renta Mensual",
+      "securityDeposit": "Depósito de Seguridad",
+      "leaseStart": "Inicio del Contrato",
+      "leaseEnd": "Fin del Contrato",
+      "redFlags": "Señales de Alerta",
+      "detected": "detectadas"
+    },
+    "severity": {
+      "high": "alta",
+      "medium": "moderado",
+      "low": "baja"
+    },
+    "rights": {
+      "title": "Conoce Tus Derechos como Inquilino",
+      "keyCategories": "categorías clave",
+      "refresh": "Actualizar",
+      "searchPlaceholder": "Buscar por tipo de ley, explicación o estatuto..."
+    },
+    "table": {
+      "headers": {
+        "lawType": "Tipo de Ley",
+        "whatItSays": "Qué Dice",
+        "example": "Ejemplo",
+        "statute": "Estatuto",
+        "source": "Fuente"
+      },
+      "categories": {
+        "securityDeposit": "Términos del Depósito de Seguridad",
+        "rentAmount": "Disposiciones sobre Monto y Aumento de Renta",
+        "maintenance": "Responsabilidades de Mantenimiento y Reparación",
+        "entryPrivacy": "Derechos de Entrada y Privacidad",
+        "leaseTerm": "Término del Contrato y Opciones de Renovación",
+        "petPolicies": "Políticas y Cargos por Mascotas",
+        "subletting": "Derechos de Subarrendamiento y Cesión",
+        "eviction": "Procedimientos y Protecciones de Desalojo",
+        "utilities": "Responsabilidades de Servicios y Utilidades",
+        "modifications": "Modificaciones y Alteraciones"
+      },
+      "footer": {
+        "showing": "Mostrando",
+        "of": "de",
+        "lawCategories": "categorías de leyes",
+        "disclaimer": "⚠️ Solo Información Legal: No es asesoramiento legal. Consulte a un abogado."
+      }
+    },
+    "keyDates": {
+      "title": "Fechas Importantes",
+      "leaseStartDate": "Fecha de Inicio del Contrato",
+      "leaseStartDesc": "La fecha en que comienza el contrato.",
+      "leaseEndDate": "Fecha de Fin del Contrato",
+      "leaseEndDesc": "La fecha en que termina el contrato.",
+      "noticeForRenewal": "Aviso al Propietario para Renovación del Contrato",
+      "noticeForRenewalDesc": "El residente debe notificar al propietario al menos 60 días antes de la expiración del contrato."
+    },
+    "scenarios": {
+      "title": "Escenarios Comunes",
+      "scenario1": "¿Qué pasa si algo se rompe?",
+      "scenario2": "Recuperar mi depósito de seguridad",
+      "scenario3": "Derechos de entrada del propietario y privacidad",
+      "scenario4": "Romper mi contrato anticipadamente",
+      "whatToDo": "Qué hacer:",
+      "source": "Fuente:"
+    }
+  },
+  "SourceCitation": {
+    "source": "Fuente",
+    "redFlag": "Señal de Alerta",
+    "translating": "Traduciendo...",
+    "hideTranslation": "Ocultar Traducción",
+    "explainInPlainEnglish": "Explicar en Lenguaje Sencillo",
+    "viewOriginalPDF": "Ver en PDF Original",
+    "exactText": "Este es el texto exacto de su documento de arrendamiento que se utilizó para extraer esta información.",
+    "close": "Cerrar",
+    "translationError": "Lo sentimos, no pudimos traducir este texto. Por favor, inténtelo de nuevo o contacte a soporte si el problema persiste.",
+    "excerptFromLease": "Extracto de su contrato:",
+    "plainTranslation": "Traducción en Lenguaje Sencillo:",
+    "page": "Página"
+  },
+  "PDFViewer": {
+    "title": "Visor de PDF del Contrato",
+    "loadingPDF": "Cargando PDF...",
+    "page": "Página",
+    "of": "de",
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar",
+    "previousPage": "Página Anterior",
+    "nextPage": "Página Siguiente",
+    "close": "Cerrar",
+    "footerText": "El PDF se ha abierto en la página {pageNumber} donde se encuentra el texto de origen. Use los controles arriba para navegar y hacer zoom."
+  }
+}
+

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Loader2, CheckCircle, Upload, FileText, Brain, Flag, Scale, Cog } from 'lucide-react';
 import { useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface SimpleLoadingModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ export default function SimpleLoadingModal({
   stage,
   logs 
 }: SimpleLoadingModalProps) {
+  const t = useTranslations();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   console.log('🔍 SimpleLoadingModal render:', { isOpen, progress, stage, logsLength: logs.length });
@@ -70,7 +72,7 @@ export default function SimpleLoadingModal({
               >
                 <Loader2 className="w-7 h-7 text-purple-600" />
               </motion.div>
-              <h2 className="text-3xl font-bold text-slate-900">Analyzing Your Lease</h2>
+              <h2 className="text-3xl font-bold text-slate-900">{t('LoadingModal.title')}</h2>
             </div>
             <p className="text-lg text-slate-600 font-medium">
               {stage}
@@ -81,7 +83,7 @@ export default function SimpleLoadingModal({
           <div className="px-8 pb-6">
             <div className="flex justify-between items-center mb-3">
               <span className="text-sm font-semibold text-slate-700">
-                Progress
+                {t('LoadingModal.progress')}
               </span>
               <span className="text-sm font-bold text-purple-600">
                 {Math.round(progress)}%
@@ -132,7 +134,7 @@ export default function SimpleLoadingModal({
           {/* Footer */}
           <div className="bg-slate-50 px-8 py-4 border-t border-slate-200">
             <p className="text-xs text-slate-500 text-center font-medium">
-              This may take 30-60 seconds depending on lease complexity
+              {t('LoadingModal.footerMessage')}
             </p>
           </div>
         </div>

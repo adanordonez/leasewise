@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { MapPin, AlertCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface PropertyStreetViewProps {
   address: string;
   className?: string;
+  title?: string;
 }
 
-export default function PropertyStreetView({ address, className = '' }: PropertyStreetViewProps) {
+export default function PropertyStreetView({ address, className = '', title }: PropertyStreetViewProps) {
+  const t = useTranslations();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -79,12 +82,12 @@ export default function PropertyStreetView({ address, className = '' }: Property
     <div className={`rounded-lg overflow-hidden border border-slate-200 shadow-sm ${className}`}>
       <div className="bg-slate-100 px-4 py-2 flex items-center gap-2 border-b border-slate-200">
         <MapPin className="w-4 h-4 text-purple-600" />
-        <span className="text-sm font-medium text-slate-700">Property Street View</span>
+        <span className="text-sm font-medium text-slate-700">{title || t('ResultsPage.propertyInfo.streetView')}</span>
       </div>
       <div className="relative">
         <img
           src={imageUrl}
-          alt={`Street view of ${address}`}
+          alt={`${t('ResultsPage.propertyInfo.streetViewOf')} ${address}`}
           className="w-full h-auto"
           style={{ maxHeight: '250px', objectFit: 'cover' }}
         />
@@ -93,7 +96,7 @@ export default function PropertyStreetView({ address, className = '' }: Property
         </div>
       </div>
       <div className="bg-slate-50 px-4 py-2 text-xs text-slate-500 text-center">
-        Powered by Google Street View
+        {t('ResultsPage.propertyInfo.poweredBy')}
       </div>
     </div>
   );

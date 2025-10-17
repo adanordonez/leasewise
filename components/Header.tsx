@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { Menu, X, ArrowLeft } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import LanguageToggle from './LanguageToggle';
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -11,6 +13,7 @@ interface HeaderProps {
 }
 
 export default function Header({ showBackButton = false, onBackClick }: HeaderProps = {}) {
+  const t = useTranslations();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -29,16 +32,17 @@ export default function Header({ showBackButton = false, onBackClick }: HeaderPr
               className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors"
             >
               <ArrowLeft className="h-5 w-5 text-slate-700" />
-              <span className="font-medium text-slate-700">Back</span>
+              <span className="font-medium text-slate-700">{t('Nav.back')}</span>
             </button>
           ) : (
             <Link href="/" className="hover:opacity-80 transition-opacity">
-              <span className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'var(--font-comfortaa)' }}>LeaseWise</span>
+              <span className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'var(--font-comfortaa)' }}>{t('Nav.brand')}</span>
             </Link>
           )}
 
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-2">
+            <LanguageToggle />
             {/* Temporarily hidden - Laws
             <Link
               href="/laws"
@@ -71,7 +75,7 @@ export default function Header({ showBackButton = false, onBackClick }: HeaderPr
                   : 'text-slate-700 hover:bg-slate-100'
               }`}
             >
-              Analyze
+              {t('Nav.analyze')}
             </Link>
           </div>
 
@@ -128,8 +132,11 @@ export default function Header({ showBackButton = false, onBackClick }: HeaderPr
                     : 'text-slate-700 hover:bg-slate-100'
                 }`}
               >
-                Analyze
+                {t('Nav.analyze')}
               </Link>
+              <div className="px-2">
+                <LanguageToggle />
+              </div>
             </div>
           </div>
         )}

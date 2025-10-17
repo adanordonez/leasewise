@@ -43,9 +43,14 @@ async function getLegalInformationWithGoogleSearch(
     securityDeposit?: string;
     leaseStart?: string;
     leaseEnd?: string;
-  }
+  },
+  locale: string = 'en'
 ): Promise<PerplexityLegalInfo[]> {
   console.log(`🔍 Getting legal information for ${state} with Perplexity URL search...`);
+  
+  const languageInstruction = locale === 'es' 
+    ? '\n\nThis output is for a Spanish speaking tenant. Please output in simple spanish terms so that tenants can understand.' 
+    : '';
   
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o',
@@ -84,6 +89,18 @@ LOCATION: ${city}, ${state}
 FOCUS: Look for ${city}-specific ordinances and regulations first, then fall back to ${state} laws if no city-specific laws exist.
 
 Categories:
+${locale === 'es' ? `
+1. Términos del Depósito de Seguridad
+2. Disposiciones sobre Monto y Aumento de Renta
+3. Responsabilidades de Mantenimiento y Reparación
+4. Derechos de Entrada y Privacidad
+5. Término del Contrato y Opciones de Renovación
+6. Políticas y Cargos por Mascotas
+7. Derechos de Subarrendamiento y Cesión
+8. Procedimientos y Protecciones de Desalojo
+9. Responsabilidades de Servicios y Utilidades
+10. Modificaciones y Alteraciones
+` : `
 1. Security Deposit Terms
 2. Rent Amount and Increase Provisions
 3. Maintenance and Repair Responsibilities
@@ -94,6 +111,7 @@ Categories:
 8. Eviction Procedures and Protections
 9. Utilities and Service Responsibilities
 10. Modifications and Alterations
+`}
 
 ${leaseContext ? `
 Personalize examples using this lease:
@@ -109,7 +127,7 @@ IMPORTANT:
 - Set statute to null if no specific law exists for that category
 - Prioritize city laws over state laws when available
 
-Return ONLY valid JSON.`
+Return ONLY valid JSON.${languageInstruction}`
       }
     ],
     temperature: 0.2,
@@ -167,7 +185,8 @@ export async function searchLegalInfoWithGoogleSearch(
     securityDeposit?: string;
     leaseStart?: string;
     leaseEnd?: string;
-  }
+  },
+  locale: string = 'en'
 ): Promise<{
   legalInfo: PerplexityLegalInfo[];
   searchMetadata: {
@@ -188,7 +207,7 @@ export async function searchLegalInfoWithGoogleSearch(
   console.log(`📍 Parsed: ${city}, ${state}`);
 
   // Get legal information with Google search URLs
-  const legalInfo = await getLegalInformationWithGoogleSearch(state, city, leaseContext);
+  const legalInfo = await getLegalInformationWithGoogleSearch(state, city, leaseContext, locale);
 
   if (legalInfo.length === 0) {
     console.log('❌ No legal information found, returning empty');

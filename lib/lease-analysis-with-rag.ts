@@ -56,13 +56,18 @@ export interface StructuredLeaseDataWithRAG {
  */
 export async function analyzeLeaseWithRAG(
   rag: LeaseRAGSystem,
-  address: string
+  address: string,
+  locale: string = 'en'
 ): Promise<StructuredLeaseDataWithRAG> {
   
   // Get relevant context from RAG system
   const rentalContext = await rag.buildContext('monthly rent security deposit lease dates', 5);
   const redFlagsContext = await rag.buildContext('fees penalties restrictions obligations', 5);
   const rightsContext = await rag.buildContext('tenant rights repairs maintenance', 5);
+
+  const languageInstruction = locale === 'es' 
+    ? '\n\nThis output is for a Spanish speaking tenant. Please output in simple spanish terms so that tenants can understand.' 
+    : '';
 
   const prompt = `You are a real estate data extraction expert analyzing a residential lease agreement.
 
@@ -132,7 +137,7 @@ Return JSON in this format:
       "source_chunk_id": "CHUNK 3"
     }
   ]
-}`;
+}${languageInstruction}`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",

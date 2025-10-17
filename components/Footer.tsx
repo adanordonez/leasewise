@@ -1,12 +1,15 @@
 'use client';
 
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 interface FooterProps {
   showDisclaimer?: boolean;
 }
 
 export default function Footer({ showDisclaimer = false }: FooterProps) {
+  const t = useTranslations();
+  
   return (
     <footer className="bg-white border-t border-gray-300 py-12 mt-auto">
       <div className="container mx-auto px-6 max-w-4xl">
@@ -16,7 +19,7 @@ export default function Footer({ showDisclaimer = false }: FooterProps) {
           {showDisclaimer && (
             <div className="w-full max-w-3xl bg-amber-50 border border-amber-200 rounded-lg p-6">
               <p className="text-sm text-slate-700 leading-relaxed text-center">
-                <span className="font-bold text-amber-900">Disclaimer:</span> This is a beta product. It uses AI and may provide wrong information. Anything you upload will be shared with ChatGPT. LeaseWise provides legal information, not legal advice. Using LeaseWise does not create an attorney-client relationship. LeaseWise is not your attorney.
+                {t('Disclaimer.text')}
               </p>
             </div>
           )}
@@ -32,7 +35,7 @@ export default function Footer({ showDisclaimer = false }: FooterProps) {
                 href="/" 
                 className="text-base font-semibold text-slate-900 hover:text-purple-600 transition-colors relative group"
               >
-                Home
+                {t('Nav.home')}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-600 group-hover:w-full transition-all duration-300"></span>
               </a>
               {/* Temporarily hidden - Laws
@@ -57,7 +60,7 @@ export default function Footer({ showDisclaimer = false }: FooterProps) {
                 href="/" 
                 className="text-base font-semibold text-slate-900 hover:text-purple-600 transition-colors relative group"
               >
-                Analyze
+                {t('Nav.analyze')}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-600 group-hover:w-full transition-all duration-300"></span>
               </a>
             </div>
@@ -73,7 +76,7 @@ export default function Footer({ showDisclaimer = false }: FooterProps) {
                   fontFamily: 'Georgia, serif'
                 }}
               >
-                Created by
+                {t('Creator.createdBy')}
               </span>
               <div className="relative h-7 w-auto">
                 <Image
@@ -93,28 +96,28 @@ export default function Footer({ showDisclaimer = false }: FooterProps) {
                 fontFamily: 'Georgia, serif'
               }}
             >
-              University of Chicago Law School • AI Lab
+              {t('Creator.institution')}
             </p>
           </div>
           
           {/* Copyright and Legal */}
           <div className="flex flex-col sm:flex-row items-center gap-3 text-sm">
             <p className="text-slate-700 font-medium">
-              © {new Date().getFullYear()} LeaseWise. All rights reserved.
+              {t('Footer.copyright')}
             </p>
             <span className="hidden sm:inline text-slate-400">•</span>
             <a 
               href="#privacy" 
               className="text-slate-700 hover:text-purple-600 hover:underline transition-colors font-semibold"
             >
-              Privacy Policy
+              {t('Footer.privacyPolicy')}
             </a>
             <span className="hidden sm:inline text-slate-400">•</span>
             <a 
               href="#terms" 
               className="text-slate-700 hover:text-purple-600 hover:underline transition-colors font-semibold"
             >
-              Terms of Service
+              {t('Footer.termsOfService')}
             </a>
           </div>
         </div>
