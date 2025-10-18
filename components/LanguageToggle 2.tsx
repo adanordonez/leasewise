@@ -1,14 +1,15 @@
 'use client';
 
 import { useLanguage } from '@/lib/i18n/LanguageContext';
-import { Globe } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { EarthIcon } from '@hugeicons-pro/core-stroke-rounded';
 
 export default function LanguageToggle() {
   const { language, setLanguage } = useLanguage();
 
   return (
     <div className="flex items-center gap-2">
-      <Globe className="h-4 w-4 text-slate-600" />
+      <HugeiconsIcon icon={EarthIcon} size={16} strokeWidth={1.5} className="text-slate-600" />
       <div className="flex items-center bg-slate-100 rounded-lg p-1">
         <button
           onClick={() => setLanguage('en')}
@@ -18,7 +19,7 @@ export default function LanguageToggle() {
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          EN
+          English
         </button>
         <button
           onClick={() => setLanguage('es')}
@@ -28,7 +29,7 @@ export default function LanguageToggle() {
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          ES
+          Español
         </button>
       </div>
     </div>

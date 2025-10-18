@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ExternalLink, Search, BookOpen, AlertCircle, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { ExternalLink, Search, AlertCircle, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { CourtLawIcon } from '@hugeicons-pro/core-stroke-rounded';
 import { useTranslations } from 'next-intl';
 import type { VerifiedLegalInfo } from '@/lib/verified-legal-search-simple';
 
@@ -109,7 +111,7 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
             onClick={() => legalInfo.length > 0 && setIsCollapsed(!isCollapsed)}
             className="flex items-center gap-3 text-left hover:opacity-80 transition-opacity w-full"
           >
-            <BookOpen className="w-5 h-5 text-purple-600 flex-shrink-0" />
+            <HugeiconsIcon icon={CourtLawIcon} size={32} strokeWidth={1.5} className="text-purple-600 flex-shrink-0" />
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-slate-900">
                 {t('ResultsPage.rights.title')}

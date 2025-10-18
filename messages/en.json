@@ -160,7 +160,7 @@
         "showing": "Showing",
         "of": "of",
         "lawCategories": "law categories",
-        "disclaimer": "⚠️ Legal Information Only: Not legal advice. Consult an attorney."
+        "disclaimer": "Legal Information Only: Not legal advice. Consult an attorney."
       }
     },
     "keyDates": {
@@ -172,15 +172,14 @@
       "noticeForRenewal": "Notice to Owner for Lease Renewal",
       "noticeForRenewalDesc": "Resident must notify Owner at least 60 days prior to the expiration of the lease."
     },
-      "scenarios": {
-        "title": "Common Scenarios",
-        "scenario1": "What if something breaks?",
-        "scenario2": "Getting my security deposit back",
-        "scenario3": "Landlord entry and privacy rights",
-        "scenario4": "Breaking my lease early",
-        "whatToDo": "What to do:",
-        "source": "Source:"
-      }
+    "scenarios": {
+      "title": "Common Scenarios",
+      "scenario1": "What if something breaks?",
+      "scenario2": "Getting my security deposit back",
+      "scenario3": "Landlord entry and privacy rights",
+      "scenario4": "Breaking my lease early",
+      "whatToDo": "What to do:",
+      "source": "Source:"
     }
   },
   "SourceCitation": {
@@ -208,6 +207,65 @@
     "nextPage": "Next Page",
     "close": "Close",
     "footerText": "The PDF has been opened to page {pageNumber} where the source text is located. Use the controls above to navigate and zoom."
+  },
+  "Tabs": {
+    "analysisResults": "Analysis Results",
+    "chatWithLease": "Chat with Lease",
+    "legalLetters": "Legal Letters"
+  },
+  "LeaseChat": {
+    "header": {
+      "title": "Chat with Your Lease",
+      "subtitle": "Ask me anything about your lease document"
+    },
+    "emptyState": {
+      "title": "Start a conversation",
+      "description": "Ask me anything about your lease. I'll search through your document and provide accurate answers with sources.",
+      "suggestedQuestions": "Suggested Questions:"
+    },
+    "messages": {
+      "thinking": "Thinking...",
+      "sources": "Sources:",
+      "page": "Page",
+      "error": "Sorry, I encountered an error. Please try again."
+    },
+    "input": {
+      "placeholder": "Ask a question about your lease...",
+      "tip": "💡 Tip: Ask specific questions about dates, fees, policies, or your rights as a tenant."
+    }
+  },
+  "LegalLetters": {
+    "header": {
+      "title": "Legal Letter Generator",
+      "subtitle": "Generate professional letters to your landlord based on your lease and applicable law"
+    },
+    "selectLetter": {
+      "title": "Select Letter Type",
+      "description": "Choose the type of letter you'd like to generate"
+    },
+    "letterTypes": {
+      "securityDeposit": {
+        "name": "Security Deposit Return Request",
+        "description": "Request the return of your security deposit with legal backing"
+      }
+    },
+    "form": {
+      "landlordName": "Landlord's Name",
+      "landlordAddress": "Landlord's Address",
+      "additionalDetails": "Additional Details (Optional)",
+      "additionalDetailsPlaceholder": "Add any specific details about damages, cleaning, or other relevant information...",
+      "generate": "Generate Letter",
+      "generating": "Generating Letter..."
+    },
+    "preview": {
+      "title": "Letter Preview",
+      "download": "Download Letter",
+      "copy": "Copy to Clipboard",
+      "copied": "Copied!",
+      "edit": "Edit & Regenerate",
+      "newLetter": "Create New Letter"
+    },
+    "disclaimer": "This letter is for informational purposes only and does not constitute legal advice. Consider consulting with an attorney for your specific situation."
   }
 }
 

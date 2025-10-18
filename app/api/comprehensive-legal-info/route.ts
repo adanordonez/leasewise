@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { searchLegalInfoWithGoogleSearch } from '@/lib/perplexity-legal-search';
 import { createLeaseRAG } from '@/lib/rag-system';
 import { analyzeLawApplications } from '@/lib/lease-law-application';
-import { extractTextWithPageNumbers } from '@/lib/pdf-utils';
+import { extractTextWithPageNumbers } from '@/lib/llamaparse-utils';
 
 export const maxDuration = 120; // 120 seconds for verification + RAG analysis
 
@@ -42,9 +42,9 @@ export async function POST(request: NextRequest) {
         // Fetch PDF and extract text
         const pdfResponse = await fetch(pdfUrl);
         const pdfBuffer = await pdfResponse.arrayBuffer();
-        const pageTexts = await extractTextWithPageNumbers(new Uint8Array(pdfBuffer));
+        const { pages: pageTexts, totalPages } = await extractTextWithPageNumbers(new Uint8Array(pdfBuffer));
         
-        console.log(`📄 Extracted text from ${pageTexts.length} pages`);
+        console.log(`📄 Extracted text from ${totalPages} pages`);
         
         // Create RAG system
         const leaseRAG = await createLeaseRAG(pageTexts);

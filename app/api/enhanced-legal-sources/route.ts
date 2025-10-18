@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { searchEnhancedLegalSources } from '@/lib/legal-search';
 import { createLeaseRAG } from '@/lib/rag-system';
 import { analyzeLawApplications } from '@/lib/lease-law-application';
-import { extractTextWithPageNumbers } from '@/lib/pdf-utils';
+import { extractTextWithPageNumbers } from '@/lib/llamaparse-utils';
 
 export const maxDuration = 90; // 90 seconds for Jina AI + RAG analysis
 
@@ -52,7 +52,7 @@ We recommend consulting with a local tenant rights attorney for specific legal a
         // Fetch PDF and extract text
         const pdfResponse = await fetch(pdfUrl);
         const pdfBuffer = await pdfResponse.arrayBuffer();
-        const pageTexts = await extractTextWithPageNumbers(Buffer.from(pdfBuffer));
+        const { pages: pageTexts } = await extractTextWithPageNumbers(Buffer.from(pdfBuffer));
         
         // Create RAG system
         const leaseRAG = await createLeaseRAG(pageTexts);

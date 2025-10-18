@@ -10,9 +10,10 @@ import LanguageToggle from './LanguageToggle';
 interface HeaderProps {
   showBackButton?: boolean;
   onBackClick?: () => void;
+  showLanguageToggle?: boolean;
 }
 
-export default function Header({ showBackButton = false, onBackClick }: HeaderProps = {}) {
+export default function Header({ showBackButton = false, onBackClick, showLanguageToggle = true }: HeaderProps = {}) {
   const t = useTranslations();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -42,7 +43,7 @@ export default function Header({ showBackButton = false, onBackClick }: HeaderPr
 
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-2">
-            <LanguageToggle />
+            {showLanguageToggle && <LanguageToggle />}
             {/* Temporarily hidden - Laws
             <Link
               href="/laws"
@@ -134,9 +135,11 @@ export default function Header({ showBackButton = false, onBackClick }: HeaderPr
               >
                 {t('Nav.analyze')}
               </Link>
-              <div className="px-2">
-                <LanguageToggle />
-              </div>
+              {showLanguageToggle && (
+                <div className="px-2">
+                  <LanguageToggle />
+                </div>
+              )}
             </div>
           </div>
         )}

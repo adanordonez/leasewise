@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Loader2, CheckCircle, Upload, FileText, Brain, Flag, Scale, Cog } from 'lucide-react';
+import { CheckCircle, Upload, FileText, Brain, Flag, Scale, Cog } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 
@@ -65,15 +65,7 @@ export default function SimpleLoadingModal({
         <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
           {/* Header */}
           <div className="px-8 py-8 text-center">
-            <div className="flex items-center justify-center gap-3 mb-3">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              >
-                <Loader2 className="w-7 h-7 text-purple-600" />
-              </motion.div>
-              <h2 className="text-3xl font-bold text-slate-900">{t('LoadingModal.title')}</h2>
-            </div>
+            <h2 className="text-3xl font-bold text-slate-900 mb-3">{t('LoadingModal.title')}</h2>
             <p className="text-lg text-slate-600 font-medium">
               {stage}
             </p>

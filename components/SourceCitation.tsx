@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { FileText, X, ExternalLink, MessageCircle } from 'lucide-react';
+import { X, ExternalLink, MessageCircle } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { DocumentAttachmentIcon } from '@hugeicons-pro/core-stroke-rounded';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 
@@ -81,7 +83,7 @@ export default function SourceCitation({
         className="inline-flex items-center justify-center w-5 h-5 ml-2 text-slate-400 hover:text-purple-600 transition-colors"
         title="View source from lease"
       >
-        <FileText className="w-4 h-4" />
+        <HugeiconsIcon icon={DocumentAttachmentIcon} size={16} strokeWidth={1.5} />
       </button>
 
       {/* Modal/Popup */}
@@ -97,7 +99,7 @@ export default function SourceCitation({
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
               <div className="flex items-center gap-3">
                 <div className="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-lg">
-                  <FileText className="w-5 h-5 text-purple-600" />
+                  <HugeiconsIcon icon={DocumentAttachmentIcon} size={20} strokeWidth={1.5} className="text-purple-600" />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900">{label}</h3>
               </div>

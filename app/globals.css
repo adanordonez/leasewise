@@ -123,3 +123,13 @@ body {
     background-position: 0% 50%;
   }
 }
+
+/* Utility for BlurReveal component */
+.grid-stack {
+  display: grid;
+  place-items: center center;
+}
+
+.grid-stack > * {
+  grid-area: 1 / 1;
+}

@@ -1,7 +1,35 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, AlertCircle, CheckCircle, FileText, Calendar, Download, Plus, X, BarChart3, ArrowRight, Menu, Loader2, ExternalLink } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { 
+  DocumentAttachmentIcon, 
+  Upload01Icon, 
+  Download01Icon,
+  Calendar03Icon,
+  AlertCircleIcon,
+  CheckmarkCircle01Icon,
+  Add01Icon,
+  Cancel01Icon,
+  ChartHistogramIcon,
+  ArrowRight01Icon,
+  Menu01Icon,
+  LinkSquare02Icon,
+  CloudUploadIcon,
+  UserListIcon,
+  Location03Icon,
+  DocumentValidationIcon,
+  Comment01Icon,
+  QuillWrite02Icon,
+  ArrowLeft02Icon,
+  PlusSignIcon,
+  DownloadSquare02Icon,
+  AlertSquareIcon,
+  CourtLawIcon,
+  MapsSearchIcon
+} from '@hugeicons-pro/core-stroke-rounded';
+import { CircleIcon, Alert02Icon } from '@hugeicons-pro/core-solid-rounded';
 import { useTranslations } from 'next-intl';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { SmartExtractionIcon, RedFlagDetectionIcon, KnowYourRightsIcon } from './AnimatedIcons';
@@ -14,8 +42,11 @@ import EnhancedLegalSources from '@/components/EnhancedLegalSources';
 import SimpleLoadingModal from '@/components/SimpleLoadingModal';
 import PropertyStreetView from '@/components/PropertyStreetView';
 import LanguageToggle from '@/components/LanguageToggle';
+import LeaseChat from '@/components/LeaseChat';
+import LegalLetters from '@/components/LegalLetters';
 import { exportLeaseReportHTML } from '@/lib/export-pdf-html';
 import Image from 'next/image';
+import { BlurReveal } from '@/components/BlurReveal';
 
 type Page = 'landing' | 'upload' | 'results';
 
@@ -74,6 +105,7 @@ export default function LeaseWiseApp() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [scenarios, setScenarios] = useState<Scenarios | null>(null);
+  const [leaseDataId, setLeaseDataId] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -81,6 +113,7 @@ export default function LeaseWiseApp() {
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [analysisStage, setAnalysisStage] = useState('');
   const [analysisLogs, setAnalysisLogs] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<'analysis' | 'chat' | 'letters'>('analysis');
 
   const validateAndSetFile = (file: File) => {
     // Check file size limits - all files go to Supabase
@@ -328,8 +361,10 @@ export default function LeaseWiseApp() {
         
         // Small delay to show 100% before transitioning
         setTimeout(() => {
+        console.log('📊 Analysis complete! leaseDataId:', data.leaseDataId);
         setAnalysisResult(data.analysis);
         setScenarios(data.scenarios);
+        setLeaseDataId(data.leaseDataId);
         setCurrentPage('results');
         }, 500);
         
@@ -403,7 +438,7 @@ export default function LeaseWiseApp() {
             </div>
 
             <button className="md:hidden p-2">
-              <Menu className="h-6 w-6 text-slate-700" />
+              <HugeiconsIcon icon={Menu01Icon} size={24} strokeWidth={1.5} className="text-slate-700" />
             </button>
           </div>
         </nav>
@@ -413,9 +448,11 @@ export default function LeaseWiseApp() {
           <div className="pt-12 pb-8 flex justify-center items-start">
             <div className="max-w-2xl flex flex-col items-center gap-8">
               <div className="w-full flex flex-col items-center gap-6">
-                <div className="inline-flex h-10 px-8 py-2 items-center gap-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
-                  <p className="text-sm font-medium text-foreground">{t('Hero.badge')}</p>
-              </div>
+                <BlurReveal duration={1800} blur={12}>
+                  <div className="inline-flex h-10 px-8 py-2 items-center gap-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
+                    <p className="text-sm font-medium text-foreground">{t('Hero.badge')}</p>
+                  </div>
+                </BlurReveal>
               
                 <h1 className="text-5xl sm:text-6xl font-bold text-center text-slate-900 leading-tight">
                   {t.rich('Hero.title', {
@@ -433,7 +470,7 @@ export default function LeaseWiseApp() {
                 className="inline-flex h-12 items-center justify-center gap-2 px-8 rounded-[10px] bg-[#6039B3] text-white font-semibold text-base hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
                 >
                 {t('Hero.cta')}
-                <ArrowRight className="w-4 h-4" />
+                <HugeiconsIcon icon={ArrowRight01Icon} size={16} strokeWidth={1.5} />
                 </button>
               
               <div className="flex flex-col items-center gap-3">
@@ -760,7 +797,7 @@ export default function LeaseWiseApp() {
 
       {currentPage === 'upload' && (
         <>
-        <Header showBackButton onBackClick={() => setCurrentPage('landing')} />
+        <Header showBackButton onBackClick={() => setCurrentPage('landing')} showLanguageToggle={false} />
 
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
           <div className="text-center mb-12">
@@ -772,12 +809,12 @@ export default function LeaseWiseApp() {
 
           {error && (
             <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <HugeiconsIcon icon={AlertCircleIcon} size={20} strokeWidth={1.5} className="text-red-600 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
                 <p className="text-sm font-medium text-red-900">{error}</p>
               </div>
               <button onClick={() => setError(null)} className="text-red-600 hover:text-red-700">
-                <X className="h-5 w-5" />
+                <HugeiconsIcon icon={Cancel01Icon} size={20} strokeWidth={1.5} />
               </button>
             </div>
           )}
@@ -786,9 +823,7 @@ export default function LeaseWiseApp() {
             {/* File Upload Section */}
             <div className="space-y-4">
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex items-center justify-center w-8 h-8 bg-slate-100 rounded-lg">
-                  <FileText className="h-5 w-5 text-slate-700" />
-                </div>
+                <HugeiconsIcon icon={DocumentAttachmentIcon} size={28} strokeWidth={1.5} className="text-slate-700" />
                 <label className="text-lg font-semibold text-slate-900">{t('AnalyzePage.documentUpload.title')}</label>
               </div>
               
@@ -813,13 +848,18 @@ export default function LeaseWiseApp() {
                     : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50/50'
                 }`}
               >
-                <Upload className={`h-12 w-12 mx-auto mb-4 transition-all duration-200 ${
-                  isDragging 
-                    ? 'text-blue-600 scale-110' 
-                    : uploadedFile 
-                      ? 'text-slate-900' 
-                      : 'text-slate-400'
-                }`} />
+                <HugeiconsIcon 
+                  icon={CloudUploadIcon} 
+                  size={56} 
+                  strokeWidth={1.5}
+                  className={`mx-auto mb-4 transition-all duration-200 ${
+                    isDragging 
+                      ? 'text-blue-600 scale-110' 
+                      : uploadedFile 
+                        ? 'text-slate-900' 
+                        : 'text-slate-400'
+                  }`} 
+                />
                 <p className="text-lg font-medium text-slate-900 mb-2">
                   {isDragging 
                     ? t('AnalyzePage.documentUpload.dropHere')
@@ -846,7 +886,7 @@ export default function LeaseWiseApp() {
               
               {uploadedFile && uploadProgress === 100 && (
                 <div className="mt-4 flex items-center justify-center gap-2 text-green-700">
-                  <CheckCircle className="h-5 w-5" />
+                  <HugeiconsIcon icon={CheckmarkCircle01Icon} size={20} strokeWidth={1.5} />
                   <span className="text-sm font-medium">{t('AnalyzePage.documentUpload.uploadComplete')}</span>
                 </div>
               )}
@@ -855,9 +895,7 @@ export default function LeaseWiseApp() {
             {/* User Information Section */}
             <div className="space-y-4">
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex items-center justify-center w-8 h-8 bg-slate-100 rounded-lg">
-                  <FileText className="h-5 w-5 text-slate-700" />
-                </div>
+                <HugeiconsIcon icon={UserListIcon} size={28} strokeWidth={1.5} className="text-slate-700" />
                 <label className="text-lg font-semibold text-slate-900">{t('AnalyzePage.userInfo.title')}</label>
               </div>
               
@@ -897,9 +935,7 @@ export default function LeaseWiseApp() {
             {/* Address Section */}
             <div className="space-y-4">
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex items-center justify-center w-8 h-8 bg-slate-100 rounded-lg">
-                  <Calendar className="h-5 w-5 text-slate-700" />
-                </div>
+                <HugeiconsIcon icon={Location03Icon} size={28} strokeWidth={1.5} className="text-slate-700" />
                 <label className="text-lg font-semibold text-slate-900">{t('AnalyzePage.userInfo.address')}</label>
               </div>
               
@@ -907,7 +943,7 @@ export default function LeaseWiseApp() {
               
               {address && (
                 <div className="mt-4 flex items-center justify-center gap-2 text-green-700">
-                  <CheckCircle className="h-5 w-5" />
+                  <HugeiconsIcon icon={CheckmarkCircle01Icon} size={20} strokeWidth={1.5} />
                   <span className="text-sm font-medium">Address confirmed</span>
                 </div>
               )}
@@ -969,7 +1005,7 @@ export default function LeaseWiseApp() {
       {currentPage === 'results' && analysisResult && (
         <>
       
-      <Header showBackButton onBackClick={() => setCurrentPage('landing')} />
+      <Header showBackButton onBackClick={() => setCurrentPage('landing')} showLanguageToggle={false} />
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Action Buttons */}
@@ -1047,7 +1083,7 @@ export default function LeaseWiseApp() {
               </>
             ) : (
               <>
-                <Download className="h-4 w-4" />
+                <HugeiconsIcon icon={DownloadSquare02Icon} size={16} strokeWidth={1.5} />
                 {t('ResultsPage.navigation.exportPDF')}
               </>
             )}
@@ -1063,24 +1099,66 @@ export default function LeaseWiseApp() {
                 }}
                 className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-all duration-200 flex items-center gap-2"
               >
-                <Plus className="h-4 w-4" />
+                <HugeiconsIcon icon={PlusSignIcon} size={16} strokeWidth={1.5} />
                 {t('ResultsPage.navigation.newAnalysis')}
               </button>
             </div>
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">{t('ResultsPage.header.title')}</h1>
-          <p className="text-xl text-slate-600">{address}</p>
+
+        {/* Tab Navigation */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex bg-slate-100 rounded-lg p-1">
+            <button
+              onClick={() => setActiveTab('analysis')}
+              className={`px-6 py-2.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                activeTab === 'analysis'
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <HugeiconsIcon icon={DocumentValidationIcon} size={18} strokeWidth={1.5} />
+              {t('Tabs.analysisResults')}
+            </button>
+            <button
+              onClick={() => setActiveTab('chat')}
+              className={`px-6 py-2.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                activeTab === 'chat'
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <HugeiconsIcon icon={Comment01Icon} size={18} strokeWidth={1.5} />
+              {t('Tabs.chatWithLease')}
+            </button>
+            <button
+              onClick={() => setActiveTab('letters')}
+              className={`px-6 py-2.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                activeTab === 'letters'
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <HugeiconsIcon icon={QuillWrite02Icon} size={18} strokeWidth={1.5} />
+              {t('Tabs.legalLetters')}
+            </button>
+          </div>
         </div>
 
-        {/* Property Street View */}
-        {address && (
-          <div className="mb-12">
-            <PropertyStreetView address={address} title={t('ResultsPage.propertyInfo.streetView')} />
-          </div>
-        )}
+        {/* Analysis Tab Content */}
+        {activeTab === 'analysis' && (
+          <>
+            {/* Header */}
+            <div className="text-center mb-12">
+              <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">{t('ResultsPage.header.title')}</h1>
+              <p className="text-xl text-slate-600">{address}</p>
+            </div>
+            {/* Property Street View */}
+            {address && (
+              <div className="mb-12">
+                <PropertyStreetView address={address} title={t('ResultsPage.propertyInfo.streetView')} />
+              </div>
+            )}
 
-        {/* Summary Cards */}
+            {/* Summary Cards */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-md transition-shadow duration-200">
             <div className="text-sm font-medium text-slate-500 mb-2 flex items-center">
@@ -1142,9 +1220,7 @@ export default function LeaseWiseApp() {
             <div className="border-b border-slate-200/60 px-6 py-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg">
-                    <AlertCircle className="h-5 w-5 text-red-600" />
-                  </div>
+                  <HugeiconsIcon icon={AlertSquareIcon} size={32} strokeWidth={1.5} className="text-red-600" />
                   <h2 className="text-xl font-semibold text-slate-900">{t('ResultsPage.propertyInfo.redFlags')}</h2>
                 </div>
                 <span className="px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-full">
@@ -1156,7 +1232,7 @@ export default function LeaseWiseApp() {
               {analysisResult.redFlags.map((flag, i) => (
                 <div key={i} className="px-6 py-5 hover:bg-slate-50/50 transition-colors duration-200">
                   <div className="flex items-start gap-4">
-                    <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                    <HugeiconsIcon icon={CircleIcon} size={12} strokeWidth={2} className="text-red-600 mt-1.5 flex-shrink-0" />
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="font-semibold text-slate-900">{flag.issue}</h3>
@@ -1204,9 +1280,7 @@ export default function LeaseWiseApp() {
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60">
             <div className="border-b border-slate-200/60 px-6 py-5">
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg">
-                  <Calendar className="h-5 w-5 text-blue-600" />
-                </div>
+                <HugeiconsIcon icon={Calendar03Icon} size={32} strokeWidth={1.5} className="text-blue-600" />
                 <h2 className="text-xl font-semibold text-slate-900">{t('ResultsPage.keyDates.title')}</h2>
               </div>
             </div>
@@ -1215,7 +1289,7 @@ export default function LeaseWiseApp() {
                 <div key={i} className="px-6 py-5 hover:bg-slate-50/50 transition-colors duration-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Calendar className="h-5 w-5 text-slate-400" />
+                      <HugeiconsIcon icon={Calendar03Icon} size={20} strokeWidth={1.5} className="text-slate-400" />
                       <div>
                         <div className="flex items-center gap-2">
                         <p className="font-semibold text-slate-900">{date.event}</p>
@@ -1259,9 +1333,7 @@ export default function LeaseWiseApp() {
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60">
               <div className="border-b border-slate-200/60 px-6 py-5">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-lg">
-                    <FileText className="h-5 w-5 text-purple-600" />
-                  </div>
+                  <HugeiconsIcon icon={MapsSearchIcon} size={32} strokeWidth={1.5} className="text-purple-600" />
                   <h2 className="text-xl font-semibold text-slate-900">{t('ResultsPage.scenarios.title')}</h2>
                 </div>
               </div>
@@ -1296,7 +1368,7 @@ export default function LeaseWiseApp() {
                     {scenario.actionableSteps && scenario.actionableSteps.length > 0 && (
                       <div className="bg-green-50 rounded-lg p-4 mb-4 border border-green-200">
                         <div className="flex items-center gap-2 mb-3">
-                          <CheckCircle className="w-4 h-4 text-green-600" />
+                          <HugeiconsIcon icon={CheckmarkCircle01Icon} size={16} strokeWidth={1.5} className="text-green-600" />
                           <span className="text-sm font-semibold text-green-700">
                             {t('ResultsPage.scenarios.whatToDo')}
                           </span>
@@ -1321,6 +1393,69 @@ export default function LeaseWiseApp() {
             </div>
         )}
           </div>
+          </>
+        )}
+
+        {/* Chat Tab Content */}
+        {activeTab === 'chat' && (
+          <>
+            {leaseDataId ? (
+              <div>
+                <LeaseChat 
+                  leaseDataId={leaseDataId}
+                  userEmail={userEmail}
+                  pdfUrl={analysisResult.pdfUrl}
+                  analysisResult={analysisResult}
+                />
+              </div>
+            ) : (
+              <div className="max-w-2xl mx-auto mt-12">
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-8 text-center">
+                  <div className="flex justify-center mb-4">
+                    <HugeiconsIcon icon={Alert02Icon} size={40} className="text-amber-500" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-amber-900 mb-2">
+                    Chat Not Available
+                  </h3>
+                  <p className="text-amber-800">
+                    This is an old analysis from before the chat feature was added. Please analyze a new lease to use the chat feature.
+                  </p>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Legal Letters Tab Content */}
+        {activeTab === 'letters' && (
+          <>
+            {leaseDataId ? (
+              <div>
+                <LegalLetters 
+                  leaseDataId={leaseDataId}
+                  userEmail={userEmail}
+                  userName={userName}
+                  address={address}
+                  analysisResult={analysisResult}
+                />
+              </div>
+            ) : (
+              <div className="max-w-2xl mx-auto mt-12">
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-8 text-center">
+                  <div className="flex justify-center mb-4">
+                    <HugeiconsIcon icon={Alert02Icon} size={40} className="text-amber-500" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-amber-900 mb-2">
+                    Legal Letters Not Available
+                  </h3>
+                  <p className="text-amber-800">
+                    This is an old analysis from before the legal letters feature was added. Please analyze a new lease to use this feature.
+                  </p>
+                </div>
+              </div>
+            )}
+          </>
+        )}
 
       </main>
       

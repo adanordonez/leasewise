@@ -2,7 +2,8 @@
 
 import { useTransition } from 'react';
 import { useLocale } from 'next-intl';
-import { Globe } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { EarthIcon } from '@hugeicons-pro/core-stroke-rounded';
 
 export default function LanguageToggle() {
   const [isPending, startTransition] = useTransition();
@@ -27,8 +28,8 @@ export default function LanguageToggle() {
       className="inline-flex items-center justify-center gap-2 h-9 px-3 rounded-[10px] bg-white/80 hover:bg-white border border-slate-200 text-slate-700 font-medium text-sm transition-all duration-200 shadow-sm hover:shadow disabled:opacity-50"
       title={locale === 'en' ? 'Switch to Spanish' : 'Cambiar a inglés'}
     >
-      <Globe className="w-4 h-4" />
-      <span className="hidden sm:inline">{locale === 'en' ? 'ES' : 'EN'}</span>
+      <HugeiconsIcon icon={EarthIcon} size={16} strokeWidth={1.5} />
+      <span className="hidden sm:inline">{locale === 'en' ? 'Español' : 'English'}</span>
       <span className="sm:hidden">{locale === 'en' ? 'ES' : 'EN'}</span>
     </button>
   );

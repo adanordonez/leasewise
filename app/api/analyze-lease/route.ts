@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeLeaseStructured, generateActionableScenarios } from '@/lib/lease-analysis';
 import { extractBasicLeaseInfo } from '@/lib/lease-extraction';
-import { extractText } from 'unpdf';
 import { getDownloadUrl } from '@vercel/blob';
 import { supabase } from '@/lib/supabase';
-import { extractTextWithPageNumbers, findPageNumber } from '@/lib/pdf-utils';
+import { extractTextWithPageNumbers, findPageNumber } from '@/lib/llamaparse-utils';
 import { createLeaseRAG } from '@/lib/rag-system';
 import { analyzeLeaseWithRAG, enrichWithSources } from '@/lib/lease-analysis-with-rag';
 import { analyzeRedFlagsWithRAG } from '@/lib/red-flags-analysis';
@@ -527,40 +526,65 @@ async function performAnalysis(request: NextRequest) {
     let leaseDataId = null;
     try {
       console.log('💾 Saving lease data to Supabase...');
+      
+      // Store chunks with embeddings for fast RAG rebuild in chat
+      // NOTE: This requires the database migration to be run first
+      const chunksToStore = rag ? rag.getAllChunks().map(chunk => ({
+        text: chunk.text,
+        pageNumber: chunk.pageNumber,
+        embedding: chunk.embedding || [],
+        chunkIndex: chunk.chunkIndex,
+        startIndex: chunk.startIndex || 0,
+        endIndex: chunk.endIndex || 0
+      })) : [];
+      
+      console.log(`💾 Preparing to store ${chunksToStore.length} chunks with embeddings...`);
+      
+      // Prepare lease data object
+      const leaseDataToInsert: any = {
+        user_name: userName,
+        user_email: userEmail,
+        pdf_url: pdfUrl || '',
+        user_address: address,
+        building_name: basicInfo.building_name,
+        property_address: basicInfo.property_address,
+        monthly_rent: basicInfo.monthly_rent,
+        security_deposit: basicInfo.security_deposit,
+        lease_start_date: basicInfo.lease_start_date,
+        lease_end_date: basicInfo.lease_end_date,
+        notice_period_days: enrichedData.notice_period_days,
+        property_type: basicInfo.property_type,
+        square_footage: basicInfo.square_footage,
+        bedrooms: basicInfo.bedrooms,
+        bathrooms: basicInfo.bathrooms,
+        parking_spaces: enrichedData.parking_spaces,
+        pet_policy: enrichedData.pet_policy,
+        utilities_included: basicInfo.utilities_included,
+        amenities: basicInfo.amenities,
+        landlord_name: basicInfo.landlord_name,
+        management_company: basicInfo.management_company,
+        contact_email: basicInfo.contact_email,
+        contact_phone: basicInfo.contact_phone,
+        lease_terms: enrichedData.lease_terms,
+        special_clauses: enrichedData.special_clauses,
+        market_analysis: enrichedData.market_analysis,
+        red_flags: enrichedData.red_flags,
+        tenant_rights: enrichedData.tenant_rights,
+        key_dates: enrichedData.key_dates,
+        raw_analysis: enrichedData,
+      };
+      
+      // Only add chunks if we have them (requires database migration)
+      if (chunksToStore && chunksToStore.length > 0) {
+        leaseDataToInsert.chunks = chunksToStore;
+        console.log(`💾 Including ${chunksToStore.length} chunks in database insert`);
+      } else {
+        console.log('⚠️ No chunks to store (RAG not initialized or migration not run)');
+      }
+      
       const { data: leaseData, error: leaseError } = await supabase
         .from('lease_data')
-        .insert({
-          user_name: userName,
-          user_email: userEmail,
-          pdf_url: pdfUrl || '', // Will be updated if we have the URL
-          user_address: address, // User's input address for map pins
-          building_name: basicInfo.building_name,
-          property_address: basicInfo.property_address, // AI-extracted address from lease
-          monthly_rent: basicInfo.monthly_rent,
-          security_deposit: basicInfo.security_deposit,
-          lease_start_date: basicInfo.lease_start_date,
-          lease_end_date: basicInfo.lease_end_date,
-          notice_period_days: enrichedData.notice_period_days,
-          property_type: basicInfo.property_type,
-          square_footage: basicInfo.square_footage,
-          bedrooms: basicInfo.bedrooms,
-          bathrooms: basicInfo.bathrooms,
-          parking_spaces: enrichedData.parking_spaces,
-          pet_policy: enrichedData.pet_policy,
-          utilities_included: basicInfo.utilities_included,
-          amenities: basicInfo.amenities,
-          landlord_name: basicInfo.landlord_name,
-          management_company: basicInfo.management_company,
-          contact_email: basicInfo.contact_email,
-          contact_phone: basicInfo.contact_phone,
-          lease_terms: enrichedData.lease_terms,
-          special_clauses: enrichedData.special_clauses,
-          market_analysis: enrichedData.market_analysis,
-          red_flags: enrichedData.red_flags,
-          tenant_rights: enrichedData.tenant_rights,
-          key_dates: enrichedData.key_dates,
-          raw_analysis: enrichedData
-        })
+        .insert(leaseDataToInsert)
         .select()
         .single();
 

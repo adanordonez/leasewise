@@ -160,7 +160,7 @@
         "showing": "Mostrando",
         "of": "de",
         "lawCategories": "categorías de leyes",
-        "disclaimer": "⚠️ Solo Información Legal: No es asesoramiento legal. Consulte a un abogado."
+        "disclaimer": "Solo Información Legal: No es asesoramiento legal. Consulte a un abogado."
       }
     },
     "keyDates": {
@@ -207,6 +207,65 @@
     "nextPage": "Página Siguiente",
     "close": "Cerrar",
     "footerText": "El PDF se ha abierto en la página {pageNumber} donde se encuentra el texto de origen. Use los controles arriba para navegar y hacer zoom."
+  },
+  "Tabs": {
+    "analysisResults": "Resultados del Análisis",
+    "chatWithLease": "Chatear con el Contrato",
+    "legalLetters": "Cartas Legales"
+  },
+  "LeaseChat": {
+    "header": {
+      "title": "Chatear con Tu Contrato",
+      "subtitle": "Pregúntame lo que sea sobre tu documento de contrato"
+    },
+    "emptyState": {
+      "title": "Inicia una conversación",
+      "description": "Pregúntame lo que sea sobre tu contrato. Buscaré en tu documento y proporcionaré respuestas precisas con fuentes.",
+      "suggestedQuestions": "Preguntas Sugeridas:"
+    },
+    "messages": {
+      "thinking": "Pensando...",
+      "sources": "Fuentes:",
+      "page": "Página",
+      "error": "Lo siento, encontré un error. Por favor, inténtalo de nuevo."
+    },
+    "input": {
+      "placeholder": "Haz una pregunta sobre tu contrato...",
+      "tip": "💡 Consejo: Haz preguntas específicas sobre fechas, tarifas, políticas o tus derechos como inquilino."
+    }
+  },
+  "LegalLetters": {
+    "header": {
+      "title": "Generador de Cartas Legales",
+      "subtitle": "Genera cartas profesionales para tu propietario basadas en tu contrato y la ley aplicable"
+    },
+    "selectLetter": {
+      "title": "Selecciona el Tipo de Carta",
+      "description": "Elige el tipo de carta que te gustaría generar"
+    },
+    "letterTypes": {
+      "securityDeposit": {
+        "name": "Solicitud de Devolución de Depósito de Seguridad",
+        "description": "Solicita la devolución de tu depósito de seguridad con respaldo legal"
+      }
+    },
+    "form": {
+      "landlordName": "Nombre del Propietario",
+      "landlordAddress": "Dirección del Propietario",
+      "additionalDetails": "Detalles Adicionales (Opcional)",
+      "additionalDetailsPlaceholder": "Agrega cualquier detalle específico sobre daños, limpieza u otra información relevante...",
+      "generate": "Generar Carta",
+      "generating": "Generando Carta..."
+    },
+    "preview": {
+      "title": "Vista Previa de la Carta",
+      "download": "Descargar Carta",
+      "copy": "Copiar al Portapapeles",
+      "copied": "¡Copiado!",
+      "edit": "Editar y Regenerar",
+      "newLetter": "Crear Nueva Carta"
+    },
+    "disclaimer": "Esta carta es solo para fines informativos y no constituye asesoramiento legal. Considera consultar con un abogado para tu situación específica."
   }
 }
 

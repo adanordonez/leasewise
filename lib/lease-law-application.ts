@@ -40,7 +40,7 @@ export async function analyzeHowLawAppliesToLease(
     
     const allChunks: any[] = [];
     for (const query of specificQueries) {
-      const chunks = await leaseRAG.retrieveRelevant(query, 4); // 4 chunks per query
+      const chunks = await leaseRAG.retrieve(query, 4); // 4 chunks per query
       allChunks.push(...chunks);
     }
     
