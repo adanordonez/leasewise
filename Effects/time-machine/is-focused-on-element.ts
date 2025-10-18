@@ -10,7 +10,7 @@ export function isFocusedOnElement() {
     el.tagName === "SELECT" ||
     el.role === "menuitem"
   ) {
-    // It's okay to trigger global keybinds from readonly inputs
+    // It's okay to trigger global keybinds from readonly inputs    
     if (el.hasAttribute("readonly")) {
       return false;
     }
