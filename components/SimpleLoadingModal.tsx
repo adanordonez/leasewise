@@ -23,6 +23,44 @@ export default function SimpleLoadingModal({
   
   console.log('🔍 SimpleLoadingModal render:', { isOpen, progress, stage, logsLength: logs.length });
   
+  // Prevent background scrolling when modal is open (with scroll position preservation)
+  useEffect(() => {
+    if (isOpen) {
+      // Save current scroll position
+      const scrollY = window.scrollY;
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      
+      // Apply position fixed to body to prevent scrolling
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflowY = 'scroll'; // Prevent layout shift from scrollbar
+      
+      // If there's a scrollbar, add padding to prevent content shift
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+      
+      // Cleanup function to restore scrolling when modal closes
+      return () => {
+        // Get the scroll position from the negative top value
+        const scrollY = document.body.style.top;
+        
+        // Remove all the styles
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflowY = '';
+        document.body.style.paddingRight = '';
+        
+        // Restore the scroll position
+        if (scrollY) {
+          window.scrollTo(0, parseInt(scrollY || '0') * -1);
+        }
+      };
+    }
+  }, [isOpen]);
+  
   // Auto-scroll to bottom when new logs are added
   useEffect(() => {
     if (scrollContainerRef.current && logs.length > 0) {
@@ -54,7 +92,7 @@ export default function SimpleLoadingModal({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
       data-testid="loading-modal"
     >
       <motion.div

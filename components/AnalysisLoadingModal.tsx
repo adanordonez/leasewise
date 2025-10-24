@@ -27,6 +27,44 @@ export default function AnalysisLoadingModal({
   const [displayedLogs, setDisplayedLogs] = useState<LogEntry[]>([]);
   const [visibleLogIds, setVisibleLogIds] = useState<Set<string>>(new Set());
 
+  // Prevent background scrolling when modal is open (with scroll position preservation)
+  useEffect(() => {
+    if (isOpen) {
+      // Save current scroll position
+      const scrollY = window.scrollY;
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      
+      // Apply position fixed to body to prevent scrolling
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflowY = 'scroll'; // Prevent layout shift from scrollbar
+      
+      // If there's a scrollbar, add padding to prevent content shift
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+      
+      // Cleanup function to restore scrolling when modal closes
+      return () => {
+        // Get the scroll position from the negative top value
+        const scrollY = document.body.style.top;
+        
+        // Remove all the styles
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflowY = '';
+        document.body.style.paddingRight = '';
+        
+        // Restore the scroll position
+        if (scrollY) {
+          window.scrollTo(0, parseInt(scrollY || '0') * -1);
+        }
+      };
+    }
+  }, [isOpen]);
+
   // Update displayed logs when new logs arrive
   useEffect(() => {
     if (logs.length === 0) return;
@@ -60,7 +98,7 @@ export default function AnalysisLoadingModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}

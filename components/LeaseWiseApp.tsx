@@ -401,7 +401,8 @@ export default function LeaseWiseApp() {
 
       {currentPage === 'landing' && (
         <>
-        {/* Navbar */}
+        {/* Navbar - Hidden when analyzing */}
+        {!isAnalyzing && (
         <nav className="container mx-auto max-w-7xl py-6 px-6 relative z-50">
           <div className="flex justify-between items-center">
               <button 
@@ -442,6 +443,7 @@ export default function LeaseWiseApp() {
             </button>
           </div>
         </nav>
+        )}
 
         {/* Hero Section */}
         <main className="container mx-auto max-w-7xl px-6 relative z-10">
@@ -797,7 +799,9 @@ export default function LeaseWiseApp() {
 
       {currentPage === 'upload' && (
         <>
-        <Header showBackButton onBackClick={() => setCurrentPage('landing')} showLanguageToggle={false} />
+        {!isAnalyzing && (
+          <Header showBackButton onBackClick={() => setCurrentPage('landing')} showLanguageToggle={false} />
+        )}
 
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
           <div className="text-center mb-12">
@@ -1005,7 +1009,9 @@ export default function LeaseWiseApp() {
       {currentPage === 'results' && analysisResult && (
         <>
       
-      <Header showBackButton onBackClick={() => setCurrentPage('landing')} showLanguageToggle={false} />
+      {!isAnalyzing && (
+        <Header showBackButton onBackClick={() => setCurrentPage('landing')} showLanguageToggle={false} />
+      )}
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Action Buttons */}
