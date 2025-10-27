@@ -81,6 +81,7 @@
   },
   "LoadingModal": {
     "title": "Analyzing Your Lease",
+    "finalizingTitle": "Finalizing Analysis",
     "progress": "Progress",
     "footerMessage": "This may take 30-60 seconds depending on lease complexity",
     "stages": {
@@ -102,6 +103,13 @@
       "identifyingRedFlags": "Identifying potential red flags...",
       "extractingRights": "Extracting tenant rights and obligations...",
       "structuringData": "Structuring lease data..."
+    },
+    "insights": {
+      "documentExtracted": "Document text extracted",
+      "issuesIdentified": "Potential issues identified",
+      "rightsAnalyzed": "Tenant rights analyzed",
+      "clausesReviewed": "Lease clauses reviewed",
+      "aiComplete": "AI analysis complete"
     }
   },
   "ResultsPage": {
@@ -211,7 +219,7 @@
   "Tabs": {
     "analysisResults": "Analysis Results",
     "chatWithLease": "Chat with Lease",
-    "legalLetters": "Legal Letters"
+    "legalLetters": "Template Letters"
   },
   "LeaseChat": {
     "header": {
@@ -236,8 +244,8 @@
   },
   "LegalLetters": {
     "header": {
-      "title": "Legal Letter Generator",
-      "subtitle": "Generate professional letters to your landlord based on your lease and applicable law"
+      "title": "Template Letter Generator",
+      "subtitle": "Generate customizable letter templates for communicating with your landlord"
     },
     "selectLetter": {
       "title": "Select Letter Type",

@@ -81,6 +81,7 @@
   },
   "LoadingModal": {
     "title": "Analizando Tu Contrato",
+    "finalizingTitle": "Finalizando Análisis",
     "progress": "Progreso",
     "footerMessage": "Esto puede tomar de 30 a 60 segundos dependiendo de la complejidad del contrato",
     "stages": {
@@ -102,6 +103,13 @@
       "identifyingRedFlags": "Identificando posibles señales de alerta...",
       "extractingRights": "Extrayendo derechos y obligaciones del inquilino...",
       "structuringData": "Estructurando datos del contrato..."
+    },
+    "insights": {
+      "documentExtracted": "Texto del documento extraído",
+      "issuesIdentified": "Posibles problemas identificados",
+      "rightsAnalyzed": "Derechos del inquilino analizados",
+      "clausesReviewed": "Cláusulas del contrato revisadas",
+      "aiComplete": "Análisis de IA completo"
     }
   },
   "ResultsPage": {
@@ -211,7 +219,7 @@
   "Tabs": {
     "analysisResults": "Resultados del Análisis",
     "chatWithLease": "Chatear con el Contrato",
-    "legalLetters": "Cartas Legales"
+    "legalLetters": "Plantillas de Cartas"
   },
   "LeaseChat": {
     "header": {
@@ -236,8 +244,8 @@
   },
   "LegalLetters": {
     "header": {
-      "title": "Generador de Cartas Legales",
-      "subtitle": "Genera cartas profesionales para tu propietario basadas en tu contrato y la ley aplicable"
+      "title": "Generador de Plantillas de Cartas",
+      "subtitle": "Genera plantillas de cartas personalizables para comunicarte con tu propietario"
     },
     "selectLetter": {
       "title": "Selecciona el Tipo de Carta",

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -30,6 +30,7 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
   const [error, setError] = useState<string | null>(null);
   const [metadata, setMetadata] = useState<{ state: string; city: string; totalSources: number; verifiedSources?: number; rejectedSources?: number } | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false); // Start expanded for auto-load
+  const hasLoadedRef = useRef(false); // Track if data has ever been loaded
 
   const fetchLegalInfo = async () => {
     setIsLoading(true);
@@ -61,6 +62,7 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
       setLegalInfo(data.legalInfo);
       setFilteredInfo(data.legalInfo);
       setMetadata(data.searchMetadata);
+      hasLoadedRef.current = true; // Mark as loaded
       
     } catch (err: any) {
       console.error('❌ Error fetching legal info:', err);
@@ -70,9 +72,9 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
     }
   };
 
-  // Automatically fetch legal info when component mounts
+  // Automatically fetch legal info when component mounts (only once)
   useEffect(() => {
-    if (userAddress && !legalInfo.length && !isLoading && !error) {
+    if (userAddress && !hasLoadedRef.current && !legalInfo.length && !isLoading && !error) {
       console.log('🚀 Auto-loading legal information...');
       fetchLegalInfo();
     }

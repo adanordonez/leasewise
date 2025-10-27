@@ -1150,7 +1150,7 @@ export default function LeaseWiseApp() {
         </div>
 
         {/* Analysis Tab Content */}
-        {activeTab === 'analysis' && (
+        <div style={{ display: activeTab === 'analysis' ? 'block' : 'none' }}>
           <>
             {/* Header */}
             <div className="text-center mb-12">
@@ -1280,46 +1280,8 @@ export default function LeaseWiseApp() {
           />
         </div>
 
-        {/* Two Column Layout */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-8">
-          {/* Key Dates */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60">
-            <div className="border-b border-slate-200/60 px-6 py-5">
-              <div className="flex items-center gap-3">
-                <HugeiconsIcon icon={Calendar03Icon} size={32} strokeWidth={1.5} className="text-blue-600" />
-                <h2 className="text-xl font-semibold text-slate-900">{t('ResultsPage.keyDates.title')}</h2>
-              </div>
-            </div>
-            <div className="divide-y divide-slate-200/60">
-              {analysisResult.keyDates.map((date, i) => (
-                <div key={i} className="px-6 py-5 hover:bg-slate-50/50 transition-colors duration-200">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <HugeiconsIcon icon={Calendar03Icon} size={20} strokeWidth={1.5} className="text-slate-400" />
-                      <div>
-                        <div className="flex items-center gap-2">
-                        <p className="font-semibold text-slate-900">{date.event}</p>
-                          <SourceCitation 
-                            sourceText={date.source} 
-                            label={`Key Date: ${date.event}`}
-                            pageNumber={date.page_number}
-                            pdfUrl={analysisResult.pdfUrl}
-                            searchText={date.source}
-                          />
-                        </div>
-                        <p className="text-sm text-slate-600">{date.description}</p>
-                      </div>
-                    </div>
-                    <span className="text-sm font-medium text-slate-900 bg-slate-100 px-3 py-1 rounded-full">
-                      {date.date}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Enhanced Common Scenarios */}
+        {/* Enhanced Common Scenarios */}
+        <div className="mb-8">
           {scenarios && (() => {
             console.log('📋 Scenarios data received:', scenarios);
             console.log('📋 First scenario:', scenarios.scenarios[0]);
@@ -1398,12 +1360,12 @@ export default function LeaseWiseApp() {
               </div>
             </div>
         )}
-          </div>
+        </div>
           </>
-        )}
+        </div>
 
         {/* Chat Tab Content */}
-        {activeTab === 'chat' && (
+        <div style={{ display: activeTab === 'chat' ? 'block' : 'none' }}>
           <>
             {leaseDataId ? (
               <div>
@@ -1430,10 +1392,10 @@ export default function LeaseWiseApp() {
               </div>
             )}
           </>
-        )}
+        </div>
 
-        {/* Legal Letters Tab Content */}
-        {activeTab === 'letters' && (
+        {/* Template Letters Tab Content */}
+        <div style={{ display: activeTab === 'letters' ? 'block' : 'none' }}>
           <>
             {leaseDataId ? (
               <div>
@@ -1452,16 +1414,16 @@ export default function LeaseWiseApp() {
                     <HugeiconsIcon icon={Alert02Icon} size={40} className="text-amber-500" />
                   </div>
                   <h3 className="text-lg font-semibold text-amber-900 mb-2">
-                    Legal Letters Not Available
+                    Template Letters Not Available
                   </h3>
                   <p className="text-amber-800">
-                    This is an old analysis from before the legal letters feature was added. Please analyze a new lease to use this feature.
+                    This is an old analysis from before the template letters feature was added. Please analyze a new lease to use this feature.
                   </p>
                 </div>
               </div>
             )}
           </>
-        )}
+        </div>
 
       </main>
       

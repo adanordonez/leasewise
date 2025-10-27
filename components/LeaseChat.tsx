@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Loader2, Sparkles } from 'lucide-react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Comment01Icon, SentIcon } from '@hugeicons-pro/core-stroke-rounded';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import type { ChatMessage, SuggestedQuestion } from '@/types/chat';
 import SourceCitation from './SourceCitation';
 
@@ -17,6 +17,7 @@ interface LeaseChatProps {
 
 export default function LeaseChat({ leaseDataId, userEmail, pdfUrl, analysisResult }: LeaseChatProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +52,7 @@ export default function LeaseChat({ leaseDataId, userEmail, pdfUrl, analysisResu
         const response = await fetch('/api/generate-suggested-questions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ leaseDataId }),
+          body: JSON.stringify({ leaseDataId, language: locale }),
         });
         
         if (response.ok) {
@@ -66,7 +67,7 @@ export default function LeaseChat({ leaseDataId, userEmail, pdfUrl, analysisResu
     }
     
     loadSuggestedQuestions();
-  }, [leaseDataId]);
+  }, [leaseDataId, locale]);
   
   const sendMessage = async (question: string) => {
     if (!question.trim() || isLoading) return;

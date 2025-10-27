@@ -25,33 +25,37 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, errorMessa
   return Promise.race([promise, timeout]);
 }
 
-// Helper function to generate advice
-async function generateAdvice(question: string, leaseText: string, locale: string = 'en'): Promise<string> {
+// Helper function to generate advice and action steps
+async function generateAdviceWithSteps(question: string, leaseText: string, locale: string = 'en'): Promise<{ advice: string; actionSteps: string[] }> {
   const languageInstruction = locale === 'es' 
-    ? '\n\nThis output is for a Spanish speaking tenant. Please output in simple spanish terms so that tenants can understand.' 
+    ? '\n\nIMPORTANT: This output is for a Spanish speaking tenant. Please respond ENTIRELY in Spanish.' 
     : '';
     
-  const advicePrompt = `You are a helpful assistant that explains lease terms in clear, professional language that's easy to understand.
+  const advicePrompt = `You are a helpful assistant that explains lease terms in clear, professional language and provides actionable steps.
 
 QUESTION: ${question}
-LEASE TEXT: ${leaseText}
+LEASE TEXT FROM THE ACTUAL LEASE: ${leaseText}
 
 INSTRUCTIONS:
-1. Read the lease text carefully and identify the key terms
-2. Explain what this means for the tenant in clear, professional language
-3. Keep your answer to 2-3 sentences maximum
-4. Use clear, everyday language that any adult can understand
-5. Focus on practical implications and what the tenant should know
-6. Avoid legal jargon but don't oversimplify${languageInstruction}
+1. Read the lease text carefully and extract the relevant information
+2. Provide a clear 2-3 sentence explanation of what this means for the tenant
+3. Generate 2-4 specific, actionable steps based on what's actually in THIS lease (not generic advice)
+4. Each step should be practical and directly related to the lease terms you read
+5. Use clear, everyday language
+6. If the lease has specific timelines, amounts, or procedures, reference them in the action steps${languageInstruction}
 
-Write a clear explanation:`;
+Return your response in this JSON format:
+{
+  "advice": "Your 2-3 sentence explanation here",
+  "actionSteps": ["Step 1", "Step 2", "Step 3"]
+}`;
 
   const adviceCompletion = await openai.chat.completions.create({
     model: 'gpt-4o',
     messages: [
       {
         role: 'system',
-        content: 'You are a knowledgeable assistant who explains lease terms in clear, professional language. Use everyday language that any adult can understand, but don\'t oversimplify or use childish language. Be informative and practical.'
+        content: 'You are a knowledgeable assistant who explains lease terms in clear, professional language and provides specific, actionable advice based on the actual lease content. Always provide practical steps that are directly related to what\'s written in the lease.'
       },
       {
         role: 'user',
@@ -59,10 +63,29 @@ Write a clear explanation:`;
       }
     ],
     temperature: 0.3,
-    max_tokens: 150
+    max_tokens: 300,
+    response_format: { type: "json_object" }
   });
 
-  return adviceCompletion.choices[0].message.content?.trim() || `Here's what you should know about ${question.toLowerCase()}. Check your lease for specific details.`;
+  try {
+    const response = JSON.parse(adviceCompletion.choices[0].message.content || '{}');
+    return {
+      advice: response.advice || `Here's what you should know about ${question.toLowerCase()}. Check your lease for specific details.`,
+      actionSteps: response.actionSteps || []
+    };
+  } catch (e) {
+    console.error('Failed to parse advice response:', e);
+    return {
+      advice: `Here's what you should know about ${question.toLowerCase()}. Check your lease for specific details.`,
+      actionSteps: []
+    };
+  }
+}
+
+// Deprecated: Keep for backwards compatibility but not used
+async function generateAdvice(question: string, leaseText: string, locale: string = 'en'): Promise<string> {
+  const result = await generateAdviceWithSteps(question, leaseText, locale);
+  return result.advice;
 }
 
 // Helper function to create fallback scenario
@@ -483,20 +506,22 @@ async function performAnalysis(request: NextRequest) {
         const topChunk = relevantChunks[0];
         console.log(`   ✅ Found relevant chunk on page ${topChunk.pageNumber}`);
 
-        // Generate advice with timeout
+        // Generate advice and actionable steps with timeout
         let simpleAdvice;
+        let actionableSteps: string[] = [];
         try {
-          const advicePromise = generateAdvice(question, topChunk.text, locale);
-          simpleAdvice = await withTimeout(advicePromise, 15000, `Advice generation timeout for ${question}`);
+          const advicePromise = generateAdviceWithSteps(question, topChunk.text, locale);
+          const result = await withTimeout(advicePromise, 20000, `Advice generation timeout for ${question}`);
+          simpleAdvice = result.advice;
+          actionableSteps = result.actionSteps;
         } catch (adviceError) {
           console.error(`   🚨 Advice generation failed for "${question}":`, adviceError);
           simpleAdvice = locale === 'es' 
             ? `Esto es lo que debe saber sobre ${question.toLowerCase()}. Verifique su contrato para obtener detalles específicos.`
             : `Here's what you should know about ${question.toLowerCase()}. Check your lease for specific details.`;
+          // Fallback to generic steps only if generation fails
+          actionableSteps = getActionableSteps(question, locale);
         }
-        
-        // Get scenario-specific action steps
-        const actionableSteps = getActionableSteps(question, locale);
 
         enhancedScenarios.push({
           title: question,
