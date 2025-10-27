@@ -29,11 +29,8 @@ export default function SimpleLoadingModal({
   // Trigger finalizing state at 85% progress
   useEffect(() => {
     if (progress >= 85 && !showFinalizingState) {
+      console.log('🎯 Finalizing state triggered at 85%');
       setShowFinalizingState(true);
-      // Start timer for "just a few more seconds" message after 20 seconds
-      finalizingTimerRef.current = setTimeout(() => {
-        setShowExtraWaitMessage(true);
-      }, 20000); // 20 seconds
     } else if (progress < 85 && showFinalizingState) {
       setShowFinalizingState(false);
       setShowExtraWaitMessage(false);
@@ -42,14 +39,26 @@ export default function SimpleLoadingModal({
         finalizingTimerRef.current = null;
       }
     }
+  }, [progress, showFinalizingState]);
+  
+  // Separate effect for the 20-second timer
+  useEffect(() => {
+    if (showFinalizingState && !finalizingTimerRef.current) {
+      console.log('⏱️ Starting 20-second timer for extra message');
+      finalizingTimerRef.current = setTimeout(() => {
+        console.log('✅ 20 seconds elapsed - showing extra message');
+        setShowExtraWaitMessage(true);
+      }, 20000); // 20 seconds
+    }
     
-    // Cleanup timer on unmount
+    // Cleanup timer on unmount or when finalizing state ends
     return () => {
       if (finalizingTimerRef.current) {
         clearTimeout(finalizingTimerRef.current);
+        finalizingTimerRef.current = null;
       }
     };
-  }, [progress, showFinalizingState]);
+  }, [showFinalizingState]);
   
   // Extract insights from logs for the finalizing state
   const extractedInsights = useMemo(() => {

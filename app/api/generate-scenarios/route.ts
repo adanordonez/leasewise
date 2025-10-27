@@ -71,7 +71,7 @@ async function getScenarioContext(
   // Execute all queries and collect unique chunks
   for (const query of queries) {
     try {
-      const chunks = await rag.retrieve(query, 3);
+      const chunks = await rag.retrieve(query, 2); // Reduced from 3 to 2 for faster processing
       
       for (const chunk of chunks) {
         if (!seenTexts.has(chunk.text)) {
@@ -84,10 +84,18 @@ async function getScenarioContext(
       }
     } catch (error) {
       console.error(`   ⚠️ Query failed: ${query}`, error);
+      // Continue with other queries even if one fails
     }
   }
   
   console.log(`   ✅ Collected ${allChunks.length} unique chunks from ${queries.length} queries`);
+  
+  // Limit chunks to avoid token overflow
+  const MAX_CHUNKS = 15; // Limit per scenario to prevent timeout
+  if (allChunks.length > MAX_CHUNKS) {
+    console.log(`   ⚠️ Too many chunks (${allChunks.length}), limiting to ${MAX_CHUNKS}`);
+    allChunks.splice(MAX_CHUNKS);
+  }
   
   return allChunks;
 }
@@ -144,31 +152,38 @@ Return your response in this JSON format:
   "actionSteps": ["Step 1 with specific details from lease and page reference", "Step 2...", "Step 3..."]
 }`;
 
-  const adviceCompletion = await openai.chat.completions.create({
-    model: 'gpt-4o',
-    messages: [
-      {
-        role: 'system',
-        content: 'You are a precise lease document analyst. You synthesize information from multiple lease excerpts to provide accurate, specific explanations. You ONLY use information explicitly stated in the provided excerpts. You never make assumptions. You always include specific details (numbers, dates, procedures, pages) when they appear in the text. If information is missing, you clearly state what is and isn\'t covered in the provided excerpts.'
-      },
-      {
-        role: 'user',
-        content: advicePrompt
-      }
-    ],
-    temperature: 0.2,
-    max_tokens: 500,
-    response_format: { type: "json_object" }
-  });
-
   try {
+    const adviceCompletion = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a precise lease document analyst. You synthesize information from multiple lease excerpts to provide accurate, specific explanations. You ONLY use information explicitly stated in the provided excerpts. You never make assumptions. You always include specific details (numbers, dates, procedures, pages) when they appear in the text. If information is missing, you clearly state what is and isn\'t covered in the provided excerpts.'
+        },
+        {
+          role: 'user',
+          content: advicePrompt
+        }
+      ],
+      temperature: 0.2,
+      max_tokens: 500,
+      response_format: { type: "json_object" }
+    });
+
     const response = JSON.parse(adviceCompletion.choices[0].message.content || '{}');
     return {
       advice: response.advice || `Here's what you should know about ${question.toLowerCase()}. Check your lease for specific details.`,
       actionSteps: response.actionSteps || []
     };
   } catch (error) {
-    console.error('Failed to parse AI response:', error);
+    console.error('🚨 OpenAI scenario generation failed:', error);
+    if (error instanceof Error) {
+      console.error('   Error message:', error.message);
+      if (error.message.includes('token') || error.message.includes('limit')) {
+        console.error('   ⚠️ Token limit exceeded for scenario generation');
+      }
+    }
+    // Return fallback on any error
     return {
       advice: `Here's what you should know about ${question.toLowerCase()}. Check your lease for specific details.`,
       actionSteps: []
@@ -283,9 +298,16 @@ export async function POST(request: NextRequest) {
     
     for (const question of scenarioQuestions) {
       console.log(`🔍 Processing scenario: ${question}`);
+      const startTime = Date.now();
       
       try {
-        const allRelevantChunks = await getScenarioContext(rag, question, question);
+        // Gather context with timeout protection
+        const allRelevantChunks = await Promise.race([
+          getScenarioContext(rag, question, question),
+          new Promise<never>((_, reject) => 
+            setTimeout(() => reject(new Error('Context gathering timeout')), 15000)
+          )
+        ]);
         
         if (allRelevantChunks.length === 0) {
           console.log(`   ❌ No relevant chunks found for: ${question}`);
@@ -295,7 +317,13 @@ export async function POST(request: NextRequest) {
 
         console.log(`   ✅ Collected ${allRelevantChunks.length} relevant chunks`);
 
-        const result = await generateAdviceWithSteps(question, allRelevantChunks, locale);
+        // Generate advice with timeout protection
+        const result = await Promise.race([
+          generateAdviceWithSteps(question, allRelevantChunks, locale),
+          new Promise<never>((_, reject) => 
+            setTimeout(() => reject(new Error('Advice generation timeout')), 15000)
+          )
+        ]);
         
         const displayChunk = allRelevantChunks[0];
         scenarios.push({
@@ -307,13 +335,18 @@ export async function POST(request: NextRequest) {
           actionableSteps: result.actionSteps
         });
         
+        const elapsed = Date.now() - startTime;
+        console.log(`   ⏱️ Scenario completed in ${elapsed}ms`);
+        
       } catch (scenarioError) {
         console.error(`❌ Error processing scenario "${question}":`, scenarioError);
+        const elapsed = Date.now() - startTime;
+        console.error(`   ⏱️ Failed after ${elapsed}ms`);
         scenarios.push(createFallbackScenario(question, locale));
       }
     }
     
-    console.log(`✅ Generated ${scenarios.length} scenarios`);
+    console.log(`✅ Generated ${scenarios.length} scenarios (${scenarios.filter(s => s.leaseRelevantText).length} with lease context)`);
     
     return NextResponse.json({ scenarios });
     

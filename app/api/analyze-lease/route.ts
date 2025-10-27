@@ -257,10 +257,15 @@ async function performAnalysis(request: NextRequest) {
         securityDeposit: basicInfo.security_deposit?.toString(),
         address: address
       }, locale);
-      redFlags = await withTimeout(redFlagsPromise, 45000, 'Red flags analysis timeout');
+      redFlags = await withTimeout(redFlagsPromise, 60000, 'Red flags analysis timeout'); // Increased from 45s to 60s
       console.log(`✅ Found ${redFlags.length} red flags`);
+      
+      if (redFlags.length === 0) {
+        console.log('ℹ️ No red flags found - this could be good (clean lease) or analysis may have failed silently');
+      }
     } catch (redFlagsError) {
       console.error('🚨 Red flags analysis failed:', redFlagsError);
+      console.error('🚨 Error details:', redFlagsError instanceof Error ? redFlagsError.message : String(redFlagsError));
       console.warn('⚠️ Continuing without red flags analysis...');
       // Use empty array as fallback
       redFlags = [];

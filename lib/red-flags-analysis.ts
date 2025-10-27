@@ -73,14 +73,19 @@ export async function analyzeRedFlagsWithRAG(
   }> = [];
 
   for (const query of problematicQueries) {
-    const chunks = await rag.retrieve(query, 7); // Top 7 for each query (increased for better coverage)
-    chunks.forEach(chunk => {
-      relevantChunks.push({
-        text: chunk.text,
-        pageNumber: chunk.pageNumber,
-        query: query
+    try {
+      const chunks = await rag.retrieve(query, 3); // Reduced from 7 to 3 to avoid token limits
+      chunks.forEach(chunk => {
+        relevantChunks.push({
+          text: chunk.text,
+          pageNumber: chunk.pageNumber,
+          query: query
+        });
       });
-    });
+    } catch (error) {
+      console.error(`⚠️ RAG query failed for: "${query}"`, error);
+      // Continue with other queries even if one fails
+    }
   }
 
   // Remove duplicates
@@ -89,6 +94,19 @@ export async function analyzeRedFlagsWithRAG(
   );
 
   console.log(`✅ Found ${uniqueChunks.length} potentially problematic clauses`);
+  
+  // If we have too many chunks, limit to avoid token limits
+  const MAX_CHUNKS = 40; // Limit to prevent token overflow
+  if (uniqueChunks.length > MAX_CHUNKS) {
+    console.log(`⚠️ Too many chunks (${uniqueChunks.length}), limiting to ${MAX_CHUNKS}`);
+    uniqueChunks.splice(MAX_CHUNKS);
+  }
+  
+  // If we have no chunks at all, return empty array
+  if (uniqueChunks.length === 0) {
+    console.log('⚠️ No chunks found for red flags analysis');
+    return [];
+  }
 
   // STEP 2: Analyze each chunk for red flags with GPT-4o
   console.log('🔍 Analyzing clauses for red flags...');
@@ -165,24 +183,42 @@ If NO red flags found, return: {"redFlags": []}
 
 IMPORTANT: Be conservative. Only flag clear problems. When in doubt, don't flag it.`;
 
-  const completion = await openai.chat.completions.create({
-    model: 'gpt-4o',
-    messages: [
-      {
-        role: 'system',
-        content: 'You are a tenant advocate who analyzes leases for genuinely problematic clauses. You only flag clear, specific problems found in the lease text. You do NOT reference laws or make assumptions. You compare clauses to reasonable industry standards. You are conservative - when in doubt, you do NOT flag it. You return valid JSON only.'
-      },
-      {
-        role: 'user',
-        content: prompt
-      }
-    ],
-    temperature: 0.1,
-    response_format: { type: 'json_object' }
-  });
+  let redFlags: RedFlag[] = [];
+  
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a tenant advocate who analyzes leases for genuinely problematic clauses. You only flag clear, specific problems found in the lease text. You do NOT reference laws or make assumptions. You compare clauses to reasonable industry standards. You are conservative - when in doubt, you do NOT flag it. You return valid JSON only.'
+        },
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      temperature: 0.1,
+      response_format: { type: 'json_object' },
+      max_tokens: 3000 // Add explicit token limit
+    });
 
-  const result = JSON.parse(completion.choices[0].message.content || '{"redFlags":[]}');
-  const redFlags = result.redFlags || [];
+    const result = JSON.parse(completion.choices[0].message.content || '{"redFlags":[]}');
+    redFlags = result.redFlags || [];
+    
+    console.log(`✅ OpenAI identified ${redFlags.length} red flags`);
+  } catch (error) {
+    console.error('🚨 OpenAI red flags analysis failed:', error);
+    if (error instanceof Error) {
+      console.error('   Error message:', error.message);
+      // Check if it's a token limit error
+      if (error.message.includes('token') || error.message.includes('limit')) {
+        console.error('   ⚠️ Token limit exceeded - too many chunks sent to OpenAI');
+      }
+    }
+    // Return empty array on error instead of throwing
+    return [];
+  }
 
   console.log(`✅ Identified ${redFlags.length} red flags`);
   

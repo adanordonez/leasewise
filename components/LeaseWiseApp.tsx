@@ -1346,7 +1346,7 @@ export default function LeaseWiseApp() {
                     
                     {/* Simple Main Advice - Big and Clear */}
                     <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 mb-4 border border-blue-200">
-                      <p className="text-base text-slate-800 leading-relaxed">
+                      <p className="text-slate-600 leading-relaxed">
                         {scenario.advice}
                       </p>
                       {/* Source Attribution for Advice - Always show if available */}
