@@ -132,7 +132,13 @@
       "leaseStart": "Inicio del Contrato",
       "leaseEnd": "Fin del Contrato",
       "redFlags": "Señales de Alerta",
-      "detected": "detectadas"
+      "detected": "detectadas",
+      "notSpecified": "No especificado"
+    },
+    "redFlags": {
+      "noneFound": "No se encontraron problemas",
+      "noneFoundTitle": "No Se Encontraron Señales de Alerta",
+      "noneFoundDescription": "¡Buenas noticias! No encontramos cláusulas problemáticas en tu contrato. Este contrato parece seguir prácticas estándar."
     },
     "severity": {
       "high": "alta",

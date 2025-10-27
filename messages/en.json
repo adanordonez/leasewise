@@ -132,7 +132,13 @@
       "leaseStart": "Lease Start",
       "leaseEnd": "Lease End",
       "redFlags": "Red Flags",
-      "detected": "detected"
+      "detected": "detected",
+      "notSpecified": "Not specified"
+    },
+    "redFlags": {
+      "noneFound": "No issues found",
+      "noneFoundTitle": "No Red Flags Found",
+      "noneFoundDescription": "Great news! We didn't find any problematic clauses in your lease. This lease appears to follow standard practices."
     },
     "severity": {
       "high": "high",

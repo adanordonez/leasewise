@@ -1203,71 +1203,98 @@ export default function LeaseWiseApp() {
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-md transition-shadow duration-200">
             <div className="text-sm font-medium text-slate-500 mb-2 flex items-center">
               {t('ResultsPage.propertyInfo.monthlyRent')}
-              <SourceCitation 
-                sourceText={analysisResult.summary.sources?.monthlyRent} 
-                label="Monthly Rent Source"
-                pageNumber={analysisResult.summary.pageNumbers?.monthlyRent}
-                pdfUrl={analysisResult.pdfUrl}
-                searchText={analysisResult.summary.sources?.monthlyRent}
-              />
+              {analysisResult.summary.sources?.monthlyRent && (
+                <SourceCitation 
+                  sourceText={analysisResult.summary.sources.monthlyRent} 
+                  label="Monthly Rent Source"
+                  pageNumber={analysisResult.summary.pageNumbers?.monthlyRent}
+                  pdfUrl={analysisResult.pdfUrl}
+                  searchText={analysisResult.summary.sources.monthlyRent}
+                />
+              )}
             </div>
-            <div className="text-3xl font-bold text-slate-900">{analysisResult.summary.monthlyRent}</div>
+            <div className={`text-3xl font-bold ${analysisResult.summary.monthlyRent && analysisResult.summary.monthlyRent !== '$0' ? 'text-slate-900' : 'text-slate-400'}`}>
+              {analysisResult.summary.monthlyRent && analysisResult.summary.monthlyRent !== '$0' 
+                ? analysisResult.summary.monthlyRent 
+                : t('ResultsPage.propertyInfo.notSpecified')}
+            </div>
           </div>
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-md transition-shadow duration-200">
             <div className="text-sm font-medium text-slate-500 mb-2 flex items-center">
               {t('ResultsPage.propertyInfo.securityDeposit')}
-              <SourceCitation 
-                sourceText={analysisResult.summary.sources?.securityDeposit} 
-                label="Security Deposit Source"
-                pageNumber={analysisResult.summary.pageNumbers?.securityDeposit}
-                pdfUrl={analysisResult.pdfUrl}
-                searchText={analysisResult.summary.sources?.securityDeposit}
-              />
+              {analysisResult.summary.sources?.securityDeposit && (
+                <SourceCitation 
+                  sourceText={analysisResult.summary.sources.securityDeposit} 
+                  label="Security Deposit Source"
+                  pageNumber={analysisResult.summary.pageNumbers?.securityDeposit}
+                  pdfUrl={analysisResult.pdfUrl}
+                  searchText={analysisResult.summary.sources.securityDeposit}
+                />
+              )}
             </div>
-            <div className="text-3xl font-bold text-slate-900">{analysisResult.summary.securityDeposit}</div>
+            <div className={`text-3xl font-bold ${analysisResult.summary.securityDeposit && analysisResult.summary.securityDeposit !== '$0' ? 'text-slate-900' : 'text-slate-400'}`}>
+              {analysisResult.summary.securityDeposit && analysisResult.summary.securityDeposit !== '$0' 
+                ? analysisResult.summary.securityDeposit 
+                : t('ResultsPage.propertyInfo.notSpecified')}
+            </div>
           </div>
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-md transition-shadow duration-200">
             <div className="text-sm font-medium text-slate-500 mb-2 flex items-center">
               {t('ResultsPage.propertyInfo.leaseStart')}
-              <SourceCitation 
-                sourceText={analysisResult.summary.sources?.leaseStart} 
-                label="Lease Start Date Source"
-                pageNumber={analysisResult.summary.pageNumbers?.leaseStart}
-                pdfUrl={analysisResult.pdfUrl}
-                searchText={analysisResult.summary.sources?.leaseStart}
-              />
+              {analysisResult.summary.sources?.leaseStart && (
+                <SourceCitation 
+                  sourceText={analysisResult.summary.sources.leaseStart} 
+                  label="Lease Start Date Source"
+                  pageNumber={analysisResult.summary.pageNumbers?.leaseStart}
+                  pdfUrl={analysisResult.pdfUrl}
+                  searchText={analysisResult.summary.sources.leaseStart}
+                />
+              )}
             </div>
-            <div className="text-2xl font-bold text-slate-900">{analysisResult.summary.leaseStart}</div>
+            <div className={`text-2xl font-bold ${analysisResult.summary.leaseStart ? 'text-slate-900' : 'text-slate-400'}`}>
+              {analysisResult.summary.leaseStart || t('ResultsPage.propertyInfo.notSpecified')}
+            </div>
           </div>
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-md transition-shadow duration-200">
             <div className="text-sm font-medium text-slate-500 mb-2 flex items-center">
               {t('ResultsPage.propertyInfo.leaseEnd')}
-              <SourceCitation 
-                sourceText={analysisResult.summary.sources?.leaseEnd} 
-                label="Lease End Date Source"
-                pageNumber={analysisResult.summary.pageNumbers?.leaseEnd}
-                pdfUrl={analysisResult.pdfUrl}
-                searchText={analysisResult.summary.sources?.leaseEnd}
-              />
+              {analysisResult.summary.sources?.leaseEnd && (
+                <SourceCitation 
+                  sourceText={analysisResult.summary.sources.leaseEnd} 
+                  label="Lease End Date Source"
+                  pageNumber={analysisResult.summary.pageNumbers?.leaseEnd}
+                  pdfUrl={analysisResult.pdfUrl}
+                  searchText={analysisResult.summary.sources.leaseEnd}
+                />
+              )}
             </div>
-            <div className="text-2xl font-bold text-slate-900">{analysisResult.summary.leaseEnd}</div>
+            <div className={`text-2xl font-bold ${analysisResult.summary.leaseEnd ? 'text-slate-900' : 'text-slate-400'}`}>
+              {analysisResult.summary.leaseEnd || t('ResultsPage.propertyInfo.notSpecified')}
+            </div>
           </div>
         </div>
 
-        {/* Red Flags Section */}
-        {analysisResult.redFlags.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 mb-8">
-            <div className="border-b border-slate-200/60 px-6 py-5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <HugeiconsIcon icon={AlertSquareIcon} size={32} strokeWidth={1.5} className="text-red-600" />
-                  <h2 className="text-xl font-semibold text-slate-900">{t('ResultsPage.propertyInfo.redFlags')}</h2>
-                </div>
-                <span className="px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-full">
-                  {analysisResult.redFlags.length} {t('ResultsPage.propertyInfo.detected')}
-                </span>
+        {/* Red Flags Section - Always Show */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 mb-8">
+          <div className="border-b border-slate-200/60 px-6 py-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <HugeiconsIcon icon={AlertSquareIcon} size={32} strokeWidth={1.5} className={analysisResult.redFlags.length > 0 ? "text-red-600" : "text-green-600"} />
+                <h2 className="text-xl font-semibold text-slate-900">{t('ResultsPage.propertyInfo.redFlags')}</h2>
               </div>
+              <span className={`px-3 py-1 text-sm font-medium rounded-full ${
+                analysisResult.redFlags.length > 0 
+                  ? 'bg-red-100 text-red-700' 
+                  : 'bg-green-100 text-green-700'
+              }`}>
+                {analysisResult.redFlags.length > 0 
+                  ? `${analysisResult.redFlags.length} ${t('ResultsPage.propertyInfo.detected')}`
+                  : t('ResultsPage.redFlags.noneFound')
+                }
+              </span>
             </div>
+          </div>
+          {analysisResult.redFlags.length > 0 ? (
             <div className="divide-y divide-slate-200/60">
               {analysisResult.redFlags.map((flag, i) => (
                 <div key={i} className="px-6 py-5 hover:bg-slate-50/50 transition-colors duration-200">
@@ -1297,8 +1324,18 @@ export default function LeaseWiseApp() {
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="px-6 py-12 text-center">
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                  <HugeiconsIcon icon={CheckmarkCircle01Icon} size={32} strokeWidth={2} className="text-green-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900">{t('ResultsPage.redFlags.noneFoundTitle')}</h3>
+                <p className="text-slate-600 max-w-md">{t('ResultsPage.redFlags.noneFoundDescription')}</p>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Comprehensive Legal Information Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 mb-8">
