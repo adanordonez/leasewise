@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { 
@@ -114,6 +115,35 @@ export default function LeaseWiseApp() {
   const [analysisStage, setAnalysisStage] = useState('');
   const [analysisLogs, setAnalysisLogs] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'analysis' | 'chat' | 'letters'>('analysis');
+  const [isScenariosLoading, setIsScenariosLoading] = useState(false);
+
+  // Function to load scenarios separately
+  const loadScenarios = async (leaseId: string) => {
+    console.log('📋 Loading scenarios for lease:', leaseId);
+    setIsScenariosLoading(true);
+    
+    try {
+      const response = await fetch('/api/generate-scenarios', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leaseDataId: leaseId }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to load scenarios');
+      }
+      
+      const data = await response.json();
+      console.log('✅ Scenarios loaded:', data.scenarios.length);
+      setScenarios({ scenarios: data.scenarios });
+    } catch (error) {
+      console.error('❌ Error loading scenarios:', error);
+      // Set empty scenarios as fallback
+      setScenarios({ scenarios: [] });
+    } finally {
+      setIsScenariosLoading(false);
+    }
+  };
 
   const validateAndSetFile = (file: File) => {
     // Check file size limits - all files go to Supabase
@@ -363,9 +393,13 @@ export default function LeaseWiseApp() {
         setTimeout(() => {
         console.log('📊 Analysis complete! leaseDataId:', data.leaseDataId);
         setAnalysisResult(data.analysis);
-        setScenarios(data.scenarios);
         setLeaseDataId(data.leaseDataId);
         setCurrentPage('results');
+        
+        // Load scenarios separately (won't block UI)
+        if (data.leaseDataId) {
+          loadScenarios(data.leaseDataId);
+        }
         }, 500);
         
         // Show warning if text was chunked
@@ -1282,22 +1316,19 @@ export default function LeaseWiseApp() {
 
         {/* Enhanced Common Scenarios */}
         <div className="mb-8">
-          {scenarios && (() => {
-            console.log('📋 Scenarios data received:', scenarios);
-            console.log('📋 First scenario:', scenarios.scenarios[0]);
-            scenarios.scenarios.forEach((s, i) => {
-              console.log(`📋 Scenario ${i + 1}:`, {
-                title: s.title,
-                hasLeaseText: !!s.leaseRelevantText,
-                leaseTextLength: s.leaseRelevantText?.length || 0,
-                pageNumber: s.pageNumber,
-                severity: s.severity,
-                hasActionSteps: !!s.actionableSteps?.length
-              });
-            });
-            return null;
-          })()}
-          {scenarios && (
+          {isScenariosLoading ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 px-6 py-12 text-center">
+              <div className="flex flex-col items-center gap-4">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full"
+                />
+                <p className="text-slate-600 font-medium">Loading Common Scenarios...</p>
+                <p className="text-sm text-slate-500">Analyzing your lease for specific situations...</p>
+              </div>
+            </div>
+          ) : scenarios && (
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60">
               <div className="border-b border-slate-200/60 px-6 py-5">
                 <div className="flex items-center gap-3">
@@ -1315,7 +1346,7 @@ export default function LeaseWiseApp() {
                     
                     {/* Simple Main Advice - Big and Clear */}
                     <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 mb-4 border border-blue-200">
-                      <p className="text-base text-slate-800 leading-relaxed font-medium">
+                      <p className="text-base text-slate-800 leading-relaxed">
                         {scenario.advice}
                       </p>
                       {/* Source Attribution for Advice - Always show if available */}

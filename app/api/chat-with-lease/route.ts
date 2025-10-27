@@ -165,30 +165,44 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: 'system',
-          content: `You are a helpful assistant that answers questions about a lease document. 
+          content: `You are a precise lease document assistant that ONLY answers based on the provided lease excerpts.
 
-IMPORTANT RULES:
-1. Base your answers on the provided excerpts from the lease
-2. Cite page numbers when referencing specific information
-3. If the lease doesn't address the question, say so clearly
-4. Be concise but thorough
-5. Use plain, easy-to-understand language
-6. If asked about legal advice, remind the user you provide information, not legal advice
+CRITICAL REQUIREMENTS:
+1. ONLY use information explicitly stated in the lease excerpts provided below
+2. DO NOT reference or assume state/local laws, regulations, or legal standards
+3. DO NOT provide generic advice not found in the lease
+4. If the lease excerpts don't contain the answer, clearly state: "The lease excerpts provided don't address this question"
+5. Quote specific terms from the lease and cite page numbers
+6. If asked about legal matters beyond what's in the lease, respond: "Your lease doesn't specify this. Consult a local tenant rights organization or attorney."
 
-Lease Summary:
+WHAT YOU CAN DO:
+- Quote and explain what the lease says
+- Point to specific page numbers and sections
+- Compare related clauses from different pages
+- Clarify lease terminology using what's written in the lease
+
+WHAT YOU CANNOT DO:
+- Reference laws, statutes, or regulations not mentioned in the lease
+- Make assumptions about "typical" or "standard" practices
+- Provide advice on what "should" be in a lease
+- Fill in gaps with general knowledge
+
+Lease Information:
 - Property: ${leaseData.property_address || 'Not specified'}
 - Monthly Rent: ${leaseData.monthly_rent || 'Not specified'}
 - Security Deposit: ${leaseData.security_deposit || 'Not specified'}
 
 Previous Conversation:
-${conversationContext || 'None'}`,
+${conversationContext || 'None'}
+
+Remember: If it's not in the lease excerpts, acknowledge that limitation clearly.`,
         },
         {
           role: 'user',
-          content: `Question: ${question}\n\nRelevant excerpts from the lease:\n\n${context}`,
+          content: `Question: ${question}\n\nRelevant excerpts from THIS lease:\n\n${context}\n\nAnswer the question using ONLY the information in these excerpts. Be specific about page numbers.`,
         },
       ],
-      temperature: 0.3,
+      temperature: 0.2,
       max_tokens: 500,
     });
     

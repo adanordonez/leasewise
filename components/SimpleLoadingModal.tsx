@@ -21,6 +21,8 @@ export default function SimpleLoadingModal({
   const t = useTranslations();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showFinalizingState, setShowFinalizingState] = useState(false);
+  const [showExtraWaitMessage, setShowExtraWaitMessage] = useState(false);
+  const finalizingTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   console.log('🔍 SimpleLoadingModal render:', { isOpen, progress, stage, logsLength: logs.length });
   
@@ -28,9 +30,25 @@ export default function SimpleLoadingModal({
   useEffect(() => {
     if (progress >= 85 && !showFinalizingState) {
       setShowFinalizingState(true);
+      // Start timer for "just a few more seconds" message after 20 seconds
+      finalizingTimerRef.current = setTimeout(() => {
+        setShowExtraWaitMessage(true);
+      }, 20000); // 20 seconds
     } else if (progress < 85 && showFinalizingState) {
       setShowFinalizingState(false);
+      setShowExtraWaitMessage(false);
+      if (finalizingTimerRef.current) {
+        clearTimeout(finalizingTimerRef.current);
+        finalizingTimerRef.current = null;
+      }
     }
+    
+    // Cleanup timer on unmount
+    return () => {
+      if (finalizingTimerRef.current) {
+        clearTimeout(finalizingTimerRef.current);
+      }
+    };
   }, [progress, showFinalizingState]);
   
   // Extract insights from logs for the finalizing state
@@ -151,6 +169,17 @@ export default function SimpleLoadingModal({
                   <h2 className="text-4xl font-bold text-slate-900">
                     {t('LoadingModal.finalizingTitle')}
                   </h2>
+                  
+                  {/* Extra wait message after 20 seconds */}
+                  {showExtraWaitMessage && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-lg text-purple-600 font-medium"
+                    >
+                      {t('LoadingModal.justAFewMore')}
+                    </motion.p>
+                  )}
                   
                   {/* Fast Spinning Circle */}
                   <motion.div

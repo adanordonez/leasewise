@@ -147,18 +147,8 @@ async function generateSecurityDepositLetter({
   const securityDeposit = leaseData.summary?.securityDeposit || 'the security deposit amount';
   const leaseStartDate = leaseData.summary?.leaseStartDate || 'the lease start date';
   const leaseEndDate = leaseData.summary?.leaseEndDate || 'the lease end date';
-  
-  // Get state for applicable law (extract from address)
-  const stateMatch = tenantAddress.match(/\b([A-Z]{2})\b/);
-  const state = stateMatch ? stateMatch[1] : '';
 
-  // Get relevant legal info from analysis
-  const securityDepositLaw = leaseData.legalInfo?.find((law: any) => 
-    law.category?.toLowerCase().includes('security deposit') ||
-    law.lawType?.toLowerCase().includes('security deposit')
-  );
-
-  const prompt = `You are a professional legal assistant helping a tenant draft a formal letter to request the return of their security deposit.
+  const prompt = `You are a professional letter drafter helping a tenant write a formal request for security deposit return.
 
 TENANT INFORMATION:
 - Tenant Name: ${userName}
@@ -175,54 +165,58 @@ LEASE DETAILS:
 - Lease End Date: ${leaseEndDate}
 - Property Address: ${tenantAddress}
 
-RELEVANT LEASE CLAUSES:
-${relevantClauses || 'No specific clauses found.'}
+RELEVANT CLAUSES FROM THE LEASE:
+${relevantClauses || 'No specific security deposit clauses were found in the lease.'}
 
-APPLICABLE LAW:
-${securityDepositLaw ? `State: ${state}
-Law Type: ${securityDepositLaw.lawType}
-What It Says: ${securityDepositLaw.whatItSays}
-Example: ${securityDepositLaw.example}
-Statute: ${securityDepositLaw.statute || 'Not specified'}` : 'State law information not available.'}
-
-ADDITIONAL DETAILS FROM TENANT:
+TENANT'S ADDITIONAL CONTEXT:
 ${additionalDetails || 'None provided.'}
 
-INSTRUCTIONS:
-Draft a professional, formal letter requesting the return of the security deposit. The letter should:
-1. Be dated today (${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })})
-2. Use proper business letter format (include landlord address block if provided, otherwise use simplified format)
-3. Start with proper salutation to ${landlordName}
-4. Reference specific lease clauses about security deposit return
-5. Cite applicable state law (if available)
-6. Be polite but firm
-7. Request the full return of the security deposit
-8. Provide the tenant's forwarding address (${tenantAddress}) for the deposit check
-9. Mention that the property was left in good condition (if not contradicted by additional details)
-10. Reference the lease end date and required timeline for return
-11. Include the tenant's contact information (${leaseData.user_email})
-12. Include a professional closing with the tenant's name (${userName})
+CRITICAL REQUIREMENTS:
+1. ONLY reference what's explicitly stated in the lease clauses above
+2. DO NOT cite state laws, statutes, or general legal standards unless they appear in the lease itself
+3. If the lease specifies return timelines, amounts, or procedures, reference those exact terms
+4. If the lease doesn't specify something (e.g., timeline), simply request "prompt return as per the lease terms"
+5. Keep the tone professional, polite, and firm
+6. This is a template - the tenant will review and may need to adjust based on additional legal advice
 
-NOTE: The tenant's address (${tenantAddress}) should appear in the letter as their return/forwarding address, NOT as the recipient address.
+LETTER REQUIREMENTS:
+1. Date: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+2. Proper business letter format
+3. Salutation to ${landlordName}
+4. Opening paragraph: State purpose (request return of security deposit)
+5. Middle paragraph(s): 
+   - Reference lease end date: ${leaseEndDate}
+   - Quote or reference specific lease terms about deposit return (if found in clauses)
+   - Mention property was left in good condition (unless contradicted by tenant's notes)
+   - If lease specifies procedures (inspection, itemized list, etc.), reference those
+6. Closing paragraph:
+   - Request prompt return of full deposit: ${securityDeposit}
+   - Provide forwarding address for check: ${tenantAddress}
+   - Provide contact email: ${leaseData.user_email}
+7. Professional closing with tenant's name: ${userName}
 
-The letter should sound like it was written by a knowledgeable tenant who understands their rights, but maintain a respectful and professional tone throughout.
+IMPORTANT - WHAT TO AVOID:
+- Do NOT cite state law unless it's mentioned in the lease clauses
+- Do NOT reference "legal rights" beyond what the lease states
+- Do NOT make assumptions about legal requirements
+- Do NOT mention attorneys or legal action (keep it a simple request)
 
-Generate ONLY the letter text, no additional commentary or explanations.`;
+Generate ONLY the letter text, no additional commentary.`;
 
   try {
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       messages: [
         {
           role: 'system',
-          content: 'You are a professional legal document writer specializing in tenant-landlord correspondence. Write clear, professional, legally-sound letters.',
+          content: 'You are a professional letter drafter. You write clear, polite business letters based strictly on the provided lease terms. You do NOT reference laws or regulations unless they appear in the lease itself. You help tenants communicate their lease-based requests professionally.',
         },
         {
           role: 'user',
           content: prompt,
         },
       ],
-      temperature: 0.7,
+      temperature: 0.5,
       max_tokens: 2000,
     });
 

@@ -82,6 +82,7 @@
   "LoadingModal": {
     "title": "Analizando Tu Contrato",
     "finalizingTitle": "Finalizando Análisis",
+    "justAFewMore": "Solo unos segundos más...",
     "progress": "Progreso",
     "footerMessage": "Esto puede tomar de 30 a 60 segundos dependiendo de la complejidad del contrato",
     "stages": {

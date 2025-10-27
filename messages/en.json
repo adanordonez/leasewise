@@ -82,6 +82,7 @@
   "LoadingModal": {
     "title": "Analyzing Your Lease",
     "finalizingTitle": "Finalizing Analysis",
+    "justAFewMore": "Just a few more seconds...",
     "progress": "Progress",
     "footerMessage": "This may take 30-60 seconds depending on lease complexity",
     "stages": {

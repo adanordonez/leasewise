@@ -102,9 +102,9 @@ CRITICAL: For each piece of information you extract (especially red flags, tenan
   "lease_terms": ["key", "lease", "terms", "and", "conditions"],
   "special_clauses": ["unusual", "or", "notable", "clauses"],
   "market_analysis": {
-    "rent_percentile": 0,
-    "deposit_status": "higher|standard|lower",
-    "rent_analysis": "Analysis of rent compared to market"
+    "rent_percentile": 50,
+    "deposit_status": "standard",
+    "rent_analysis": "Market analysis not available - analysis focuses on lease terms only"
   },
   "red_flags": [
     {
@@ -116,8 +116,8 @@ CRITICAL: For each piece of information you extract (especially red flags, tenan
   ],
   "tenant_rights": [
     {
-      "right": "Specific tenant right",
-      "law": "Relevant law or statute",
+      "right": "Tenant right or provision found in the lease",
+      "law": "Section or clause reference from the lease (NOT external laws)",
       "source": "Exact text from the lease that mentions this right (1-3 sentences)"
     }
   ],
@@ -138,12 +138,15 @@ CRITICAL: For each piece of information you extract (especially red flags, tenan
   }
 }
 
-IMPORTANT:
-- Extract actual numbers, dates, and amounts from the lease
-- If information is not available, use null or appropriate defaults
-- Be specific about property details (sq ft, bedrooms, etc.)
-- Include all financial terms and conditions
-- Focus on data that would be valuable for property management companies
+CRITICAL REQUIREMENTS:
+- Extract ONLY information explicitly stated in the lease document above
+- DO NOT reference external laws, statutes, or regulations
+- DO NOT make assumptions about market conditions or typical practices
+- Extract actual numbers, dates, and amounts directly from the lease
+- If information is not available in the lease, use null or appropriate defaults
+- Be specific about property details found in the lease (sq ft, bedrooms, etc.)
+- For "tenant_rights", ONLY list rights/provisions explicitly stated IN THE LEASE
+- For "tenant_rights" "law" field, reference the lease section/clause, NOT external statutes
 - Ensure all dates are in YYYY-MM-DD format
 - Make sure all monetary amounts are numbers, not strings
 
@@ -152,14 +155,15 @@ SOURCE TEXT REQUIREMENTS:
 - Keep source excerpts concise (1-3 sentences maximum)
 - Include enough context to be meaningful but not the entire section
 - If multiple sections relate to the same item, choose the most relevant excerpt
-- Do not paraphrase - use the exact wording from the lease`;
+- Do not paraphrase - use the exact wording from the lease
+- NEVER cite or reference laws that are not explicitly mentioned in the lease text`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
       {
         role: "system",
-        content: "You are a real estate data extraction expert. Extract structured data from lease agreements with high accuracy. Return only valid JSON."
+        content: "You are a lease data extraction expert. Extract ONLY information explicitly stated in the provided lease document. Do NOT reference external laws, market data, or general knowledge. Return ONLY valid JSON with exact information from the lease."
       },
       {
         role: "user",

@@ -97,60 +97,87 @@ export async function analyzeRedFlagsWithRAG(
     ? '\n\nThis output is for a Spanish speaking tenant. Please output in simple spanish terms so that tenants can understand.' 
     : '';
   
-  const prompt = `You are an expert tenant rights attorney analyzing a residential lease agreement.
+  const prompt = `You are an expert tenant advocate analyzing a residential lease for genuinely problematic clauses.
 
-YOUR TASK: Identify ONLY clauses that are GENUINELY problematic, unfair, or potentially illegal for tenants.
+YOUR TASK: Identify ONLY clauses that are ACTUALLY problematic, unfair, or unreasonable based on what's written in THIS lease.
 
 LEASE CONTEXT:
 - Monthly Rent: ${leaseContext.monthlyRent || 'Not specified'}
 - Security Deposit: ${leaseContext.securityDeposit || 'Not specified'}
-- Location: ${leaseContext.address || 'Not specified'}
+- Property Location: ${leaseContext.address || 'Not specified'}
 
-POTENTIALLY PROBLEMATIC CLAUSES FROM LEASE:
+POTENTIALLY PROBLEMATIC CLAUSES FROM THIS LEASE:
 ${uniqueChunks.map((chunk, i) => `
 [Clause ${i + 1}] (Page ${chunk.pageNumber})
 ${chunk.text}
 ---`).join('\n')}
 
-CRITICAL INSTRUCTIONS:
-1. Only flag clauses that are ACTUALLY problematic (unfair fees, illegal restrictions, unfair liability, etc.)
-2. Do NOT flag standard, reasonable lease terms (normal rent, standard deposits, reasonable rules)
-3. For each red flag, use the ENTIRE relevant chunk text as the source (not just a small excerpt)
-4. Explain WHY it's problematic and what the fair alternative should be
-5. Rate severity: HIGH (likely illegal/very unfair), MEDIUM (unfair but common), LOW (potentially problematic)
-6. IMPORTANT: Use the full chunk text provided below - don't extract just a small portion
+CRITICAL REQUIREMENTS:
+1. ONLY flag clauses based on what's actually written in the lease text above
+2. DO NOT reference or assume state/local laws - analyze based on fairness and reasonableness
+3. DO NOT flag if it's a standard, reasonable lease term
+4. ONLY flag if the clause is clearly unfair, excessive, or one-sided against the tenant
 
-Return JSON array:
+WHAT TO FLAG (with examples):
+- Excessive fees: Late fee of $500/day, cleaning fees of $1000+
+- Unreasonable restrictions: No guests ever, no cooking certain foods
+- Unfair liability: Tenant responsible for ALL damages including natural disasters
+- Unreasonable entry: Landlord can enter anytime without notice for any reason
+- Excessive penalties: Forfeiture of entire deposit for minor issues
+- Rights waivers: Tenant waives right to sue, habitability rights, etc.
+
+WHAT NOT TO FLAG (these are standard):
+- Rent due on 1st of month
+- Standard late fees ($50-75 or 5% of rent)
+- Reasonable security deposits (1-2 months rent)
+- Normal noise/behavior rules
+- No pets or standard pet deposits
+- Reasonable move-out cleaning requirements
+- Standard 24-48 hour entry notice for non-emergency repairs
+
+RATING SEVERITY:
+- HIGH: Clearly unreasonable, excessive, or grossly unfair (e.g., $500 late fee after 1 day)
+- MEDIUM: Unfair but seen in leases, disadvantages tenant significantly
+- LOW: Potentially problematic depending on context, may be negotiable
+
+EXPLANATION REQUIREMENTS:
+- State WHAT the clause says (quote key parts)
+- Explain WHY it's problematic using specific numbers/details from the clause
+- Compare to what would be reasonable (e.g., "This $500 late fee is excessive compared to typical $50-75 fees")
+- DO NOT cite specific laws - focus on fairness and reasonableness
+- Use the COMPLETE chunk text as the source${languageInstruction}
+
+Return JSON:
 {
   "redFlags": [
     {
-      "issue": "Brief title of the problem",
+      "issue": "Brief, specific title referencing the actual problem",
       "severity": "high" | "medium" | "low",
-      "explanation": "Detailed explanation of why this is problematic and what the fair alternative should be. Include legal context and tenant rights implications.",
-      "source": "Use the COMPLETE chunk text from the lease clause above (the entire text block, not just a small excerpt)",
-      "page_number": page number where found,
-      "chunk_index": "Reference the chunk number from above (e.g., 'Clause 1')"
+      "explanation": "Quote the problematic part, explain why it's unfair with specific details, note what would be more reasonable. Be specific about amounts/terms from the clause.",
+      "source": "The COMPLETE chunk text from above (entire [Clause X] text block)",
+      "page_number": page number,
+      "chunk_index": "Clause 1, Clause 2, etc"
     }
   ]
 }
 
 If NO red flags found, return: {"redFlags": []}
 
-ONLY RETURN JSON. Be strict - only flag GENUINE problems.${languageInstruction}`;
+IMPORTANT: Be conservative. Only flag clear problems. When in doubt, don't flag it.`;
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o',
     messages: [
       {
         role: 'system',
-        content: 'You are a tenant rights attorney. Only flag GENUINELY problematic lease clauses. Return valid JSON only.'
+        content: 'You are a tenant advocate who analyzes leases for genuinely problematic clauses. You only flag clear, specific problems found in the lease text. You do NOT reference laws or make assumptions. You compare clauses to reasonable industry standards. You are conservative - when in doubt, you do NOT flag it. You return valid JSON only.'
       },
       {
         role: 'user',
         content: prompt
       }
     ],
-    temperature: 0.2,
+    temperature: 0.1,
     response_format: { type: 'json_object' }
   });
 

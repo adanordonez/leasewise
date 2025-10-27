@@ -110,9 +110,9 @@ Return JSON in this format:
   "lease_terms": ["key terms"],
   "special_clauses": ["notable clauses"],
   "market_analysis": {
-    "rent_percentile": 0,
-    "deposit_status": "higher|standard|lower",
-    "rent_analysis": "Analysis"
+    "rent_percentile": 50,
+    "deposit_status": "standard",
+    "rent_analysis": "Market analysis not available - analysis focuses on lease terms only"
   },
   "red_flags": [
     {
@@ -124,8 +124,8 @@ Return JSON in this format:
   ],
   "tenant_rights": [
     {
-      "right": "Specific right",
-      "law": "Relevant law",
+      "right": "Tenant right or provision found in the lease",
+      "law": "Section or clause reference from the lease (NOT external laws)",
       "source_chunk_id": "CHUNK 2"
     }
   ],
@@ -137,14 +137,23 @@ Return JSON in this format:
       "source_chunk_id": "CHUNK 3"
     }
   ]
-}${languageInstruction}`;
+}
+
+CRITICAL REQUIREMENTS:
+- Extract ONLY information explicitly stated in the lease chunks above
+- DO NOT reference external laws, statutes, or regulations
+- DO NOT make assumptions about market conditions or typical practices
+- For "tenant_rights", ONLY list rights/provisions explicitly stated IN THE LEASE
+- For "tenant_rights" "law" field, reference the lease section/clause, NOT external statutes
+- Note which CHUNK each piece of information came from
+- NEVER cite or reference laws that are not explicitly mentioned in the lease chunks${languageInstruction}`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
       {
         role: "system",
-        content: "You are a real estate data extraction expert. Extract structured data from lease agreements with high accuracy. Return only valid JSON. When you reference information, note which CHUNK it came from."
+        content: "You are a lease data extraction expert. Extract ONLY information explicitly stated in the provided lease chunks. Do NOT reference external laws, market data, or general knowledge. Return ONLY valid JSON with exact information from the lease. Note which CHUNK each piece of information came from."
       },
       {
         role: "user",
