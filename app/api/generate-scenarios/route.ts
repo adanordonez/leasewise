@@ -7,7 +7,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export const maxDuration = 60;
+export const maxDuration = 120; // 2 minutes for scenarios generation
 
 // Helper function to get comprehensive context for a scenario using multiple RAG queries
 async function getScenarioContext(
