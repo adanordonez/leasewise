@@ -25,7 +25,7 @@ function encodeTextFragment(text: string): string {
   const words = cleaned.split(' ').filter(w => w.length > 0);
   const fragment = words.slice(0, 25).join(' ');
   
-  console.log('🔗 Text fragment:', fragment.slice(0, 100));
+  // console.log('🔗 Text fragment:', fragment.slice(0, 100));
   
   // URL encode - DON'T double-encode
   return encodeURIComponent(fragment);
@@ -41,7 +41,7 @@ function encodeTextFragment(text: string): string {
  */
 export function createTextFragmentUrl(baseUrl: string, textToHighlight: string): string {
   if (!textToHighlight || textToHighlight.length < 10) {
-    console.log('⚠️ Text too short for fragment, returning base URL');
+    // console.log('⚠️ Text too short for fragment, returning base URL');
     return baseUrl; // Text too short, return base URL
   }
   
@@ -55,7 +55,7 @@ export function createTextFragmentUrl(baseUrl: string, textToHighlight: string):
       .filter(w => w.length > 0);
     
     if (words.length < 5) {
-      console.log('⚠️ Not enough words for fragment');
+      // console.log('⚠️ Not enough words for fragment');
       return baseUrl;
     }
     
@@ -66,8 +66,8 @@ export function createTextFragmentUrl(baseUrl: string, textToHighlight: string):
     const startText = startWords.join(' ');
     const encodedStart = encodeTextFragment(startText);
     
-    console.log('🔗 Creating text fragment URL');
-    console.log('   Start text:', startText.slice(0, 60) + '...');
+    // console.log('🔗 Creating text fragment URL');
+    // console.log('   Start text:', startText.slice(0, 60) + '...');
     
     // Create text fragment URL with START,END for precision
     const url = new URL(baseUrl);
@@ -75,14 +75,14 @@ export function createTextFragmentUrl(baseUrl: string, textToHighlight: string):
     if (endWords && endWords.length > 0) {
       const endText = endWords.join(' ');
       const encodedEnd = encodeTextFragment(endText);
-      console.log('   End text:', endText.slice(0, 60) + '...');
+      // console.log('   End text:', endText.slice(0, 60) + '...');
       url.hash = `:~:text=${encodedStart},${encodedEnd}`;
     } else {
       url.hash = `:~:text=${encodedStart}`;
     }
     
     const finalUrl = url.toString();
-    console.log('✅ Fragment URL created:', finalUrl.slice(0, 150) + '...');
+    // console.log('✅ Fragment URL created:', finalUrl.slice(0, 150) + '...');
     
     return finalUrl;
   } catch (error) {

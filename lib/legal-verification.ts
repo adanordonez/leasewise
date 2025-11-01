@@ -11,7 +11,7 @@ export async function verifyStatuteInContent(
   statuteText: string,
   fullContent: string
 ): Promise<{ isVerified: boolean; confidence: number; reason: string }> {
-  console.log('🔍 VERIFICATION LAYER 1: Checking if statute exists in content...');
+  // console.log('🔍 VERIFICATION LAYER 1: Checking if statute exists in content...');
   
   try {
     const completion = await openai.chat.completions.create({
@@ -48,8 +48,8 @@ Return JSON only.`
 
     const result = JSON.parse(completion.choices[0].message.content || '{}');
     
-    console.log(`📊 Verification Result: ${result.isVerified ? '✅ VERIFIED' : '❌ NOT VERIFIED'} (confidence: ${result.confidence}%)`);
-    console.log(`📝 Reason: ${result.reason}`);
+    // console.log(`📊 Verification Result: ${result.isVerified ? '✅ VERIFIED' : '❌ NOT VERIFIED'} (confidence: ${result.confidence}%)`);
+    // console.log(`📝 Reason: ${result.reason}`);
     
     return {
       isVerified: result.isVerified && result.confidence >= 80, // Require 80%+ confidence
@@ -77,7 +77,7 @@ export async function googleVerifyStatute(
   officialSources: Array<{ url: string; title: string; snippet: string }>;
   confidence: number;
 }> {
-  console.log(`🔍 VERIFICATION LAYER 2: Google search for "${statuteName}" in ${state}...`);
+  // console.log(`🔍 VERIFICATION LAYER 2: Google search for "${statuteName}" in ${state}...`);
   
   try {
     const response = await openai.responses.create({
@@ -124,7 +124,7 @@ Return ONLY official government or legal database sources.`,
       }
     }
     
-    console.log(`📚 Google found ${sources.length} official sources`);
+    // console.log(`📚 Google found ${sources.length} official sources`);
     
     return {
       officialSources: sources,
@@ -146,7 +146,7 @@ export async function verifyStatuteFormat(
   statuteText: string,
   state: string
 ): Promise<{ isValid: boolean; extractedStatute: string | null }> {
-  console.log('🔍 VERIFICATION LAYER 3: Verifying statute format...');
+  // console.log('🔍 VERIFICATION LAYER 3: Verifying statute format...');
   
   try {
     const completion = await openai.chat.completions.create({
@@ -179,8 +179,8 @@ Return JSON only.`
 
     const result = JSON.parse(completion.choices[0].message.content || '{}');
     
-    console.log(`📋 Statute Format: ${result.isValid ? '✅ VALID' : '❌ INVALID'}`);
-    console.log(`📝 Extracted: ${result.extractedStatute}`);
+    // console.log(`📋 Statute Format: ${result.isValid ? '✅ VALID' : '❌ INVALID'}`);
+    // console.log(`📝 Extracted: ${result.extractedStatute}`);
     
     return {
       isValid: result.isValid,
@@ -210,7 +210,7 @@ export async function finalAccuracyCheck(
   issues: string[];
   recommendations: string[];
 }> {
-  console.log('🔍 VERIFICATION LAYER 4: Final accuracy check...');
+  // console.log('🔍 VERIFICATION LAYER 4: Final accuracy check...');
   
   try {
     // First LLM call: Check legal accuracy
@@ -289,7 +289,7 @@ Return JSON only.`
                       legal.stateMatch &&
                       overallConfidence >= 75;
     
-    console.log(`📊 Final Accuracy: ${isAccurate ? '✅ ACCURATE' : '❌ NOT ACCURATE'} (confidence: ${overallConfidence}%)`);
+    // console.log(`📊 Final Accuracy: ${isAccurate ? '✅ ACCURATE' : '❌ NOT ACCURATE'} (confidence: ${overallConfidence}%)`);
     
     return {
       isAccurate,
@@ -333,9 +333,9 @@ export async function verifyLegalSource(
   verifiedStatuteNumber: string | null;
   recommendations: string[];
 }> {
-  console.log('\n🚀 MASTER VERIFICATION STARTING...');
-  console.log(`📍 Verifying: ${rightDescription} (${city || state})`);
-  console.log(`🔗 Source: ${sourceUrl}`);
+  // console.log('\n🚀 MASTER VERIFICATION STARTING...');
+  // console.log(`📍 Verifying: ${rightDescription} (${city || state})`);
+  // console.log(`🔗 Source: ${sourceUrl}`);
   
   // Layer 1: Verify statute exists in content
   const contentVerification = await verifyStatuteInContent(statuteText, fullContent);
@@ -389,12 +389,12 @@ export async function verifyLegalSource(
     formatVerification.isValid &&               // Must have valid format
     contentVerification.confidence >= 80;       // High content confidence
   
-  console.log('\n📊 VERIFICATION SUMMARY:');
-  console.log(`   Overall Confidence: ${overallConfidence.toFixed(1)}%`);
-  console.log(`   ✅ Verified: ${isVerified}`);
-  console.log(`   🔗 Show Link: ${shouldShowLink}`);
-  console.log(`   📜 Show Statute: ${shouldShowStatute}`);
-  console.log(`   📋 Statute Number: ${formatVerification.extractedStatute || 'None'}`);
+  // console.log('\n📊 VERIFICATION SUMMARY:');
+  // console.log(`   Overall Confidence: ${overallConfidence.toFixed(1)}%`);
+  // console.log(`   ✅ Verified: ${isVerified}`);
+  // console.log(`   🔗 Show Link: ${shouldShowLink}`);
+  // console.log(`   📜 Show Statute: ${shouldShowStatute}`);
+  // console.log(`   📋 Statute Number: ${formatVerification.extractedStatute || 'None'}`);
   
   return {
     isVerified,

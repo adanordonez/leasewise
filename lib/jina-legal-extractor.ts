@@ -24,7 +24,7 @@ interface ExtractedLegalContent {
  */
 async function fetchPageContent(url: string): Promise<string | null> {
   try {
-    console.log(`📄 Fetching content from: ${url}`);
+    // console.log(`📄 Fetching content from: ${url}`);
     
     const response = await fetch(`https://r.jina.ai/${url}`, {
       headers: {
@@ -43,7 +43,7 @@ async function fetchPageContent(url: string): Promise<string | null> {
     const data = await response.json();
     const content = data.data?.content || data.content || '';
     
-    console.log(`✅ Fetched ${content.length} characters`);
+    // console.log(`✅ Fetched ${content.length} characters`);
     return content;
   } catch (error) {
     console.error('❌ Error fetching with Jina AI:', error);
@@ -61,7 +61,7 @@ async function vetLegalContent(
   city?: string
 ): Promise<{ isRelevant: boolean; reason: string; score: number }> {
   try {
-    console.log(`🔍 Vetting content for: "${tenantRight}" in ${city || state}`);
+    // console.log(`🔍 Vetting content for: "${tenantRight}" in ${city || state}`);
     
     // Truncate to first 10k characters for vetting (cost optimization)
     const truncatedContent = content.slice(0, 10000);
@@ -110,8 +110,8 @@ Return JSON only.`
 
     const result = JSON.parse(completion.choices[0].message.content || '{}');
     
-    console.log(`📊 Vetting result: ${result.isRelevant ? '✅ RELEVANT' : '❌ NOT RELEVANT'} (score: ${result.score}/100)`);
-    console.log(`📝 Reason: ${result.reason}`);
+    // console.log(`📊 Vetting result: ${result.isRelevant ? '✅ RELEVANT' : '❌ NOT RELEVANT'} (score: ${result.score}/100)`);
+    // console.log(`📝 Reason: ${result.reason}`);
     
     return {
       isRelevant: result.isRelevant && result.score >= 60, // Require 60%+ confidence
@@ -138,7 +138,7 @@ async function extractSpecificStatute(
   city?: string
 ): Promise<{ statuteText: string; explanation: string }> {
   try {
-    console.log(`📝 Extracting specific statute text for: "${tenantRight}"`);
+    // console.log(`📝 Extracting specific statute text for: "${tenantRight}"`);
     
     // Use more content for extraction (up to 30k chars)
     const truncatedContent = content.slice(0, 30000);
@@ -175,7 +175,7 @@ ${truncatedContent}`
 
     const result = JSON.parse(completion.choices[0].message.content || '{}');
     
-    console.log(`✅ Extracted ${result.statuteText?.length || 0} characters of statute text`);
+    // console.log(`✅ Extracted ${result.statuteText?.length || 0} characters of statute text`);
     
     return {
       statuteText: result.statuteText || 'Could not extract specific text',
@@ -199,8 +199,8 @@ export async function fetchAndVetLegalSource(
   state: string,
   city?: string
 ): Promise<ExtractedLegalContent> {
-  console.log(`\n🚀 Processing legal source: ${url}`);
-  console.log(`📍 Looking for: "${tenantRight}" in ${city || state}`);
+  // console.log(`\n🚀 Processing legal source: ${url}`);
+  // console.log(`📍 Looking for: "${tenantRight}" in ${city || state}`);
   
   // Step 1: Fetch full page content with Jina AI
   const content = await fetchPageContent(url);
@@ -228,7 +228,7 @@ export async function fetchAndVetLegalSource(
   const extracted = await extractSpecificStatute(content, tenantRight, state, city);
   
   // Step 4: MULTI-LAYER VERIFICATION (NEW!)
-  console.log('🔒 Starting multi-layer verification...');
+  // console.log('🔒 Starting multi-layer verification...');
   const verification = await verifyLegalSource(
     extracted.statuteText,
     extracted.explanation,
@@ -239,10 +239,10 @@ export async function fetchAndVetLegalSource(
     city
   );
   
-  console.log(`🔒 Verification complete: ${verification.isVerified ? '✅ VERIFIED' : '❌ FAILED'}`);
-  console.log(`📊 Confidence: ${verification.overallConfidence.toFixed(1)}%`);
-  console.log(`🔗 Show Link: ${verification.shouldShowLink}`);
-  console.log(`📜 Show Statute: ${verification.shouldShowStatute}`);
+  // console.log(`🔒 Verification complete: ${verification.isVerified ? '✅ VERIFIED' : '❌ FAILED'}`);
+  // console.log(`📊 Confidence: ${verification.overallConfidence.toFixed(1)}%`);
+  // console.log(`🔗 Show Link: ${verification.shouldShowLink}`);
+  // console.log(`📜 Show Statute: ${verification.shouldShowStatute}`);
   
   // Only return if verification passed
   if (!verification.isVerified) {
@@ -289,7 +289,7 @@ export async function fetchAndVetMultipleSources(
   shouldShowStatute?: boolean;
   statuteNumber?: string | null;
 }>> {
-  console.log(`\n📚 Processing ${Math.min(sources.length, maxSources)} sources...`);
+  // console.log(`\n📚 Processing ${Math.min(sources.length, maxSources)} sources...`);
   
   const sourcesToProcess = sources.slice(0, maxSources);
   
@@ -305,10 +305,10 @@ export async function fetchAndVetMultipleSources(
     })
   );
   
-  // Filter to only relevant sources
-  const relevantSources = results.filter(r => r.isRelevant);
+  // // Filter to only relevant sources
+  // const relevantSources = results.filter(r => r.isRelevant);
   
-  console.log(`\n✅ Found ${relevantSources.length} relevant sources out of ${sourcesToProcess.length}`);
+  // console.log(`\n✅ Found ${relevantSources.length} relevant sources out of ${sourcesToProcess.length}`);
   
   return results;
 }

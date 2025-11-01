@@ -43,12 +43,12 @@ export default function EnhancedLegalSources({ rightText, userAddress, descripti
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   // Debug log
-  console.log('🔍 EnhancedLegalSources rendered:', {
-    rightText: rightText?.slice(0, 50),
-    userAddress,
-    hasPdfUrl: !!pdfUrl,
-    hasLeaseContext: !!leaseContext
-  });
+  // console.log('🔍 EnhancedLegalSources rendered:', {
+  //   rightText: rightText?.slice(0, 50),
+  //   userAddress,
+  //   hasPdfUrl: !!pdfUrl,
+  //   hasLeaseContext: !!leaseContext
+  // });
 
   const copyStatuteText = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
@@ -57,14 +57,14 @@ export default function EnhancedLegalSources({ rightText, userAddress, descripti
   };
 
   const searchLegalSources = async () => {
-    console.log('🚀 searchLegalSources called!');
-    console.log('📦 Sending data:', {
-      rightText: rightText?.slice(0, 50),
-      userAddress,
-      description: description?.slice(0, 50),
-      pdfUrl: pdfUrl?.slice(0, 50),
-      leaseContext
-    });
+    // console.log('🚀 searchLegalSources called!');
+    // console.log('📦 Sending data:', {
+    //   rightText: rightText?.slice(0, 50),
+    //   userAddress,
+    //   description: description?.slice(0, 50),
+    //   pdfUrl: pdfUrl?.slice(0, 50),
+    //   leaseContext
+    // });
     
     setIsLoading(true);
     setError(null);
@@ -73,7 +73,7 @@ export default function EnhancedLegalSources({ rightText, userAddress, descripti
     setStats(null);
     
     try {
-      console.log('📡 Fetching enhanced legal sources...');
+      // console.log('📡 Fetching enhanced legal sources...');
       
       const response = await fetch('/api/enhanced-legal-sources', {
         method: 'POST',
@@ -87,7 +87,7 @@ export default function EnhancedLegalSources({ rightText, userAddress, descripti
         }),
       });
       
-      console.log('📡 Response status:', response.status);
+      // console.log('📡 Response status:', response.status);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -102,7 +102,7 @@ export default function EnhancedLegalSources({ rightText, userAddress, descripti
           totalSearched: data.totalSearched || 0,
           notFoundCount: data.notFoundCount || 0
         });
-        console.log(`✅ Found ${data.sources?.length || 0} vetted legal sources`);
+        // console.log(`✅ Found ${data.sources?.length || 0} vetted legal sources`);
       } else {
         setError(data.error || 'Failed to fetch legal sources');
       }

@@ -7,7 +7,7 @@ import { extractTextWithPageNumbers } from '@/lib/llamaparse-utils';
 export const maxDuration = 90; // 90 seconds for Jina AI + RAG analysis
 
 export async function POST(request: NextRequest) {
-  console.log('🔍 Enhanced legal sources API called');
+  // console.log('🔍 Enhanced legal sources API called');
   
   try {
     const body = await request.json();
@@ -20,8 +20,8 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    console.log(`📚 Searching enhanced legal sources for: "${description}"`);
-    console.log(`📍 Location: ${userAddress}`);
+    // console.log(`📚 Searching enhanced legal sources for: "${description}"`);
+    // console.log(`📍 Location: ${userAddress}`);
     
     const result = await searchEnhancedLegalSources(rightText, userAddress, description);
     
@@ -47,7 +47,7 @@ We recommend consulting with a local tenant rights attorney for specific legal a
     
     if (pdfUrl && result.sources.length > 0) {
       try {
-        console.log('🔍 Analyzing how laws apply to the lease with RAG...');
+        // console.log('🔍 Analyzing how laws apply to the lease with RAG...');
         
         // Fetch PDF and extract text
         const pdfResponse = await fetch(pdfUrl);
@@ -77,14 +77,14 @@ We recommend consulting with a local tenant rights attorney for specific legal a
           hasMatch: applications[index]?.hasMatch
         }));
         
-        console.log(`✅ Successfully analyzed ${applications.length} law applications`);
+        // console.log(`✅ Successfully analyzed ${applications.length} law applications`);
         
       } catch (ragError) {
         console.error('⚠️ RAG analysis failed, returning sources without application analysis:', ragError);
         // Continue with regular sources if RAG fails
       }
     } else {
-      console.log('ℹ️ No PDF URL provided, skipping lease-specific analysis');
+      // console.log('ℹ️ No PDF URL provided, skipping lease-specific analysis');
     }
     
     return NextResponse.json({

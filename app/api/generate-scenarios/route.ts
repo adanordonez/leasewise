@@ -66,7 +66,7 @@ async function getScenarioContext(
     ];
   }
   
-  console.log(`   🔍 Running ${queries.length} RAG queries to get comprehensive context...`);
+  // console.log(`   🔍 Running ${queries.length} RAG queries to get comprehensive context...`);
   
   // Execute all queries and collect unique chunks
   for (const query of queries) {
@@ -88,12 +88,12 @@ async function getScenarioContext(
     }
   }
   
-  console.log(`   ✅ Collected ${allChunks.length} unique chunks from ${queries.length} queries`);
+  // console.log(`   ✅ Collected ${allChunks.length} unique chunks from ${queries.length} queries`);
   
   // Limit chunks to avoid token overflow
   const MAX_CHUNKS = 15; // Limit per scenario to prevent timeout
   if (allChunks.length > MAX_CHUNKS) {
-    console.log(`   ⚠️ Too many chunks (${allChunks.length}), limiting to ${MAX_CHUNKS}`);
+    // console.log(`   ⚠️ Too many chunks (${allChunks.length}), limiting to ${MAX_CHUNKS}`);
     allChunks.splice(MAX_CHUNKS);
   }
   
@@ -240,7 +240,7 @@ export async function POST(request: NextRequest) {
   try {
     const { leaseDataId } = await request.json();
     
-    console.log(`📋 Generating scenarios for lease ${leaseDataId}...`);
+    // console.log(`📋 Generating scenarios for lease ${leaseDataId}...`);
     
     // Get locale from cookies
     const locale = request.cookies.get('locale')?.value || 'en';
@@ -269,7 +269,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Rebuild RAG from stored chunks
-    console.log(`🔄 Rebuilding RAG system from ${leaseData.chunks.length} stored chunks...`);
+    // console.log(`🔄 Rebuilding RAG system from ${leaseData.chunks.length} stored chunks...`);
     const rag = new LeaseRAGSystem(true);
     rag['chunks'] = leaseData.chunks.map((chunk: any) => ({
       text: chunk.text,
@@ -279,7 +279,7 @@ export async function POST(request: NextRequest) {
       startIndex: chunk.startIndex || 0,
       endIndex: chunk.endIndex || 0
     }));
-    console.log('✅ RAG system rebuilt successfully');
+    // console.log('✅ RAG system rebuilt successfully');
     
     // Generate scenarios
     const scenarioQuestions = locale === 'es' ? [
@@ -297,7 +297,7 @@ export async function POST(request: NextRequest) {
     const scenarios = [];
     
     for (const question of scenarioQuestions) {
-      console.log(`🔍 Processing scenario: ${question}`);
+      // console.log(`🔍 Processing scenario: ${question}`);
       const startTime = Date.now();
       
       try {
@@ -310,12 +310,12 @@ export async function POST(request: NextRequest) {
         ]);
         
         if (allRelevantChunks.length === 0) {
-          console.log(`   ❌ No relevant chunks found for: ${question}`);
+          // console.log(`   ❌ No relevant chunks found for: ${question}`);
           scenarios.push(createFallbackScenario(question, locale));
           continue;
         }
 
-        console.log(`   ✅ Collected ${allRelevantChunks.length} relevant chunks`);
+        // console.log(`   ✅ Collected ${allRelevantChunks.length} relevant chunks`);
 
         // Generate advice with timeout protection
         const result = await Promise.race([
@@ -335,8 +335,8 @@ export async function POST(request: NextRequest) {
           actionableSteps: result.actionSteps
         });
         
-        const elapsed = Date.now() - startTime;
-        console.log(`   ⏱️ Scenario completed in ${elapsed}ms`);
+        // const elapsed = Date.now() - startTime;
+        // console.log(`   ⏱️ Scenario completed in ${elapsed}ms`);
         
       } catch (scenarioError) {
         console.error(`❌ Error processing scenario "${question}":`, scenarioError);
@@ -346,7 +346,7 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    console.log(`✅ Generated ${scenarios.length} scenarios (${scenarios.filter(s => s.leaseRelevantText).length} with lease context)`);
+    // console.log(`✅ Generated ${scenarios.length} scenarios (${scenarios.filter(s => s.leaseRelevantText).length} with lease context)`);
     
     return NextResponse.json({ scenarios });
     

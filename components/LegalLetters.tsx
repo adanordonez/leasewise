@@ -68,7 +68,7 @@ export default function LegalLetters({
         if (data.landlordAddress) {
           setLandlordAddress(data.landlordAddress);
         }
-        console.log('✅ Auto-extracted landlord info:', data);
+        // console.log('✅ Auto-extracted landlord info:', data);
       }
     } catch (error) {
       console.error('Error extracting landlord info:', error);

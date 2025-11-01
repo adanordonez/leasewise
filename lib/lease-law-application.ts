@@ -26,7 +26,7 @@ export async function analyzeHowLawAppliesToLease(
   hasMatch: boolean;
 }> {
   try {
-    console.log(`🔍 Analyzing how "${lawType}" applies to the lease...`);
+    // console.log(`🔍 Analyzing how "${lawType}" applies to the lease...`);
     
     // Step 1: Use RAG to find relevant parts of the lease with more specific queries
     const specificQueries = [
@@ -52,7 +52,7 @@ export async function analyzeHowLawAppliesToLease(
     const relevantChunks = uniqueChunks.slice(0, 8); // Top 8 most relevant chunks
     
     if (relevantChunks.length === 0) {
-      console.log('⚠️ No relevant lease clauses found');
+      // console.log('⚠️ No relevant lease clauses found');
       return {
         application: `Your lease does not appear to have specific terms about ${lawType.toLowerCase()}. The law still applies to your tenancy.`,
         hasMatch: false
@@ -62,7 +62,7 @@ export async function analyzeHowLawAppliesToLease(
     // Combine the relevant lease chunks
     const leaseText = relevantChunks.map(c => c.text).join('\n\n');
     
-    console.log(`✅ Found ${relevantChunks.length} relevant lease sections`);
+    // console.log(`✅ Found ${relevantChunks.length} relevant lease sections`);
     
     // Step 2: Use LLM to analyze how the law applies to the lease
     const languageInstruction = locale === 'es' 
@@ -113,7 +113,7 @@ Explain in 80-120 words how this law specifically applies to THIS tenant's lease
     const application = completion.choices[0].message.content || 
       'Unable to determine how this law applies to your specific lease.';
     
-    console.log(`✅ Generated application analysis: ${application.slice(0, 80)}...`);
+    // console.log(`✅ Generated application analysis: ${application.slice(0, 80)}...`);
     
     return {
       application: application.trim(),
@@ -156,7 +156,7 @@ export async function analyzeLawApplications(
   relevantLeaseText?: string;
   hasMatch: boolean;
 }>> {
-  console.log(`\n📋 Analyzing how ${laws.length} laws apply to the lease...`);
+  // console.log(`\n📋 Analyzing how ${laws.length} laws apply to the lease...`);
   
   const results = await Promise.all(
     laws.map(async (law) => {
@@ -179,7 +179,7 @@ export async function analyzeLawApplications(
     })
   );
   
-  console.log(`✅ Completed analysis for ${results.length} laws`);
+  // console.log(`✅ Completed analysis for ${results.length} laws`);
   
   return results;
 }

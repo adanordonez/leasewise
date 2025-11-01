@@ -6,17 +6,17 @@ const openai = new OpenAI({
 });
 
 export async function POST(request: NextRequest) {
-  console.log('📥 Translation API called');
+  // console.log('📥 Translation API called');
   
   try {
     const body = await request.json();
-    console.log('📝 Request body received:', { hasLegalText: !!body.legalText, textLength: body.legalText?.length });
+    // console.log('📝 Request body received:', { hasLegalText: !!body.legalText, textLength: body.legalText?.length });
     
     const { legalText } = body;
     
     // Get locale from cookies
     const locale = request.cookies.get('locale')?.value || 'en';
-    console.log(`🌐 Detected locale: ${locale}`);
+    // console.log(`🌐 Detected locale: ${locale}`);
 
     if (!legalText) {
       console.error('❌ No legal text provided');
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🤖 Calling OpenAI for translation...');
+    // console.log('🤖 Calling OpenAI for translation...');
     
     const systemContent = locale === 'es' 
       ? `Eres un asistente útil que traduce lenguaje legal complejo a español sencillo y fácil de entender para inquilinos.
@@ -83,7 +83,7 @@ Plain English: "You need to pay your rent by the 1st of each month. If you pay a
 
     const plainEnglish = completion.choices[0].message.content;
     
-    console.log('✅ Translation successful:', plainEnglish?.substring(0, 50) + '...');
+    // console.log('✅ Translation successful:', plainEnglish?.substring(0, 50) + '...');
 
     return NextResponse.json({
       success: true,

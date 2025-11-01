@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       .order('city', { ascending: true });
 
     if (sourcesError) {
-      console.log('Sources table not found or error fetching sources:', sourcesError);
+      // console.log('Sources table not found or error fetching sources:', sourcesError);
       // Return laws without sources if sources table doesn't exist
       return NextResponse.json({ success: true, laws });
     }

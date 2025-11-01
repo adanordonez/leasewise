@@ -35,7 +35,7 @@ async function findWorkingJustiaUrl(
   statute: string,
   state: string
 ): Promise<string> {
-  console.log(`🔍 Searching for working Justia URL: ${lawType} (${statute})`);
+  // console.log(`🔍 Searching for working Justia URL: ${lawType} (${statute})`);
 
   try {
     // Use OpenAI's web search to find the actual Justia page
@@ -75,15 +75,15 @@ Return ONLY the URL, nothing else.`
     
     if (urlMatch) {
       const foundUrl = urlMatch[1];
-      console.log(`   Found: ${foundUrl}`);
+      // console.log(`   Found: ${foundUrl}`);
       
       // Test if it works
       const works = await testUrl(foundUrl);
       if (works) {
-        console.log(`   ✅ URL verified working!`);
+        // console.log(`   ✅ URL verified working!`);
         return foundUrl;
       } else {
-        console.log(`   ❌ URL doesn't work, using fallback`);
+        // console.log(`   ❌ URL doesn't work, using fallback`);
       }
     }
   } catch (error) {
@@ -93,7 +93,7 @@ Return ONLY the URL, nothing else.`
   // Fallback: general state codes page
   const stateCode = state.toLowerCase().replace(/\s+/g, '');
   const fallbackUrl = `https://law.justia.com/codes/${stateCode}/`;
-  console.log(`   Using fallback: ${fallbackUrl}`);
+  // console.log(`   Using fallback: ${fallbackUrl}`);
   return fallbackUrl;
 }
 
@@ -108,18 +108,18 @@ export async function verifyJustiaUrlsWithWebSearch(
   }>,
   state: string
 ): Promise<Array<VerifiedJustiaUrl>> {
-  console.log(`\n🔍 Verifying ${legalInfo.length} Justia URLs with web search for ${state}...\n`);
+  // console.log(`\n🔍 Verifying ${legalInfo.length} Justia URLs with web search for ${state}...\n`);
 
   const results: VerifiedJustiaUrl[] = [];
 
   for (const info of legalInfo) {
-    console.log(`📋 ${info.lawType}`);
+    // console.log(`📋 ${info.lawType}`);
     
     // First, test the current URL
     const currentWorks = await testUrl(info.sourceUrl);
     
     if (currentWorks) {
-      console.log(`   ✅ Current URL works!`);
+      // console.log(`   ✅ Current URL works!`);
       results.push({
         lawType: info.lawType,
         statute: info.statute || '',
@@ -128,7 +128,7 @@ export async function verifyJustiaUrlsWithWebSearch(
         isWorking: true
       });
     } else {
-      console.log(`   ❌ Current URL broken, searching for working one...`);
+      // console.log(`   ❌ Current URL broken, searching for working one...`);
       
       // Search for the actual working URL
       const workingUrl = await findWorkingJustiaUrl(
@@ -150,13 +150,13 @@ export async function verifyJustiaUrlsWithWebSearch(
     await new Promise(resolve => setTimeout(resolve, 500));
   }
 
-  const workingCount = results.filter(r => r.isWorking).length;
-  const fixedCount = results.length - workingCount;
+  // const workingCount = results.filter(r => r.isWorking).length;
+  // const fixedCount = results.length - workingCount;
 
-  console.log(`\n📊 URL Verification Summary:`);
-  console.log(`   ✅ Working URLs: ${workingCount}`);
-  console.log(`   🔧 Fixed URLs: ${fixedCount}`);
-  console.log(`   📝 Total: ${results.length}\n`);
+  // console.log(`\n📊 URL Verification Summary:`);
+  // console.log(`   ✅ Working URLs: ${workingCount}`);
+  // console.log(`   🔧 Fixed URLs: ${fixedCount}`);
+  // console.log(`   📝 Total: ${results.length}\n`);
 
   return results;
 }

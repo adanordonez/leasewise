@@ -40,6 +40,9 @@ interface LeaseData {
     deposit_status: string;
     rent_analysis: string;
   };
+  // These may be NULL if not analyzed yet (on-demand loading)
+  red_flags?: any[] | null;
+  tenant_rights?: any[] | null;
 }
 
 type TabType = 'overview' | 'market' | 'list' | 'map';
@@ -753,6 +756,17 @@ function PropertyListTab({
                       <div>
                         <span className="text-gray-500">{lease.square_footage.toLocaleString()} sq ft</span>
                       </div>
+                    )}
+                    {/* Show analysis status badge */}
+                    {(lease.red_flags === null || lease.tenant_rights === null) && (
+                      <Badge className="bg-amber-100 text-amber-700 text-xs">
+                        Partial Analysis
+                      </Badge>
+                    )}
+                    {lease.red_flags && Array.isArray(lease.red_flags) && lease.red_flags.length > 0 && (
+                      <Badge className="bg-red-100 text-red-700 text-xs">
+                        {lease.red_flags.length} Red Flag{lease.red_flags.length > 1 ? 's' : ''}
+                      </Badge>
                     )}
                   </div>
                 </div>

@@ -24,7 +24,7 @@ export async function extractTextWithPageNumbers(pdfBuffer: Uint8Array): Promise
   let tmpFilePath: string | null = null;
   
   try {
-    console.log('🦙 Starting LlamaParse extraction...');
+    // console.log('🦙 Starting LlamaParse extraction...');
     
     // Initialize LlamaParse reader with markdown output
     const reader = new LlamaParseReader({ 
@@ -37,14 +37,14 @@ export async function extractTextWithPageNumbers(pdfBuffer: Uint8Array): Promise
     tmpFilePath = path.join(tmpDir, `lease-${Date.now()}.pdf`);
     
     await fs.writeFile(tmpFilePath, pdfBuffer);
-    console.log(`📁 Temporary file created: ${tmpFilePath}`);
+    // console.log(`📁 Temporary file created: ${tmpFilePath}`);
 
-    console.log('📤 Sending PDF to LlamaParse...');
+    // console.log('📤 Sending PDF to LlamaParse...');
     
     // Parse the document using LlamaParse (pass file path as string)
     const documents = await reader.loadData(tmpFilePath);
     
-    console.log(`✅ LlamaParse returned ${documents.length} document(s)`);
+    // console.log(`✅ LlamaParse returned ${documents.length} document(s)`);
 
     if (!documents || documents.length === 0) {
       throw new Error('LlamaParse returned no documents');
@@ -140,17 +140,17 @@ export async function extractTextWithPageNumbers(pdfBuffer: Uint8Array): Promise
 
     const fullText = fullTextParts.join(' ');
 
-    console.log(`✅ LlamaParse extraction complete:`, {
-      totalPages: pages.length,
-      totalChars: fullText.length,
-      avgPageLength: Math.round(fullText.length / pages.length),
-    });
+    // console.log(`✅ LlamaParse extraction complete:`, {
+    //   totalPages: pages.length,
+    //   totalChars: fullText.length,
+    //   avgPageLength: Math.round(fullText.length / pages.length),
+    // });
 
     // Clean up temporary file
     if (tmpFilePath) {
       try {
         await fs.unlink(tmpFilePath);
-        console.log(`🗑️ Temporary file deleted: ${tmpFilePath}`);
+        // console.log(`🗑️ Temporary file deleted: ${tmpFilePath}`);
       } catch (cleanupError) {
         console.warn(`⚠️ Could not delete temporary file: ${tmpFilePath}`, cleanupError);
       }
@@ -169,7 +169,7 @@ export async function extractTextWithPageNumbers(pdfBuffer: Uint8Array): Promise
     if (tmpFilePath) {
       try {
         await fs.unlink(tmpFilePath);
-        console.log(`🗑️ Temporary file deleted (after error): ${tmpFilePath}`);
+        // console.log(`🗑️ Temporary file deleted (after error): ${tmpFilePath}`);
       } catch (cleanupError) {
         // Ignore cleanup errors
       }

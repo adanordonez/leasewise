@@ -7,7 +7,7 @@ import { extractTextWithPageNumbers } from '@/lib/llamaparse-utils';
 export const maxDuration = 120; // 120 seconds for verification + RAG analysis
 
 export async function POST(request: NextRequest) {
-  console.log('🔍 Comprehensive legal info API called');
+  // console.log('🔍 Comprehensive legal info API called');
   
   try {
     const body = await request.json();
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     
     // Get locale from cookies (for Spanish output)
     const locale = request.cookies.get('locale')?.value || 'en';
-    console.log(`🌐 Detected locale: ${locale}`);
+    // console.log(`🌐 Detected locale: ${locale}`);
     
     if (!userAddress) {
       return NextResponse.json(
@@ -24,31 +24,31 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    console.log(`📚 Searching legal info with Google search for: ${userAddress}`);
-    console.log(`📄 Lease context:`, leaseContext);
-    console.log(`📄 PDF URL:`, pdfUrl ? 'Provided' : 'Not provided');
+    // console.log(`📚 Searching legal info with Google search for: ${userAddress}`);
+    // console.log(`📄 Lease context:`, leaseContext);
+    // console.log(`📄 PDF URL:`, pdfUrl ? 'Provided' : 'Not provided');
     
     // Use Google search URLs for statutes (more reliable than Justia)
     const result = await searchLegalInfoWithGoogleSearch(userAddress, leaseContext, locale);
     
-    console.log(`✅ Got ${result.legalInfo.length} legal categories with Google search URLs`);
-    console.log(`📊 Search stats: ${result.searchMetadata.totalSources} total sources`);
+    // console.log(`✅ Got ${result.legalInfo.length} legal categories with Google search URLs`);
+    // console.log(`📊 Search stats: ${result.searchMetadata.totalSources} total sources`);
     
     // If we have a PDF URL, use RAG to personalize the examples
     if (pdfUrl && result.legalInfo.length > 0) {
       try {
-        console.log('🔍 Starting RAG analysis to personalize legal info...');
+        // console.log('🔍 Starting RAG analysis to personalize legal info...');
         
         // Fetch PDF and extract text
         const pdfResponse = await fetch(pdfUrl);
         const pdfBuffer = await pdfResponse.arrayBuffer();
-        const { pages: pageTexts, totalPages } = await extractTextWithPageNumbers(new Uint8Array(pdfBuffer));
+        const { pages: pageTexts /*, totalPages */ } = await extractTextWithPageNumbers(new Uint8Array(pdfBuffer));
         
-        console.log(`📄 Extracted text from ${totalPages} pages`);
+        // console.log(`📄 Extracted text from ${totalPages} pages`);
         
         // Create RAG system
         const leaseRAG = await createLeaseRAG(pageTexts);
-        console.log(`✅ RAG system created`);
+        // console.log(`✅ RAG system created`);
         
         // Convert legal info to format for analysis
         const lawsToAnalyze = result.legalInfo.map(info => ({
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
           explanation: info.explanation
         }));
         
-        console.log(`🔍 Analyzing ${lawsToAnalyze.length} laws with RAG...`);
+        // console.log(`🔍 Analyzing ${lawsToAnalyze.length} laws with RAG...`);
         
         // Analyze how each law applies to the lease
         const applications = await analyzeLawApplications(
@@ -67,14 +67,14 @@ export async function POST(request: NextRequest) {
           locale
         );
         
-        console.log(`✅ RAG analysis complete!`);
+        // console.log(`✅ RAG analysis complete!`);
         
         // Log each category's analysis
-        applications.forEach((app, index) => {
-          console.log(`\n📋 Category ${index + 1}: ${app.lawType}`);
-          console.log(`   Application: ${app.application.slice(0, 100)}...`);
-          console.log(`   Has Match: ${app.hasMatch ? 'Yes' : 'No'}`);
-        });
+        // applications.forEach((app, index) => {
+        //   console.log(`\n📋 Category ${index + 1}: ${app.lawType}`);
+        //   console.log(`   Application: ${app.application.slice(0, 100)}...`);
+        //   console.log(`   Has Match: ${app.hasMatch ? 'Yes' : 'No'}`);
+        // });
         
         // Merge applications back into legal info (replace "example" with "application")
         const enrichedLegalInfo = result.legalInfo.map((info, index) => ({
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
           hasMatch: applications[index]?.hasMatch
         }));
         
-        console.log(`✅ Successfully personalized ${enrichedLegalInfo.length} legal categories`);
+        // console.log(`✅ Successfully personalized ${enrichedLegalInfo.length} legal categories`);
         
         return NextResponse.json({
           success: true,
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
         // Continue with regular legal info if RAG fails
       }
     } else {
-      console.log('ℹ️ No PDF URL provided, using generic examples');
+      // console.log('ℹ️ No PDF URL provided, using generic examples');
     }
     
     return NextResponse.json({

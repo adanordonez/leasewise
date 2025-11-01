@@ -32,18 +32,18 @@ export async function generateRAGScenarios(
     leaseEnd?: string;
   }
 ): Promise<RAGScenariosResult> {
-  console.log('🎯 Starting RAG scenarios generation...');
-  console.log('📊 RAG System Stats:', rag.getStats());
-  console.log('📍 Address:', address);
-  console.log('📋 Lease Context:', leaseContext);
+  // console.log('🎯 Starting RAG scenarios generation...');
+  // console.log('📊 RAG System Stats:', rag.getStats());
+  // console.log('📍 Address:', address);
+  // console.log('📋 Lease Context:', leaseContext);
 
   // Test RAG system with a simple query first
-  console.log('🧪 Testing RAG system with simple query...');
+  // console.log('🧪 Testing RAG system with simple query...');
   try {
     const testChunks = await rag.retrieve('rent payment', 3);
-    console.log(`🧪 RAG Test: Found ${testChunks.length} chunks for "rent payment"`);
+    // console.log(`🧪 RAG Test: Found ${testChunks.length} chunks for "rent payment"`);
     if (testChunks.length > 0) {
-      console.log(`🧪 RAG Test: First chunk preview: "${testChunks[0].text.substring(0, 100)}..."`);
+      // console.log(`🧪 RAG Test: First chunk preview: "${testChunks[0].text.substring(0, 100)}..."`);
     }
   } catch (testError) {
     console.error('❌ RAG Test Failed:', testError);
@@ -59,16 +59,16 @@ export async function generateRAGScenarios(
   const scenarios: RAGScenario[] = [];
 
   for (const question of scenarioQuestions) {
-    console.log(`🔍 Processing scenario: ${question}`);
+    // console.log(`🔍 Processing scenario: ${question}`);
     
     try {
       // Step 1: Use RAG to find relevant lease content
-      console.log(`   🔍 Searching RAG for: "${question}"`);
+      // console.log(`   🔍 Searching RAG for: "${question}"`);
       const relevantChunks = await rag.retrieve(question, 5);
-      console.log(`   📄 Found ${relevantChunks.length} chunks for: "${question}"`);
+      // console.log(`   📄 Found ${relevantChunks.length} chunks for: "${question}"`);
       
       if (relevantChunks.length === 0) {
-        console.log(`   ❌ No relevant chunks found for: ${question}`);
+        // console.log(`   ❌ No relevant chunks found for: ${question}`);
         // Create a basic scenario without lease-specific content
         scenarios.push({
           title: question,
@@ -88,13 +88,13 @@ export async function generateRAGScenarios(
 
       // Get the most relevant chunk
       const topChunk = relevantChunks[0];
-      console.log(`   ✅ Found relevant chunk on page ${topChunk.pageNumber}`);
-      console.log(`   📝 Chunk text preview: "${topChunk.text.substring(0, 100)}..."`);
+      // console.log(`   ✅ Found relevant chunk on page ${topChunk.pageNumber}`);
+      // console.log(`   📝 Chunk text preview: "${topChunk.text.substring(0, 100)}..."`);
 
       // Step 2: Use LLM to generate simple advice based on the lease chunk
       const simpleAdvice = await generateSimpleAdvice(question, topChunk.text, leaseContext);
       
-      console.log(`   Generated advice: ${simpleAdvice.advice.substring(0, 50)}...`);
+      // console.log(`   Generated advice: ${simpleAdvice.advice.substring(0, 50)}...`);
 
       scenarios.push({
         title: question,
@@ -125,7 +125,7 @@ export async function generateRAGScenarios(
     }
   }
 
-  console.log(`✅ Generated ${scenarios.length} RAG scenarios`);
+  // console.log(`✅ Generated ${scenarios.length} RAG scenarios`);
   return { scenarios };
 }
 

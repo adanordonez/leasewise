@@ -27,7 +27,7 @@ export async function analyzeRedFlagsWithRAG(
   },
   locale: string = 'en'
 ): Promise<RedFlag[]> {
-  console.log('🚩 Starting dedicated red flags analysis with RAG...');
+  // console.log('🚩 Starting dedicated red flags analysis with RAG...');
 
   // STEP 1: Use RAG to find potentially problematic clauses with more specific queries
   const problematicQueries = [
@@ -64,7 +64,7 @@ export async function analyzeRedFlagsWithRAG(
     'assignment subletting lease transfer tenant rights',
   ];
 
-  console.log('🔍 Searching for problematic clauses...');
+  // console.log('🔍 Searching for problematic clauses...');
   
   const relevantChunks: Array<{
     text: string;
@@ -93,23 +93,23 @@ export async function analyzeRedFlagsWithRAG(
     index === self.findIndex(c => c.text === chunk.text)
   );
 
-  console.log(`✅ Found ${uniqueChunks.length} potentially problematic clauses`);
+  // console.log(`✅ Found ${uniqueChunks.length} potentially problematic clauses`);
   
   // If we have too many chunks, limit to avoid token limits
   const MAX_CHUNKS = 40; // Limit to prevent token overflow
   if (uniqueChunks.length > MAX_CHUNKS) {
-    console.log(`⚠️ Too many chunks (${uniqueChunks.length}), limiting to ${MAX_CHUNKS}`);
+    // console.log(`⚠️ Too many chunks (${uniqueChunks.length}), limiting to ${MAX_CHUNKS}`);
     uniqueChunks.splice(MAX_CHUNKS);
   }
   
   // If we have no chunks at all, return empty array
   if (uniqueChunks.length === 0) {
-    console.log('⚠️ No chunks found for red flags analysis');
+    // console.log('⚠️ No chunks found for red flags analysis');
     return [];
   }
 
   // STEP 2: Analyze each chunk for red flags with GPT-4o
-  console.log('🔍 Analyzing clauses for red flags...');
+  // console.log('🔍 Analyzing clauses for red flags...');
   
   const languageInstruction = locale === 'es' 
     ? '\n\nThis output is for a Spanish speaking tenant. Please output in simple spanish terms so that tenants can understand.' 
@@ -206,7 +206,7 @@ IMPORTANT: Be conservative. Only flag clear problems. When in doubt, don't flag 
     const result = JSON.parse(completion.choices[0].message.content || '{"redFlags":[]}');
     redFlags = result.redFlags || [];
     
-    console.log(`✅ OpenAI identified ${redFlags.length} red flags`);
+    // console.log(`✅ OpenAI identified ${redFlags.length} red flags`);
   } catch (error) {
     console.error('🚨 OpenAI red flags analysis failed:', error);
     if (error instanceof Error) {
@@ -220,7 +220,7 @@ IMPORTANT: Be conservative. Only flag clear problems. When in doubt, don't flag 
     return [];
   }
 
-  console.log(`✅ Identified ${redFlags.length} red flags`);
+  // console.log(`✅ Identified ${redFlags.length} red flags`);
   
   // Post-process to ensure we use full chunk text instead of short excerpts
   const enhancedRedFlags = redFlags.map((flag: RedFlag) => {
@@ -231,9 +231,9 @@ IMPORTANT: Be conservative. Only flag clear problems. When in doubt, don't flag 
         const chunkNumber = parseInt(chunkMatch[1]) - 1; // Convert to 0-based index
         if (chunkNumber >= 0 && chunkNumber < uniqueChunks.length) {
           const fullChunk = uniqueChunks[chunkNumber];
-          console.log(`📝 Replacing short excerpt with full chunk text for: ${flag.issue}`);
-          console.log(`   Original: "${flag.source.slice(0, 50)}..."`);
-          console.log(`   Full chunk: "${fullChunk.text.slice(0, 50)}..."`);
+          // console.log(`📝 Replacing short excerpt with full chunk text for: ${flag.issue}`);
+          // console.log(`   Original: "${flag.source.slice(0, 50)}..."`);
+          // console.log(`   Full chunk: "${fullChunk.text.slice(0, 50)}..."`);
           
           return {
             ...flag,
@@ -248,8 +248,8 @@ IMPORTANT: Be conservative. Only flag clear problems. When in doubt, don't flag 
 
   // Log each red flag for debugging
   enhancedRedFlags.forEach((flag: RedFlag, i: number) => {
-    console.log(`   ${i + 1}. [${flag.severity.toUpperCase()}] ${flag.issue}`);
-    console.log(`      Source length: ${flag.source.length} characters`);
+    // console.log(`   ${i + 1}. [${flag.severity.toUpperCase()}] ${flag.issue}`);
+    // console.log(`      Source length: ${flag.source.length} characters`);
   });
 
   return enhancedRedFlags;

@@ -43,19 +43,19 @@ export async function generateEnhancedScenarios(
     leaseEnd?: string;
   }
 ): Promise<EnhancedScenariosResult> {
-  console.log('🎯 Starting enhanced scenarios analysis...');
+  // console.log('🎯 Starting enhanced scenarios analysis...');
 
   // Step 1: Extract location info
   const locationInfo = extractLocationFromAddress(address);
-  console.log(`📍 Location: ${locationInfo.city}, ${locationInfo.state}`);
+  // console.log(`📍 Location: ${locationInfo.city}, ${locationInfo.state}`);
 
   // Step 2: Get state-specific legal information
-  console.log('⚖️ Researching state-specific laws...');
+  // console.log('⚖️ Researching state-specific laws...');
   const legalInfo = await searchLegalInfoWithGoogleSearch(address, leaseContext);
-  console.log(`✅ Found ${legalInfo.legalInfo.length} relevant laws`);
+  // console.log(`✅ Found ${legalInfo.legalInfo.length} relevant laws`);
 
   // Step 3: Use RAG to find relevant lease clauses for each scenario
-  console.log('🔍 Analyzing lease with RAG for scenario-specific content...');
+  // console.log('🔍 Analyzing lease with RAG for scenario-specific content...');
   
   const scenarioQueries = [
     {
@@ -99,7 +99,7 @@ export async function generateEnhancedScenarios(
   const enhancedScenarios: EnhancedScenario[] = [];
 
   for (const scenario of scenarioQueries) {
-    console.log(`🔍 Processing scenario: ${scenario.title}`);
+    // console.log(`🔍 Processing scenario: ${scenario.title}`);
     
     try {
       // Use RAG to find relevant lease content
@@ -133,8 +133,8 @@ export async function generateEnhancedScenarios(
       // Find relevant state law for this scenario
       const relevantLaw = findRelevantStateLaw(scenario.title, legalInfo.legalInfo);
       
-      console.log(`   Found ${uniqueChunks.length} relevant lease clauses`);
-      console.log(`   Found relevant state law: ${relevantLaw ? relevantLaw.lawType : 'None'}`);
+      // console.log(`   Found ${uniqueChunks.length} relevant lease clauses`);
+      // console.log(`   Found relevant state law: ${relevantLaw ? relevantLaw.lawType : 'None'}`);
 
       // Generate enhanced advice using both lease and state law
       const enhancedAdvice = await generateEnhancedAdvice(
@@ -173,7 +173,7 @@ export async function generateEnhancedScenarios(
     }
   }
 
-  console.log(`✅ Generated ${enhancedScenarios.length} enhanced scenarios`);
+  // console.log(`✅ Generated ${enhancedScenarios.length} enhanced scenarios`);
 
   return {
     scenarios: enhancedScenarios,

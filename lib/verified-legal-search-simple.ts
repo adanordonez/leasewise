@@ -34,7 +34,7 @@ async function getLegalInformation(
   sourceTitle: string;
   statute?: string;
 }>> {
-  console.log(`🔍 Getting legal information for ${state}...`);
+  // console.log(`🔍 Getting legal information for ${state}...`);
   
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o',
@@ -106,7 +106,7 @@ Return ONLY valid JSON.`
   const content = completion.choices[0].message.content || '{}';
   const parsed = JSON.parse(content);
   
-  console.log(`✅ Got ${parsed.legalInfo?.length || 0} categories`);
+  // console.log(`✅ Got ${parsed.legalInfo?.length || 0} categories`);
   
   return parsed.legalInfo || [];
 }
@@ -134,18 +134,18 @@ export async function searchVerifiedLegalInfo(
     rejectedSources: number;
   };
 }> {
-  console.log('\n🚀 VERIFIED LEGAL SEARCH');
-  console.log(`📍 Location: ${userAddress}`);
+  // console.log('\n🚀 VERIFIED LEGAL SEARCH');
+  // console.log(`📍 Location: ${userAddress}`);
   
   // Parse address
   const addressParts = userAddress.split(',').map(s => s.trim());
   const state = addressParts.length >= 2 ? addressParts[addressParts.length - 2] : '';
   const city = addressParts.length >= 3 ? addressParts[addressParts.length - 3] : '';
   
-  console.log(`📍 Parsed: ${city}, ${state}`);
+  // console.log(`📍 Parsed: ${city}, ${state}`);
   
   if (!state) {
-    console.log('❌ No state found');
+    // console.log('❌ No state found');
     return {
       legalInfo: [],
       searchMetadata: {
@@ -159,11 +159,11 @@ export async function searchVerifiedLegalInfo(
   }
   
   // STEP 1: Get legal information
-  console.log('\n📚 STEP 1: Getting legal information...');
+  // console.log('\n📚 STEP 1: Getting legal information...');
   const initialInfo = await getLegalInformation(state, city, leaseContext);
   
   if (initialInfo.length === 0) {
-    console.log('❌ No information found');
+    // console.log('❌ No information found');
     return {
       legalInfo: [],
       searchMetadata: {
@@ -177,7 +177,7 @@ export async function searchVerifiedLegalInfo(
   }
   
   // Just return the info - using better prompting for accurate URLs
-  console.log(`✅ Returning ${initialInfo.length} categories with better-prompted URLs\n`);
+  // console.log(`✅ Returning ${initialInfo.length} categories with better-prompted URLs\n`);
   
   return {
     legalInfo: initialInfo,

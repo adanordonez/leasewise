@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { leaseDataId } = body;
 
-    console.log(`🔍 Extracting landlord information for lease ${leaseDataId}...`);
+    // console.log(`🔍 Extracting landlord information for lease ${leaseDataId}...`);
 
     // Fetch lease data from Supabase
     const { data: leaseData, error: leaseError } = await supabase
@@ -29,12 +29,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('✅ Lease data fetched successfully');
+    // console.log('✅ Lease data fetched successfully');
 
     // Rebuild RAG system from stored chunks
     let relevantSections = '';
     if (leaseData.chunks && Array.isArray(leaseData.chunks) && leaseData.chunks.length > 0) {
-      console.log(`🔄 Rebuilding RAG system from ${leaseData.chunks.length} stored chunks...`);
+      // console.log(`🔄 Rebuilding RAG system from ${leaseData.chunks.length} stored chunks...`);
       
       const pagesFromChunks = leaseData.chunks.map((chunk: any) => ({
         text: chunk.text,
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
         
         // Set chunks directly
         leaseRAG['chunks'] = reconstructedChunks;
-        console.log('✅ RAG system rebuilt successfully');
+        // console.log('✅ RAG system rebuilt successfully');
 
         // Search for landlord information
         const queries = [
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
           }
         }
         
-        console.log('✅ Retrieved relevant sections about landlord');
+        // console.log('✅ Retrieved relevant sections about landlord');
       } catch (error) {
         console.error('Error with RAG:', error);
       }
@@ -123,13 +123,13 @@ Return ONLY the JSON object, no other text.`;
       });
 
       const responseText = completion.choices[0]?.message?.content || '';
-      console.log('AI Response:', responseText);
+      // console.log('AI Response:', responseText);
       
       // Parse JSON response
       const jsonMatch = responseText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const extracted = JSON.parse(jsonMatch[0]);
-        console.log('✅ Extracted landlord info:', extracted);
+        // console.log('✅ Extracted landlord info:', extracted);
         
         return NextResponse.json({
           landlordName: extracted.landlordName || '',
@@ -137,7 +137,7 @@ Return ONLY the JSON object, no other text.`;
           timestamp: new Date().toISOString(),
         });
       } else {
-        console.log('⚠️ Could not parse JSON from AI response');
+        // console.log('⚠️ Could not parse JSON from AI response');
         return NextResponse.json({
           landlordName: '',
           landlordAddress: '',

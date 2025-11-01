@@ -38,8 +38,8 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
     setIsCollapsed(false); // Expand when fetching
     
     try {
-      console.log('📡 Fetching comprehensive legal info...');
-      console.log('📄 Lease context:', leaseContext);
+      // console.log('📡 Fetching comprehensive legal info...');
+      // console.log('📄 Lease context:', leaseContext);
       
       const response = await fetch('/api/comprehensive-legal-info', {
         method: 'POST',
@@ -57,7 +57,7 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
       }
       
       const data = await response.json();
-      console.log(`✅ Received ${data.legalInfo.length} legal categories`);
+      // console.log(`✅ Received ${data.legalInfo.length} legal categories`);
       
       setLegalInfo(data.legalInfo);
       setFilteredInfo(data.legalInfo);
@@ -75,7 +75,7 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
   // Automatically fetch legal info when component mounts (only once)
   useEffect(() => {
     if (userAddress && !hasLoadedRef.current && !legalInfo.length && !isLoading && !error) {
-      console.log('🚀 Auto-loading legal information...');
+      // console.log('🚀 Auto-loading legal information...');
       fetchLegalInfo();
     }
   }, [userAddress]); // Only run when userAddress is available

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import OpenAI from 'openai';
 import { LeaseRAGSystem } from '@/lib/rag-system';
+import { rebuildRAGFromChunks } from '@/lib/rag-rebuild';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
       tenantAddress,
     } = body;
 
-    console.log(`📝 Generating ${letterType} letter for lease ${leaseDataId}...`);
+    // console.log(`📝 Generating ${letterType} letter for lease ${leaseDataId}...`);
 
     // Fetch lease data from Supabase
     const { data: leaseData, error: leaseError } = await supabase
@@ -38,29 +39,55 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('✅ Lease data fetched successfully');
+    // console.log('✅ Lease data fetched successfully');
 
     // Rebuild RAG system from stored chunks
     let leaseRAG: LeaseRAGSystem | null = null;
     if (leaseData.chunks && Array.isArray(leaseData.chunks) && leaseData.chunks.length > 0) {
-      console.log(`🔄 Rebuilding RAG system from ${leaseData.chunks.length} stored chunks...`);
+      // console.log(`🔄 Rebuilding RAG system from ${leaseData.chunks.length} stored chunks...`);
       
       try {
-        leaseRAG = new LeaseRAGSystem(true); // Enable embeddings
+        leaseRAG = await rebuildRAGFromChunks(leaseData.chunks);
         
-        // Reconstruct chunks with embeddings
-        const reconstructedChunks = leaseData.chunks.map((chunk: any) => ({
-          text: chunk.text,
-          pageNumber: chunk.pageNumber,
-          embedding: chunk.embedding || [],
-          chunkIndex: chunk.chunkIndex,
-          startIndex: chunk.startIndex || 0,
-          endIndex: chunk.endIndex || 0
-        }));
+        // ⚡ Check if embeddings exist - if not, create them now!
+        const hasEmbeddings = leaseData.chunks.some((c: { embedding?: number[] }) => 
+          c.embedding && c.embedding.length > 0
+        );
         
-        // Set chunks directly
-        leaseRAG['chunks'] = reconstructedChunks;
-        console.log('✅ RAG system rebuilt successfully');
+        if (!hasEmbeddings) {
+          console.log('⚡ No embeddings found - creating them now for letter generation (this will take 10-15s)...');
+          
+          // Import the embedding creation function
+          const { createEmbeddingsBatch } = await import('@/lib/rag-embeddings');
+          
+          // Create embeddings for all chunks
+          const chunksWithEmbeddings = await createEmbeddingsBatch(leaseRAG.getAllChunks());
+          
+          // Update the RAG system with new embeddings
+          // @ts-expect-error - accessing private property
+          leaseRAG.chunks = chunksWithEmbeddings;
+          
+          // Save embeddings to database for future use
+          const updatedChunks = chunksWithEmbeddings.map(chunk => ({
+            text: chunk.text,
+            pageNumber: chunk.pageNumber,
+            embedding: chunk.embedding,
+            chunkIndex: chunk.chunkIndex,
+            startIndex: chunk.startIndex,
+            endIndex: chunk.endIndex
+          }));
+          
+          await supabase
+            .from('lease_data')
+            .update({ chunks: updatedChunks })
+            .eq('id', leaseDataId);
+          
+          console.log('✅ Embeddings created and saved to database');
+        } else {
+          console.log('✅ Embeddings already exist - reusing them for letter generation');
+        }
+        
+        // console.log('✅ RAG system rebuilt successfully');
       } catch (error) {
         console.error('Error rebuilding RAG:', error);
       }
@@ -81,7 +108,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    console.log('✅ Letter generated successfully');
+    // console.log('✅ Letter generated successfully');
 
     return NextResponse.json({
       letter,
@@ -109,6 +136,7 @@ async function generateSecurityDepositLetter({
   tenantAddress,
 }: {
   leaseRAG: LeaseRAGSystem | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   leaseData: any;
   landlordName: string;
   landlordAddress: string;
@@ -117,7 +145,7 @@ async function generateSecurityDepositLetter({
   tenantAddress: string;
 }): Promise<string> {
   
-  console.log('💼 Generating security deposit return letter...');
+  // console.log('💼 Generating security deposit return letter...');
 
   // Get relevant context from RAG
   let relevantClauses = '';
@@ -137,7 +165,7 @@ async function generateSecurityDepositLetter({
         }
       }
       
-      console.log('✅ Retrieved relevant clauses from lease');
+      // console.log('✅ Retrieved relevant clauses from lease');
     } catch (error) {
       console.error('Error retrieving from RAG:', error);
     }
@@ -221,7 +249,7 @@ Generate ONLY the letter text, no additional commentary.`;
     });
 
     const letter = completion.choices[0]?.message?.content || '';
-    console.log('✅ Letter drafted by AI');
+    // console.log('✅ Letter drafted by AI');
     
     return letter;
   } catch (error) {

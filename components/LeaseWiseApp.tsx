@@ -73,9 +73,10 @@ interface AnalysisResult {
       noticePeriod?: number;
     };
   };
-  redFlags: Array<{ issue: string; severity: string; explanation: string; source?: string; page_number?: number }>;
-  rights: Array<{ right: string; law: string; source?: string; page_number?: number }>;
-  keyDates: Array<{ event: string; date: string; description: string; source?: string; page_number?: number }>;
+  // ⚡ These can be null (loaded on-demand)
+  redFlags: Array<{ issue: string; severity: string; explanation: string; source?: string; page_number?: number }> | null;
+  rights: Array<{ right: string; law: string; source?: string; page_number?: number }> | null;
+  keyDates: Array<{ event: string; date: string; description: string; source?: string; page_number?: number }> | null;
   pdfUrl?: string; // URL to the PDF for viewing
 }
 
@@ -116,10 +117,98 @@ export default function LeaseWiseApp() {
   const [analysisLogs, setAnalysisLogs] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'analysis' | 'chat' | 'letters'>('analysis');
   const [isScenariosLoading, setIsScenariosLoading] = useState(false);
+  
+  // ⚡ On-demand loading states
+  const [isRedFlagsLoading, setIsRedFlagsLoading] = useState(false);
+  const [isRightsLoading, setIsRightsLoading] = useState(false);
+  const [redFlagsExpanded, setRedFlagsExpanded] = useState(false);
+  const [rightsExpanded, setRightsExpanded] = useState(false);
+  const [legalTableExpanded, setLegalTableExpanded] = useState(false);
+  const [scenariosExpanded, setScenariosExpanded] = useState(false);
+
+  // ⚡ NEW: Load red flags on-demand
+  const loadRedFlags = async () => {
+    if (!leaseDataId || !analysisResult) return;
+    if (analysisResult.redFlags && analysisResult.redFlags.length >= 0) {
+      // Already loaded
+      setRedFlagsExpanded(true);
+      return;
+    }
+    
+    console.log('🚩 Loading red flags on-demand...');
+    setIsRedFlagsLoading(true);
+    setRedFlagsExpanded(true);
+    
+    try {
+      const response = await fetch('/api/analyze-red-flags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leaseDataId }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to load red flags');
+      }
+      
+      const data = await response.json();
+      console.log('✅ Red flags loaded:', data.redFlags.length);
+      
+      // Update analysis result with red flags
+      setAnalysisResult(prev => prev ? {
+        ...prev,
+        redFlags: data.redFlags
+      } : null);
+    } catch (error) {
+      console.error('❌ Error loading red flags:', error);
+      setAnalysisResult(prev => prev ? { ...prev, redFlags: [] } : null);
+    } finally {
+      setIsRedFlagsLoading(false);
+    }
+  };
+  
+  // ⚡ NEW: Load tenant rights on-demand
+  const loadRights = async () => {
+    if (!leaseDataId || !analysisResult) return;
+    if (analysisResult.rights && analysisResult.rights.length >= 0) {
+      // Already loaded
+      setRightsExpanded(true);
+      return;
+    }
+    
+    console.log('⚖️ Loading tenant rights on-demand...');
+    setIsRightsLoading(true);
+    setRightsExpanded(true);
+    
+    try {
+      const response = await fetch('/api/analyze-rights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leaseDataId }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to load tenant rights');
+      }
+      
+      const data = await response.json();
+      console.log('✅ Tenant rights loaded:', data.rights.length);
+      
+      // Update analysis result with rights
+      setAnalysisResult(prev => prev ? {
+        ...prev,
+        rights: data.rights
+      } : null);
+    } catch (error) {
+      console.error('❌ Error loading rights:', error);
+      setAnalysisResult(prev => prev ? { ...prev, rights: [] } : null);
+    } finally {
+      setIsRightsLoading(false);
+    }
+  };
 
   // Function to load scenarios separately
   const loadScenarios = async (leaseId: string) => {
-    console.log('📋 Loading scenarios for lease:', leaseId);
+    // console.log('📋 Loading scenarios for lease:', leaseId);
     setIsScenariosLoading(true);
     
     try {
@@ -134,7 +223,7 @@ export default function LeaseWiseApp() {
       }
       
       const data = await response.json();
-      console.log('✅ Scenarios loaded:', data.scenarios.length);
+      // console.log('✅ Scenarios loaded:', data.scenarios.length);
       setScenarios({ scenarios: data.scenarios });
     } catch (error) {
       console.error('❌ Error loading scenarios:', error);
@@ -207,7 +296,7 @@ export default function LeaseWiseApp() {
   };
 
   const handleAnalyze = async () => {
-    console.log('🚀 Starting analysis...');
+    // console.log('🚀 Starting analysis...');
     
     if (!address || !uploadedFile || !userName || !userEmail) {
       setError('Please fill in all required fields: name, email, address, and upload a lease');
@@ -221,7 +310,7 @@ export default function LeaseWiseApp() {
       return;
     }
     
-    console.log('✅ Validation passed, starting analysis...');
+    // console.log('✅ Validation passed, starting analysis...');
     setIsAnalyzing(true);
     setError(null);
     setAnalysisProgress(0);
@@ -229,7 +318,7 @@ export default function LeaseWiseApp() {
     setAnalysisLogs([]);
     let analysisSuccessful = false;
     
-    console.log('📊 Modal should be visible now. isAnalyzing:', true);
+    // console.log('📊 Modal should be visible now. isAnalyzing:', true);
     
     // Helper to add logs
     const addLog = (log: string) => {
@@ -248,7 +337,7 @@ export default function LeaseWiseApp() {
       setAnalysisStage(t('LoadingModal.stages.uploadingDocument'));
       setAnalysisProgress(5);
       addLog(t('LoadingModal.logs.uploadingToStorage'));
-      console.log('Uploading file directly to Supabase...');
+      // console.log('Uploading file directly to Supabase...');
       
       const { createClient } = await import('@supabase/supabase-js');
       const supabase = createClient(
@@ -287,7 +376,7 @@ export default function LeaseWiseApp() {
         throw new Error('Failed to get public URL for uploaded file');
       }
 
-      console.log('File uploaded successfully:', urlData.publicUrl);
+      // console.log('File uploaded successfully:', urlData.publicUrl);
 
       // Save PDF metadata to database
       const { data: pdfUploadData, error: pdfUploadError } = await supabase
@@ -391,15 +480,11 @@ export default function LeaseWiseApp() {
         
         // Small delay to show 100% before transitioning
         setTimeout(() => {
-        console.log('📊 Analysis complete! leaseDataId:', data.leaseDataId);
+        // console.log('📊 Analysis complete! leaseDataId:', data.leaseDataId);
         setAnalysisResult(data.analysis);
         setLeaseDataId(data.leaseDataId);
         setCurrentPage('results');
         
-        // Load scenarios separately (won't block UI)
-        if (data.leaseDataId) {
-          loadScenarios(data.leaseDataId);
-        }
         }, 500);
         
         // Show warning if text was chunked
@@ -1089,9 +1174,9 @@ export default function LeaseWiseApp() {
                   
                   await exportLeaseReportHTML({
                     summary: analysisResult.summary,
-                    redFlags: analysisResult.redFlags,
-                    rights: analysisResult.rights,
-                    keyDates: analysisResult.keyDates,
+                    redFlags: analysisResult.redFlags || [],
+                    rights: analysisResult.rights || [],
+                    keyDates: analysisResult.keyDates || [],
                     scenarios: scenariosForPDF,
                     address,
                     userName,
@@ -1274,106 +1359,202 @@ export default function LeaseWiseApp() {
           </div>
         </div>
 
-        {/* Red Flags Section - Always Show */}
+        {/* Red Flags Section - On-Demand Loading ⚡ */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 mb-8">
-          <div className="border-b border-slate-200/60 px-6 py-5">
+          <button
+            onClick={() => {
+              if (!redFlagsExpanded && (!analysisResult.redFlags || analysisResult.redFlags === null)) {
+                loadRedFlags();
+              } else {
+                setRedFlagsExpanded(!redFlagsExpanded);
+              }
+            }}
+            className="w-full border-b border-slate-200/60 px-6 py-5 text-left hover:bg-slate-50/50 transition-colors"
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <HugeiconsIcon icon={AlertSquareIcon} size={32} strokeWidth={1.5} className={analysisResult.redFlags.length > 0 ? "text-red-600" : "text-green-600"} />
+                <HugeiconsIcon icon={AlertSquareIcon} size={32} strokeWidth={1.5} className={
+                  analysisResult.redFlags === null ? "text-blue-600" : 
+                  analysisResult.redFlags?.length > 0 ? "text-red-600" : "text-green-600"
+                } />
                 <h2 className="text-xl font-semibold text-slate-900">{t('ResultsPage.propertyInfo.redFlags')}</h2>
               </div>
-              <span className={`px-3 py-1 text-sm font-medium rounded-full ${
-                analysisResult.redFlags.length > 0 
-                  ? 'bg-red-100 text-red-700' 
-                  : 'bg-green-100 text-green-700'
-              }`}>
-                {analysisResult.redFlags.length > 0 
-                  ? `${analysisResult.redFlags.length} ${t('ResultsPage.propertyInfo.detected')}`
-                  : t('ResultsPage.redFlags.noneFound')
-                }
-              </span>
-            </div>
-          </div>
-          {analysisResult.redFlags.length > 0 ? (
-            <div className="divide-y divide-slate-200/60">
-              {analysisResult.redFlags.map((flag, i) => (
-                <div key={i} className="px-6 py-5 hover:bg-slate-50/50 transition-colors duration-200">
-                  <div className="flex items-start gap-4">
-                    <HugeiconsIcon icon={CircleIcon} size={12} strokeWidth={2} className="text-red-600 mt-1.5 flex-shrink-0" />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-slate-900">{flag.issue}</h3>
-                        <SourceCitation 
-                          sourceText={flag.source} 
-                          label={`${t('SourceCitation.redFlag')}: ${flag.issue}`}
-                          pageNumber={flag.page_number}
-                          pdfUrl={analysisResult.pdfUrl}
-                          searchText={flag.source}
-                        />
-                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full uppercase ${
-                          flag.severity === 'high' ? 'bg-red-100 text-red-700' : 
-                          flag.severity === 'medium' ? 'bg-yellow-100 text-yellow-700' : 
-                          'bg-slate-100 text-slate-700'
-                        }`}>
-                          {t(`ResultsPage.severity.${flag.severity}`)}
-                        </span>
-                      </div>
-                      <p className="text-slate-600 leading-relaxed">{flag.explanation}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="px-6 py-12 text-center">
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                  <HugeiconsIcon icon={CheckmarkCircle01Icon} size={32} strokeWidth={2} className="text-green-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-slate-900">{t('ResultsPage.redFlags.noneFoundTitle')}</h3>
-                <p className="text-slate-600 max-w-md">{t('ResultsPage.redFlags.noneFoundDescription')}</p>
+              <div className="flex items-center gap-3">
+                {analysisResult.redFlags === null ? (
+                  <span className="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-700">
+                    Click to Analyze
+                  </span>
+                ) : (
+                  <span className={`px-3 py-1 text-sm font-medium rounded-full ${
+                    analysisResult.redFlags.length > 0 
+                      ? 'bg-red-100 text-red-700' 
+                      : 'bg-green-100 text-green-700'
+                  }`}>
+                    {analysisResult.redFlags.length > 0 
+                      ? `${analysisResult.redFlags.length} ${t('ResultsPage.propertyInfo.detected')}`
+                      : t('ResultsPage.redFlags.noneFound')
+                    }
+                  </span>
+                )}
+                <HugeiconsIcon 
+                  icon={ArrowRight01Icon} 
+                  size={20} 
+                  strokeWidth={2} 
+                  className={`text-slate-400 transition-transform ${redFlagsExpanded ? 'rotate-90' : ''}`}
+                />
               </div>
             </div>
+          </button>
+          
+          {redFlagsExpanded && (
+            <>
+              {isRedFlagsLoading ? (
+                <div className="px-6 py-12 text-center">
+                  <div className="flex flex-col items-center gap-4">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full"
+                    />
+                    <p className="text-slate-600 font-medium">Analyzing Red Flags...</p>
+                    <p className="text-sm text-slate-500">Scanning your lease for potential concerns...</p>
+                  </div>
+                </div>
+              ) : analysisResult.redFlags && analysisResult.redFlags.length > 0 ? (
+                <div className="divide-y divide-slate-200/60">
+                  {analysisResult.redFlags.map((flag, i) => (
+                    <div key={i} className="px-6 py-5 hover:bg-slate-50/50 transition-colors duration-200">
+                      <div className="flex items-start gap-4">
+                        <HugeiconsIcon icon={CircleIcon} size={12} strokeWidth={2} className="text-red-600 mt-1.5 flex-shrink-0" />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="font-semibold text-slate-900">{flag.issue}</h3>
+                            <SourceCitation 
+                              sourceText={flag.source} 
+                              label={`${t('SourceCitation.redFlag')}: ${flag.issue}`}
+                              pageNumber={flag.page_number}
+                              pdfUrl={analysisResult.pdfUrl}
+                              searchText={flag.source}
+                            />
+                            <span className={`px-2 py-0.5 text-xs font-medium rounded-full uppercase ${
+                              flag.severity === 'high' ? 'bg-red-100 text-red-700' : 
+                              flag.severity === 'medium' ? 'bg-yellow-100 text-yellow-700' : 
+                              'bg-slate-100 text-slate-700'
+                            }`}>
+                              {t(`ResultsPage.severity.${flag.severity}`)}
+                            </span>
+                          </div>
+                          <p className="text-slate-600 leading-relaxed">{flag.explanation}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : analysisResult.redFlags && analysisResult.redFlags.length === 0 ? (
+                <div className="px-6 py-12 text-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                      <HugeiconsIcon icon={CheckmarkCircle01Icon} size={32} strokeWidth={2} className="text-green-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-slate-900">{t('ResultsPage.redFlags.noneFoundTitle')}</h3>
+                    <p className="text-slate-600 max-w-md">{t('ResultsPage.redFlags.noneFoundDescription')}</p>
+                  </div>
+                </div>
+              ) : null}
+            </>
           )}
         </div>
 
-        {/* Comprehensive Legal Information Table */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 mb-8">
-          <ComprehensiveLegalTable 
-            userAddress={address}
-            pdfUrl={analysisResult.pdfUrl}
-            leaseContext={{
-              monthlyRent: analysisResult.summary.monthlyRent,
-              securityDeposit: analysisResult.summary.securityDeposit,
-              leaseStart: analysisResult.summary.leaseStart,
-              leaseEnd: analysisResult.summary.leaseEnd,
-            }}
-          />
-        </div>
-
-        {/* Enhanced Common Scenarios */}
-        <div className="mb-8">
-          {isScenariosLoading ? (
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 px-6 py-12 text-center">
-              <div className="flex flex-col items-center gap-4">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full"
+        {/* Know Your Renter Rights Section - On-Demand Loading ⚡ */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 mb-8">
+          <button
+            onClick={() => setLegalTableExpanded(!legalTableExpanded)}
+            className="w-full border-b border-slate-200/60 px-6 py-5 text-left hover:bg-slate-50/50 transition-colors"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <HugeiconsIcon icon={CourtLawIcon} size={32} strokeWidth={1.5} className="text-purple-600" />
+                <h2 className="text-xl font-semibold text-slate-900">Know Your Renter Rights</h2>
+              </div>
+              <div className="flex items-center gap-3">
+                {!legalTableExpanded && (
+                  <span className="px-3 py-1 text-sm font-medium rounded-full bg-purple-100 text-purple-700">
+                    Click to Analyze
+                  </span>
+                )}
+                <HugeiconsIcon 
+                  icon={ArrowRight01Icon} 
+                  size={20} 
+                  strokeWidth={2} 
+                  className={`text-slate-400 transition-transform ${legalTableExpanded ? 'rotate-90' : ''}`}
                 />
-                <p className="text-slate-600 font-medium">Loading Common Scenarios...</p>
-                <p className="text-sm text-slate-500">Analyzing your lease for specific situations...</p>
               </div>
             </div>
-          ) : scenarios && (
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60">
-              <div className="border-b border-slate-200/60 px-6 py-5">
+          </button>
+          
+          <div className={`p-6 ${!legalTableExpanded ? 'hidden' : ''}`}>
+            <ComprehensiveLegalTable 
+              userAddress={address}
+              pdfUrl={analysisResult.pdfUrl}
+              leaseContext={{
+                monthlyRent: analysisResult.summary.monthlyRent,
+                securityDeposit: analysisResult.summary.securityDeposit,
+                leaseStart: analysisResult.summary.leaseStart,
+                leaseEnd: analysisResult.summary.leaseEnd,
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Common Scenarios Section - On-Demand Loading ⚡ */}
+        <div className="mb-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60">
+            <button
+              onClick={() => {
+                if (!scenariosExpanded && !scenarios && leaseDataId) {
+                  loadScenarios(leaseDataId);
+                }
+                setScenariosExpanded(!scenariosExpanded);
+              }}
+              className="w-full border-b border-slate-200/60 px-6 py-5 text-left hover:bg-slate-50/50 transition-colors"
+            >
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <HugeiconsIcon icon={MapsSearchIcon} size={32} strokeWidth={1.5} className="text-purple-600" />
+                  <HugeiconsIcon icon={MapsSearchIcon} size={32} strokeWidth={1.5} className="text-indigo-600" />
                   <h2 className="text-xl font-semibold text-slate-900">{t('ResultsPage.scenarios.title')}</h2>
                 </div>
+                <div className="flex items-center gap-3">
+                  {!scenarios && (
+                    <span className="px-3 py-1 text-sm font-medium rounded-full bg-indigo-100 text-indigo-700">
+                      Click to Analyze
+                    </span>
+                  )}
+                  <HugeiconsIcon 
+                    icon={ArrowRight01Icon} 
+                    size={20} 
+                    strokeWidth={2} 
+                    className={`text-slate-400 transition-transform ${scenariosExpanded ? 'rotate-90' : ''}`}
+                  />
+                </div>
               </div>
-              <div className="divide-y divide-slate-200/60">
+            </button>
+            
+            {scenariosExpanded && (
+              <>
+                {isScenariosLoading ? (
+                  <div className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center gap-4">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full"
+                      />
+                      <p className="text-slate-600 font-medium">Loading Common Scenarios...</p>
+                      <p className="text-sm text-slate-500">Analyzing your lease for specific situations...</p>
+                    </div>
+                  </div>
+                ) : scenarios && scenarios.scenarios && scenarios.scenarios.length > 0 ? (
+                  <div className="divide-y divide-slate-200/60">
                 {scenarios.scenarios.map((scenario, i) => (
                   <div key={i} className="px-6 py-5 hover:bg-slate-50/50 transition-colors duration-200">
                     {/* Simple Header */}
@@ -1425,9 +1606,21 @@ export default function LeaseWiseApp() {
                     )}
               </div>
                 ))}
-              </div>
-            </div>
-        )}
+                  </div>
+                ) : scenarios && scenarios.scenarios && scenarios.scenarios.length === 0 ? (
+                  <div className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                        <HugeiconsIcon icon={MapsSearchIcon} size={32} strokeWidth={2} className="text-gray-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-900">No scenarios found</h3>
+                      <p className="text-slate-600 max-w-md">Unable to generate common scenarios for this lease.</p>
+                    </div>
+                  </div>
+                ) : null}
+              </>
+            )}
+          </div>
         </div>
           </>
         </div>

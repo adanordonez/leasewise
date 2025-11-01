@@ -1,42 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { LeaseRAGSystem } from '@/lib/rag-system';
 import OpenAI from 'openai';
 import type { ChatMessage, ChatRequest, ChatResponse } from '@/types/chat';
+import { rebuildRAGFromChunks } from '@/lib/rag-rebuild';
 
 export const maxDuration = 60; // 60 seconds for chat
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-/**
- * Rebuild RAG system from stored chunks (FAST - no re-embedding needed!)
- */
-async function rebuildRAGFromChunks(chunks: any[]): Promise<LeaseRAGSystem> {
-  console.log(`🔄 Rebuilding RAG from ${chunks.length} stored chunks...`);
-  
-  const rag = new LeaseRAGSystem(true); // Enable embeddings
-  
-  // Reconstruct chunks with embeddings
-  const reconstructedChunks = chunks.map((chunk: any) => ({
-    text: chunk.text,
-    pageNumber: chunk.pageNumber,
-    embedding: chunk.embedding,
-    chunkIndex: chunk.chunkIndex,
-    startIndex: chunk.startIndex,
-    endIndex: chunk.endIndex,
-  }));
-  
-  // Set chunks directly (bypass initialization)
-  (rag as any).chunks = reconstructedChunks;
-  (rag as any).chunkIndex = {
-    pageMap: new Map(reconstructedChunks.map((c: any) => [c.pageNumber, [c]])),
-  };
-  
-  console.log(`✅ RAG rebuilt with ${reconstructedChunks.length} chunks`);
-  return rag;
-}
 
 /**
  * Load or create chat history
@@ -50,7 +22,7 @@ async function loadChatHistory(leaseDataId: string, userEmail: string): Promise<
     .single();
   
   if (error || !data) {
-    console.log('📝 No existing chat history, starting fresh');
+    // console.log('📝 No existing chat history, starting fresh');
     return [];
   }
   
@@ -96,8 +68,8 @@ export async function POST(request: NextRequest) {
     const body: ChatRequest = await request.json();
     const { leaseDataId, userEmail, question, chatHistory = [] } = body;
     
-    console.log(`💬 Chat request for lease ${leaseDataId} from ${userEmail}`);
-    console.log(`❓ Question: ${question}`);
+    // console.log(`💬 Chat request for lease ${leaseDataId} from ${userEmail}`);
+    // console.log(`❓ Question: ${question}`);
     
     if (!leaseDataId || !userEmail || !question) {
       return NextResponse.json(
@@ -129,13 +101,51 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Rebuild RAG from stored chunks (FAST!)
+    // Rebuild RAG from stored chunks
     const rag = await rebuildRAGFromChunks(leaseData.chunks);
     
-    // Query RAG for relevant chunks
-    console.log(`🔍 Searching for relevant chunks...`);
+    // ⚡ Check if embeddings exist - if not, create them now!
+    const hasEmbeddings = leaseData.chunks.some((c: { embedding?: number[] }) => 
+      c.embedding && c.embedding.length > 0
+    );
+    
+    if (!hasEmbeddings) {
+      // console.log('⚡ No embeddings found - creating them now for chat (this will take 10-15s)...');
+      
+      // Import the embedding creation function
+      const { createEmbeddingsBatch } = await import('@/lib/rag-embeddings');
+      
+      // Create embeddings for all chunks
+      const chunksWithEmbeddings = await createEmbeddingsBatch(rag.getAllChunks());
+      
+      // Update the RAG system with new embeddings
+      // @ts-expect-error - accessing private property
+      rag.chunks = chunksWithEmbeddings;
+      
+      // Save embeddings to database for future use
+      const updatedChunks = chunksWithEmbeddings.map(chunk => ({
+        text: chunk.text,
+        pageNumber: chunk.pageNumber,
+        embedding: chunk.embedding,
+        chunkIndex: chunk.chunkIndex,
+        startIndex: chunk.startIndex,
+        endIndex: chunk.endIndex
+      }));
+      
+      await supabase
+        .from('lease_data')
+        .update({ chunks: updatedChunks })
+        .eq('id', leaseDataId);
+      
+      // console.log('✅ Embeddings created and saved to database');
+    } else {
+      // console.log('✅ Embeddings already exist - reusing them for chat');
+    }
+    
+    // Query RAG for relevant chunks (now with embeddings ready!)
+    // console.log(`🔍 Searching for relevant chunks...`);
     const relevantChunks = await rag.retrieve(question, 5);
-    console.log(`✅ Found ${relevantChunks.length} relevant chunks`);
+    // console.log(`✅ Found ${relevantChunks.length} relevant chunks`);
     
     // Build context from chunks
     const context = relevantChunks
@@ -159,7 +169,7 @@ export async function POST(request: NextRequest) {
       .join('\n');
     
     // Generate answer with GPT-4
-    console.log(`🤖 Generating answer...`);
+    // console.log(`🤖 Generating answer...`);
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
@@ -207,7 +217,7 @@ Remember: If it's not in the lease excerpts, acknowledge that limitation clearly
     });
     
     const answer = completion.choices[0].message.content || 'Sorry, I could not generate an answer.';
-    console.log(`✅ Answer generated`);
+    // console.log(`✅ Answer generated`);
     
     // Create message objects
     const userMessage: ChatMessage = {
@@ -226,7 +236,7 @@ Remember: If it's not in the lease excerpts, acknowledge that limitation clearly
     // Update chat history
     const updatedHistory = [...fullHistory, userMessage, assistantMessage];
     await saveChatHistory(leaseDataId, userEmail, updatedHistory);
-    console.log(`💾 Chat history saved`);
+    // console.log(`💾 Chat history saved`);
     
     const response: ChatResponse = {
       answer,

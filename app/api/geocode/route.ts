@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔍 Geocoding API called');
+    // console.log('🔍 Geocoding API called');
     const { address } = await request.json();
-    console.log('📍 Address to geocode:', address);
+    // console.log('📍 Address to geocode:', address);
     
     if (!address) {
-      console.log('❌ No address provided');
+      // console.log('❌ No address provided');
       return NextResponse.json(
         { error: 'Address is required' },
         { status: 400 }
@@ -18,15 +18,15 @@ export async function POST(request: NextRequest) {
     let mapboxToken = process.env.MAPBOX_TOKEN; // Server-side only, no NEXT_PUBLIC_
     
     if (!mapboxToken) {
-      console.log('⚠️ MAPBOX_TOKEN not found, trying NEXT_PUBLIC_MAPBOX_TOKEN as fallback');
+      // console.log('⚠️ MAPBOX_TOKEN not found, trying NEXT_PUBLIC_MAPBOX_TOKEN as fallback');
       mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
     }
     
-    console.log('🔑 Mapbox token exists:', !!mapboxToken);
-    console.log('🔑 Mapbox token preview:', mapboxToken ? `${mapboxToken.substring(0, 10)}...` : 'undefined');
+    // console.log('🔑 Mapbox token exists:', !!mapboxToken);
+    // console.log('🔑 Mapbox token preview:', mapboxToken ? `${mapboxToken.substring(0, 10)}...` : 'undefined');
     
     if (!mapboxToken) {
-      console.log('❌ No Mapbox token configured');
+      // console.log('❌ No Mapbox token configured');
       return NextResponse.json(
         { error: 'Mapbox token not configured. Please set MAPBOX_TOKEN environment variable.' },
         { status: 500 }

@@ -37,7 +37,7 @@ export default function LegalSourcesDisplay({
     setError('');
 
     try {
-      console.log('🔍 Fetching legal sources for:', rightText);
+      // console.log('🔍 Fetching legal sources for:', rightText);
 
       const response = await fetch('/api/search-legal-sources', {
         method: 'POST',
@@ -63,7 +63,7 @@ export default function LegalSourcesDisplay({
         setSources(data.result.sources || []);
         setSummary(data.result.summary || '');
         setIsExpanded(true);
-        console.log(`✅ Found ${data.result.sources?.length || 0} sources`);
+        // console.log(`✅ Found ${data.result.sources?.length || 0} sources`);
       } else {
         throw new Error('Invalid response format');
       }

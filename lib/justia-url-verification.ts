@@ -30,7 +30,7 @@ export async function verifyJustiaUrls(
   }>,
   state: string
 ): Promise<Array<VerifiedUrl>> {
-  console.log(`🔍 Verifying ${legalInfo.length} Justia URLs for ${state}...`);
+  // console.log(`🔍 Verifying ${legalInfo.length} Justia URLs for ${state}...`);
 
   // Build the prompt with all URLs and statutes
   const urlList = legalInfo.map((info, index) => `
@@ -104,14 +104,14 @@ Return ONLY JSON.`;
     const result = JSON.parse(completion.choices[0].message.content || '{"verifiedUrls":[]}');
     const verifiedUrls = result.verifiedUrls || [];
 
-    console.log(`✅ Verified ${verifiedUrls.length} URLs`);
+    // console.log(`✅ Verified ${verifiedUrls.length} URLs`);
     
     // Log changes
     verifiedUrls.forEach((verified: VerifiedUrl, i: number) => {
       if (!verified.isValid) {
-        console.log(`   ${i + 1}. ${verified.lawType}:`);
-        console.log(`      ❌ Old: ${verified.originalUrl}`);
-        console.log(`      ✅ New: ${verified.verifiedUrl}`);
+        // console.log(`   ${i + 1}. ${verified.lawType}:`);
+        // console.log(`      ❌ Old: ${verified.originalUrl}`);
+        // console.log(`      ✅ New: ${verified.verifiedUrl}`);
       } else {
         console.log(`   ${i + 1}. ${verified.lawType}: ✅ Valid`);
       }

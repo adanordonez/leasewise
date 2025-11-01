@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   try {
     const { leaseDataId, language = 'en' } = await request.json();
     
-    console.log(`🎯 Generating suggested questions for lease ${leaseDataId} in ${language}`);
+    // console.log(`🎯 Generating suggested questions for lease ${leaseDataId} in ${language}`);
     
     if (!leaseDataId) {
       return NextResponse.json(
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       .single();
     
     if (existingData?.suggested_questions && existingData.suggested_questions.length > 0) {
-      console.log(`✅ Using cached suggested questions`);
+      // console.log(`✅ Using cached suggested questions`);
       return NextResponse.json({ 
         questions: existingData.suggested_questions.map((q: string) => ({ question: q, category: 'general' }))
       });
@@ -114,7 +114,7 @@ Genera 6 preguntas que un inquilino podría querer hacer sobre este contrato.`
     };
 
     // Generate suggested questions with GPT-4
-    console.log(`🤖 Generating suggested questions with AI in ${language}...`);
+    // console.log(`🤖 Generating suggested questions with AI in ${language}...`);
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
@@ -136,9 +136,9 @@ Genera 6 preguntas que un inquilino podría querer hacer sobre este contrato.`
     
     try {
       const responseText = completion.choices[0].message.content || '{}';
-      console.log('📝 Raw AI response:', responseText);
+      // console.log('📝 Raw AI response:', responseText);
       const parsed = JSON.parse(responseText);
-      console.log('📊 Parsed response:', parsed);
+      // console.log('📊 Parsed response:', parsed);
       
       // Handle different possible response formats
       if (Array.isArray(parsed)) {
@@ -157,7 +157,7 @@ Genera 6 preguntas que un inquilino podría querer hacer sobre este contrato.`
         }
       }
       
-      console.log(`✅ Extracted ${questions.length} questions from AI response`);
+      // console.log(`✅ Extracted ${questions.length} questions from AI response`);
       
       // Fallback questions if parsing fails
       if (questions.length === 0) {
@@ -183,7 +183,7 @@ Genera 6 preguntas que un inquilino podría querer hacer sobre este contrato.`
         questions = fallbackQuestions[language] || fallbackQuestions.en;
       }
       
-      console.log(`✅ Generated ${questions.length} suggested questions`);
+      // console.log(`✅ Generated ${questions.length} suggested questions`);
       
       // Save to database for caching
       await supabase

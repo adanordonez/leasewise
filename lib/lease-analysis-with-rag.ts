@@ -176,7 +176,7 @@ export async function enrichWithSources(
   analysis: StructuredLeaseDataWithRAG,
   rag: LeaseRAGSystem
 ): Promise<any> {
-  console.log('🔍 Finding exact sources for each data point...');
+  // console.log('🔍 Finding exact sources for each data point...');
   
   // Enrich red flags with specific queries
   const enrichedRedFlags = await Promise.all(
@@ -223,7 +223,7 @@ export async function enrichWithSources(
     })
   );
 
-  console.log('💰 Finding sources for financial terms...');
+  // console.log('💰 Finding sources for financial terms...');
   // For summary fields, use very specific queries
   const monthlyRentSource = await rag.findSource(
     `monthly rent payment ${analysis.monthly_rent} dollars per month due`, 
@@ -266,7 +266,7 @@ export async function enrichWithSources(
     notice_period: noticePeriodSource?.pageNumber,
   };
 
-  console.log('✅ Source enrichment complete');
+  // console.log('✅ Source enrichment complete');
 
   return {
     ...analysis,

@@ -44,7 +44,7 @@ export default function SourceCitation({
     }
 
     setIsTranslating(true);
-    console.log('🔄 Starting translation for text:', sourceText.substring(0, 50) + '...');
+    // console.log('🔄 Starting translation for text:', sourceText.substring(0, 50) + '...');
     
     try {
       const response = await fetch('/api/translate-legal-text', {
@@ -53,7 +53,7 @@ export default function SourceCitation({
         body: JSON.stringify({ legalText: sourceText }),
       });
 
-      console.log('📡 Translation API response status:', response.status);
+      // console.log('📡 Translation API response status:', response.status);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
@@ -62,7 +62,7 @@ export default function SourceCitation({
       }
 
       const data = await response.json();
-      console.log('✅ Translation received:', data.plainEnglish);
+      // console.log('✅ Translation received:', data.plainEnglish);
       setPlainEnglish(data.plainEnglish);
     } catch (error) {
       console.error('❌ Error translating text:', error);
@@ -77,7 +77,7 @@ export default function SourceCitation({
       {/* Clickable icon */}
       <button
         onClick={() => {
-          console.log('📄 Source citation clicked!', { hasSourceText: !!sourceText, pageNumber });
+          // console.log('📄 Source citation clicked!', { hasSourceText: !!sourceText, pageNumber });
           setIsOpen(true);
         }}
         className="inline-flex items-center justify-center w-5 h-5 ml-2 text-slate-400 hover:text-purple-600 transition-colors"
@@ -88,7 +88,7 @@ export default function SourceCitation({
 
       {/* Modal/Popup */}
       {isOpen && ((() => {
-        console.log('🎨 Modal rendering!', { sourceText: sourceText?.substring(0, 50), pageNumber, pdfUrl: !!pdfUrl });
+        // console.log('🎨 Modal rendering!', { sourceText: sourceText?.substring(0, 50), pageNumber, pdfUrl: !!pdfUrl });
         return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setIsOpen(false)}>
           <div 
@@ -145,7 +145,7 @@ export default function SourceCitation({
               <div className="mt-4 flex flex-wrap gap-2">
                 <button
                   onClick={() => {
-                    console.log('💬 Translation button clicked!');
+                    // console.log('💬 Translation button clicked!');
                     translateToPlainEnglish();
                   }}
                   disabled={isTranslating}

@@ -35,7 +35,7 @@ export async function createEmbeddingsBatch(
   for (let i = 0; i < chunks.length; i += batchSize) {
     const batch = chunks.slice(i, i + batchSize);
     
-    console.log(`Creating embeddings for batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(chunks.length / batchSize)}...`);
+    // console.log(`Creating embeddings for batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(chunks.length / batchSize)}...`);
     
     try {
       const response = await openai.embeddings.create({
@@ -61,7 +61,7 @@ export async function createEmbeddingsBatch(
     }
   }
 
-  console.log(`Created embeddings for ${chunksWithEmbeddings.length} chunks`);
+  // console.log(`Created embeddings for ${chunksWithEmbeddings.length} chunks`);
   return chunksWithEmbeddings;
 }
 

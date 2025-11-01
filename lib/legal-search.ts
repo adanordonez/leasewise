@@ -43,8 +43,8 @@ export async function searchComprehensiveLegalInfo(
     const state = addressParts.length >= 2 ? addressParts[addressParts.length - 2] : '';
     const city = addressParts.length >= 3 ? addressParts[addressParts.length - 3] : '';
     
-    console.log(`🔍 Searching comprehensive renter laws for: ${city}, ${state}`);
-    console.log(`📄 Using lease context:`, leaseContext);
+    // console.log(`🔍 Searching comprehensive renter laws for: ${city}, ${state}`);
+    // console.log(`📄 Using lease context:`, leaseContext);
     
     // Authoritative legal domains
     const legalDomains = [
@@ -137,7 +137,7 @@ Return the JSON now:`,
     
     // Extract the response
     let outputText = response.output_text || '';
-    console.log('📝 Raw response:', outputText.substring(0, 200));
+    // console.log('📝 Raw response:', outputText.substring(0, 200));
     
     // Clean up the response to extract JSON
     // Remove markdown code blocks if present
@@ -214,8 +214,8 @@ MUST include all 10 categories. Use simple language. Return ONLY the JSON.`,
       }
     }
     
-    console.log(`✅ Found ${parsedData.legalInfo?.length || 0} legal categories`);
-    console.log(`✅ Found ${additionalSources.length} additional sources`);
+    // console.log(`✅ Found ${parsedData.legalInfo?.length || 0} legal categories`);
+    // console.log(`✅ Found ${additionalSources.length} additional sources`);
     
     return {
       legalInfo: parsedData.legalInfo || [],
@@ -254,7 +254,7 @@ export async function searchLegalSources(
     const state = addressParts.length >= 2 ? addressParts[addressParts.length - 2] : '';
     const city = addressParts.length >= 3 ? addressParts[addressParts.length - 3] : '';
     
-    console.log(`🔍 Searching legal sources for: ${tenantRight} in ${city}, ${state}`);
+    // console.log(`🔍 Searching legal sources for: ${tenantRight} in ${city}, ${state}`);
     
     // Construct a specific legal search query
     const searchQuery = issueDescription
@@ -386,7 +386,7 @@ ONLY cite information from authoritative government websites or established lega
       });
     }
     
-    console.log(`✅ Found ${sources.length} legal sources`);
+    // console.log(`✅ Found ${sources.length} legal sources`);
     
     return {
       sources,
@@ -516,7 +516,7 @@ export async function searchEnhancedLegalSources(
     const state = addressParts.length >= 2 ? addressParts[addressParts.length - 2] : '';
     const city = addressParts.length >= 3 ? addressParts[addressParts.length - 3] : '';
     
-    console.log(`\n🔍 Enhanced search for: "${description}" in ${city || state}`);
+    // console.log(`\n🔍 Enhanced search for: "${description}" in ${city || state}`);
     
     // Step 1: Use OpenAI web search to find potential sources
     const legalDomains = [
@@ -575,7 +575,7 @@ Return the most authoritative sources with specific legal information.`,
       }
     }
     
-    console.log(`📚 Found ${potentialSources.length} potential sources to vet`);
+    // console.log(`📚 Found ${potentialSources.length} potential sources to vet`);
     
     if (potentialSources.length === 0) {
       return {
@@ -598,9 +598,9 @@ Return the most authoritative sources with specific legal information.`,
     const relevantSources = vettedResults.filter(r => r.isRelevant && r.statuteText);
     const notFoundCount = vettedResults.filter(r => !r.isRelevant).length;
     
-    console.log(`\n📊 Results:`);
-    console.log(`   ✅ Relevant sources: ${relevantSources.length}`);
-    console.log(`   ❌ Not relevant: ${notFoundCount}`);
+    // console.log(`\n📊 Results:`);
+    // console.log(`   ✅ Relevant sources: ${relevantSources.length}`);
+    // console.log(`   ❌ Not relevant: ${notFoundCount}`);
     
     return {
       sources: relevantSources.map(s => ({

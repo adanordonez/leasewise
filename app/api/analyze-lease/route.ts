@@ -78,11 +78,11 @@ export async function POST(request: NextRequest) {
 
 async function performAnalysis(request: NextRequest) {
   try {
-    console.log('🔍 Starting lease analysis...');
+    // console.log('🔍 Starting lease analysis...');
     
     // Get locale from cookies (for Spanish output)
-    const locale = request.cookies.get('locale')?.value || 'en';
-    console.log(`🌐 Detected locale: ${locale}`);
+    // const locale = request.cookies.get('locale')?.value || 'en';
+    // console.log(`🌐 Detected locale: ${locale}`);
     
     // Validate request headers
     const contentType = request.headers.get('content-type');
@@ -155,7 +155,7 @@ async function performAnalysis(request: NextRequest) {
     }
 
     // Extract text from PDF with page tracking and retry logic
-    console.log('📄 Extracting text from PDF...');
+    // console.log('📄 Extracting text from PDF...');
     let pdfData;
     let retryCount = 0;
     const maxRetries = 3;
@@ -192,23 +192,24 @@ async function performAnalysis(request: NextRequest) {
       console.warn('⚠️ Very short lease text extracted:', leaseText.length, 'characters');
     }
     
-    console.log('✅ PDF text extracted successfully:', {
-      textLength: leaseText.length,
-      pageCount: pdfData.pages.length,
-      avgPageLength: Math.round(leaseText.length / pdfData.pages.length)
-    });
+    // console.log('✅ PDF text extracted successfully:', {
+    //   textLength: leaseText.length,
+    //   pageCount: pdfData.pages.length,
+    //   avgPageLength: Math.round(leaseText.length / pdfData.pages.length)
+    // });
 
     // Extract basic lease info first (for map data)
     const basicInfo = await extractBasicLeaseInfo(leaseText, address);
     
-    // Initialize RAG system for accurate source attribution
-    console.log('🚀 Initializing RAG system...');
+    // ⚡ OPTIMIZED: Create RAG WITHOUT embeddings for initial load (much faster!)
+    // Embeddings will be created on-demand when user clicks Red Flags/Rights/Chat
+    // console.log('🚀 Initializing RAG system (without embeddings for speed)...');
     let rag;
     let ragStats = null;
     try {
-      rag = await createLeaseRAG(pdfData.pages, true); // true = use embeddings
+      rag = await createLeaseRAG(pdfData.pages, false); // false = NO embeddings (saves 15-20s!)
       ragStats = rag.getStats();
-      console.log('✅ RAG system ready:', ragStats);
+      // console.log('✅ RAG system ready (no embeddings yet):', ragStats);
     } catch (ragError) {
       console.error('🚨 RAG initialization failed:', ragError);
       // Continue without RAG if it fails
@@ -216,92 +217,37 @@ async function performAnalysis(request: NextRequest) {
       rag = null;
     }
     
-    // Analyze lease using RAG (no more hallucinations!) - with timeout protection
-    console.log('🔍 Analyzing lease with RAG...');
-    let structuredData;
-    try {
-      const structuredDataPromise = analyzeLeaseWithRAG(rag, address, locale);
-      structuredData = await withTimeout(structuredDataPromise, 60000, 'Lease analysis timeout');
-    } catch (analysisError) {
-      console.error('🚨 Lease analysis failed:', analysisError);
-      // Fallback to basic analysis without RAG
-      console.warn('⚠️ Falling back to basic analysis...');
-      try {
-        structuredData = await analyzeLeaseStructured(leaseText, address);
-      } catch (fallbackError) {
-        console.error('🚨 Fallback analysis also failed:', fallbackError);
-        throw new Error(`Lease analysis failed: ${analysisError instanceof Error ? analysisError.message : 'Unknown error'}`);
-      }
-    }
+    // ⚡ OPTIMIZED: Extract basic info only (no heavy analysis)
+    // console.log('🔍 Extracting basic lease info (fast mode)...');
     
-    // Enrich with exact sources from chunks
-    console.log('📄 Enriching with exact sources...');
-    let enrichedData;
-    try {
-      const enrichPromise = enrichWithSources(structuredData, rag);
-      enrichedData = await withTimeout(enrichPromise, 30000, 'Source enrichment timeout');
-    } catch (enrichError) {
-      console.error('🚨 Source enrichment failed:', enrichError);
-      console.warn('⚠️ Continuing without source enrichment...');
-      // Use original data without enrichment
-      enrichedData = structuredData;
-    }
-    console.log('✨ Source attribution complete');
+    // Note: basicInfo is already extracted above via extractBasicLeaseInfo()
+    // We skip the heavy RAG analysis for now - it will be loaded on-demand
     
-    // Analyze red flags with dedicated RAG system
-    console.log('🚩 Analyzing red flags with RAG...');
-    let redFlags = [];
-    try {
-      const redFlagsPromise = analyzeRedFlagsWithRAG(rag, {
-        monthlyRent: basicInfo.monthly_rent?.toString(),
-        securityDeposit: basicInfo.security_deposit?.toString(),
-        address: address
-      }, locale);
-      redFlags = await withTimeout(redFlagsPromise, 60000, 'Red flags analysis timeout'); // Increased from 45s to 60s
-      console.log(`✅ Found ${redFlags.length} red flags`);
-      
-      if (redFlags.length === 0) {
-        console.log('ℹ️ No red flags found - this could be good (clean lease) or analysis may have failed silently');
-      }
-    } catch (redFlagsError) {
-      console.error('🚨 Red flags analysis failed:', redFlagsError);
-      console.error('🚨 Error details:', redFlagsError instanceof Error ? redFlagsError.message : String(redFlagsError));
-      console.warn('⚠️ Continuing without red flags analysis...');
-      // Use empty array as fallback
-      redFlags = [];
-    }
-    
-    // Replace enrichedData red flags with the new RAG-based analysis
-    enrichedData.red_flags = redFlags.map(flag => ({
-      issue: flag.issue,
-      severity: flag.severity,
-      explanation: flag.explanation,
-      source: flag.source,
-      page_number: flag.page_number
-    }));
+    // console.log('✅ Basic info extracted - skipping heavy analysis for performance');
     
     // Scenarios will be loaded separately after analysis to avoid timeout
-    console.log('📋 Scenarios will be loaded separately via /api/generate-scenarios');
+    // console.log('📋 Scenarios will be loaded separately via /api/generate-scenarios');
 
     // Save structured data to Supabase
     let leaseDataId = null;
     try {
-      console.log('💾 Saving lease data to Supabase...');
+      // console.log('💾 Saving lease data to Supabase...');
       
-      // Store chunks with embeddings for fast RAG rebuild in chat
-      // NOTE: This requires the database migration to be run first
+      // ⚡ Store chunks WITHOUT embeddings (for speed)
+      // Embeddings will be created on-demand when user needs them
       const chunksToStore = rag ? rag.getAllChunks().map(chunk => ({
         text: chunk.text,
         pageNumber: chunk.pageNumber,
-        embedding: chunk.embedding || [],
+        embedding: null, // No embeddings yet - created on-demand!
         chunkIndex: chunk.chunkIndex,
         startIndex: chunk.startIndex || 0,
         endIndex: chunk.endIndex || 0
       })) : [];
       
-      console.log(`💾 Preparing to store ${chunksToStore.length} chunks with embeddings...`);
+      // console.log(`💾 Preparing to store ${chunksToStore.length} chunks (no embeddings yet - will create on-demand)...`);
       
-      // Prepare lease data object
+      // Prepare lease data object (basic info only - heavy analysis done on-demand)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const leaseDataToInsert: any = {
         user_name: userName,
         user_email: userEmail,
@@ -313,34 +259,39 @@ async function performAnalysis(request: NextRequest) {
         security_deposit: basicInfo.security_deposit,
         lease_start_date: basicInfo.lease_start_date,
         lease_end_date: basicInfo.lease_end_date,
-        notice_period_days: enrichedData.notice_period_days,
+        notice_period_days: 30, // Default - to be analyzed on-demand
         property_type: basicInfo.property_type,
         square_footage: basicInfo.square_footage,
         bedrooms: basicInfo.bedrooms,
         bathrooms: basicInfo.bathrooms,
-        parking_spaces: enrichedData.parking_spaces,
-        pet_policy: enrichedData.pet_policy,
+        parking_spaces: 0, // Default - to be analyzed on-demand
+        pet_policy: 'Not specified', // Default - to be analyzed on-demand
         utilities_included: basicInfo.utilities_included,
         amenities: basicInfo.amenities,
         landlord_name: basicInfo.landlord_name,
         management_company: basicInfo.management_company,
         contact_email: basicInfo.contact_email,
         contact_phone: basicInfo.contact_phone,
-        lease_terms: enrichedData.lease_terms,
-        special_clauses: enrichedData.special_clauses,
-        market_analysis: enrichedData.market_analysis,
-        red_flags: enrichedData.red_flags,
-        tenant_rights: enrichedData.tenant_rights,
-        key_dates: enrichedData.key_dates,
-        raw_analysis: enrichedData,
+        // These will be populated on-demand via separate API calls
+        lease_terms: [],
+        special_clauses: [],
+        market_analysis: {
+          rent_percentile: 50,
+          deposit_status: 'standard',
+          rent_analysis: 'Market analysis available on demand'
+        },
+        red_flags: null, // Will be populated by /api/analyze-red-flags
+        tenant_rights: null, // Will be populated by /api/analyze-rights
+        key_dates: [],
+        raw_analysis: basicInfo,
       };
       
       // Only add chunks if we have them (requires database migration)
       if (chunksToStore && chunksToStore.length > 0) {
         leaseDataToInsert.chunks = chunksToStore;
-        console.log(`💾 Including ${chunksToStore.length} chunks in database insert`);
+        // console.log(`💾 Including ${chunksToStore.length} chunks in database insert`);
       } else {
-        console.log('⚠️ No chunks to store (RAG not initialized or migration not run)');
+        // console.log('⚠️ No chunks to store (RAG not initialized or migration not run)');
       }
       
       const { data: leaseData, error: leaseError } = await supabase
@@ -361,7 +312,7 @@ async function performAnalysis(request: NextRequest) {
         console.warn('⚠️ Continuing analysis without database save...');
       } else {
         leaseDataId = leaseData.id;
-        console.log('✅ Lease data saved with ID:', leaseDataId);
+        // console.log('✅ Lease data saved with ID:', leaseDataId);
         
         // Save PDF upload metadata to pdf_uploads table if we have a URL
         if (pdfUrl) {
@@ -390,7 +341,7 @@ async function performAnalysis(request: NextRequest) {
                 code: uploadError.code
               });
             } else {
-              console.log('✅ PDF upload metadata saved for lease:', leaseDataId);
+              // console.log('✅ PDF upload metadata saved for lease:', leaseDataId);
             }
           } catch (uploadError) {
             console.error('🚨 Error saving PDF metadata:', uploadError);
@@ -407,22 +358,34 @@ async function performAnalysis(request: NextRequest) {
       console.warn('⚠️ Continuing analysis without database save...');
     }
 
-    // Convert enriched data to the format expected by the frontend
-    // Note: enrichedData already has sources and page_numbers from RAG!
+    // ⚡ OPTIMIZED RESPONSE: Return basic info immediately
+    // Heavy analysis (red flags, rights) will be loaded on-demand
     const analysis = {
       summary: {
         monthlyRent: `$${basicInfo.monthly_rent.toLocaleString()}`,
         securityDeposit: `$${basicInfo.security_deposit.toLocaleString()}`,
         leaseStart: basicInfo.lease_start_date,
         leaseEnd: basicInfo.lease_end_date,
-        noticePeriod: `${enrichedData.notice_period_days} days`,
-        sources: enrichedData.sources, // Exact sources from RAG chunks
-        pageNumbers: enrichedData.page_numbers // Accurate page numbers from RAG
+        noticePeriod: '30 days', // Default - to be analyzed on-demand
+        buildingName: basicInfo.building_name,
+        propertyAddress: basicInfo.property_address,
+        propertyType: basicInfo.property_type,
+        bedrooms: basicInfo.bedrooms,
+        bathrooms: basicInfo.bathrooms,
+        squareFootage: basicInfo.square_footage,
+        amenities: basicInfo.amenities,
+        utilitiesIncluded: basicInfo.utilities_included,
+        petPolicy: 'Not specified', // Default - to be analyzed on-demand
+        landlordName: basicInfo.landlord_name,
+        managementCompany: basicInfo.management_company,
+        contactEmail: basicInfo.contact_email,
+        contactPhone: basicInfo.contact_phone,
       },
-      redFlags: enrichedData.red_flags, // Already has source + page_number from RAG
-      rights: enrichedData.tenant_rights, // Already has source + page_number from RAG
-      keyDates: enrichedData.key_dates, // Already has source + page_number from RAG
-      pdfUrl: pdfUrl || undefined // Include PDF URL for viewer
+      // These are not ready yet - will be loaded on-demand
+      redFlags: null,
+      rights: null,
+      keyDates: null,
+      pdfUrl: pdfUrl || undefined
     };
 
     return NextResponse.json({
@@ -431,7 +394,13 @@ async function performAnalysis(request: NextRequest) {
       address,
       textLength: leaseText.length,
       ragStats, // Include RAG statistics for debugging
-      leaseDataId
+      leaseDataId,
+      // Indicate which analyses are ready
+      redFlagsReady: false,
+      rightsReady: false,
+      scenariosReady: false,
+      // Include a message for frontend
+      message: '✅ Basic analysis complete! Click sections below to load detailed analysis.'
     });
 
   } catch (error) {

@@ -19,21 +19,21 @@ export class LeaseRAGSystem {
    * Initialize the RAG system with PDF pages
    */
   async initialize(pages: PageText[]): Promise<void> {
-    console.log('Initializing RAG system...');
+    // console.log('Initializing RAG system...');
     
     // Step 1: Chunk the text with page tracking
-    console.log('Creating chunks from', pages.length, 'pages...');
+    // console.log('Creating chunks from', pages.length, 'pages...');
     this.chunks = chunkTextWithPages(pages, 1500, 250); // Increased chunk size to 1500 for even better context, overlap to 250
-    console.log('Created', this.chunks.length, 'chunks');
+    // console.log('Created', this.chunks.length, 'chunks');
 
     // Step 2: Create index for fast keyword search (fallback)
     this.chunkIndex = createChunkIndex(this.chunks);
 
     // Step 3: Create embeddings (if enabled)
     if (this.useEmbeddings) {
-      console.log('Creating embeddings for chunks...');
+      // console.log('Creating embeddings for chunks...');
       this.chunks = await createEmbeddingsBatch(this.chunks);
-      console.log('Embeddings created successfully');
+      // console.log('Embeddings created successfully');
     }
   }
 

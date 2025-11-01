@@ -24,12 +24,12 @@ export default function SimpleLoadingModal({
   const [showExtraWaitMessage, setShowExtraWaitMessage] = useState(false);
   const finalizingTimerRef = useRef<NodeJS.Timeout | null>(null);
   
-  console.log('🔍 SimpleLoadingModal render:', { isOpen, progress, stage, logsLength: logs.length });
+  // console.log('🔍 SimpleLoadingModal render:', { isOpen, progress, stage, logsLength: logs.length });
   
   // Trigger finalizing state at 85% progress
   useEffect(() => {
     if (progress >= 85 && !showFinalizingState) {
-      console.log('🎯 Finalizing state triggered at 85%');
+      // console.log('🎯 Finalizing state triggered at 85%');
       setShowFinalizingState(true);
     } else if (progress < 85 && showFinalizingState) {
       setShowFinalizingState(false);
@@ -44,9 +44,9 @@ export default function SimpleLoadingModal({
   // Separate effect for the 20-second timer
   useEffect(() => {
     if (showFinalizingState && !finalizingTimerRef.current) {
-      console.log('⏱️ Starting 20-second timer for extra message');
+      // console.log('⏱️ Starting 20-second timer for extra message');
       finalizingTimerRef.current = setTimeout(() => {
-        console.log('✅ 20 seconds elapsed - showing extra message');
+        // console.log('✅ 20 seconds elapsed - showing extra message');
         setShowExtraWaitMessage(true);
       }, 20000); // 20 seconds
     }
@@ -131,11 +131,11 @@ export default function SimpleLoadingModal({
   }, [logs]);
   
   if (!isOpen) {
-    console.log('❌ Modal not open, returning null');
+    // console.log('❌ Modal not open, returning null');
     return null;
   }
   
-  console.log('✅ Modal is open, rendering...');
+  // console.log('✅ Modal is open, rendering...');
 
   // Map logs to icons
   const getLogIcon = (log: string) => {

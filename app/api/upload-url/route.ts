@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     const timestamp = Date.now();
     const uniqueFilename = `${timestamp}-${file.name}`;
 
-    console.log('Uploading file to blob storage:', uniqueFilename);
+    // console.log('Uploading file to blob storage:', uniqueFilename);
 
     // Upload file directly to Vercel Blob Storage
     const blob = await put(uniqueFilename, file, {
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       contentType: file.type,
     });
 
-    console.log('File uploaded successfully:', blob.url);
+    // console.log('File uploaded successfully:', blob.url);
 
     return NextResponse.json({
       success: true,

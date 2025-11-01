@@ -11,7 +11,7 @@ export default function TestTranslationPage() {
     setResult('Testing...');
     
     try {
-      console.log('Sending request to /api/translate-legal-text');
+      // console.log('Sending request to /api/translate-legal-text');
       
       const response = await fetch('/api/translate-legal-text', {
         method: 'POST',
@@ -23,10 +23,10 @@ export default function TestTranslationPage() {
         }),
       });
 
-      console.log('Response status:', response.status);
+      // console.log('Response status:', response.status);
       
       const data = await response.json();
-      console.log('Response data:', data);
+      // console.log('Response data:', data);
       
       setResult(JSON.stringify(data, null, 2));
     } catch (error) {

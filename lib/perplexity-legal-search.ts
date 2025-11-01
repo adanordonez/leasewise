@@ -21,14 +21,14 @@ function generateGoogleSearchUrl(
   lawType: string,
   state: string
 ): string {
-  console.log(`🔍 Generating Google search URL for: ${statute} (${lawType})`);
+  // console.log(`🔍 Generating Google search URL for: ${statute} (${lawType})`);
   
   // Create a simple search query - just the statute and state
   const searchQuery = encodeURIComponent(`${statute} ${state}`);
   
   const googleUrl = `https://www.google.com/search?q=${searchQuery}`;
   
-  console.log(`   Generated: ${googleUrl}`);
+  // console.log(`   Generated: ${googleUrl}`);
   return googleUrl;
 }
 
@@ -46,7 +46,7 @@ async function getLegalInformationWithGoogleSearch(
   },
   locale: string = 'en'
 ): Promise<PerplexityLegalInfo[]> {
-  console.log(`🔍 Getting legal information for ${state} with Perplexity URL search...`);
+  // console.log(`🔍 Getting legal information for ${state} with Perplexity URL search...`);
   
   const languageInstruction = locale === 'es' 
     ? '\n\nThis output is for a Spanish speaking tenant. Please output in simple spanish terms so that tenants can understand.' 
@@ -138,15 +138,15 @@ Return ONLY valid JSON.${languageInstruction}`
   const parsed = JSON.parse(content);
   const legalInfo = parsed.legalInfo || [];
   
-  console.log(`✅ Got ${legalInfo.length} categories from GPT-4o`);
+  // console.log(`✅ Got ${legalInfo.length} categories from GPT-4o`);
   
   // Now generate Google search URLs for each statute (only if statute exists)
-  console.log('🔍 Generating Google search URLs for statutes...');
+  // console.log('🔍 Generating Google search URLs for statutes...');
   
   const legalInfoWithUrls: PerplexityLegalInfo[] = [];
   
   for (const info of legalInfo) {
-    console.log(`   Processing: ${info.lawType} (${info.statute || 'No statute'})`);
+    // console.log(`   Processing: ${info.lawType} (${info.statute || 'No statute'})`);
     
     // Only generate URL if statute exists
     if (info.statute) {
@@ -171,7 +171,7 @@ Return ONLY valid JSON.${languageInstruction}`
     }
   }
   
-  console.log(`✅ Generated Google search URLs for ${legalInfoWithUrls.length} categories`);
+  // console.log(`✅ Generated Google search URLs for ${legalInfoWithUrls.length} categories`);
   return legalInfoWithUrls;
 }
 
@@ -197,20 +197,20 @@ export async function searchLegalInfoWithGoogleSearch(
     rejectedSources: number;
   };
 }> {
-  console.log('\n🚀 PERPLEXITY LEGAL SEARCH');
+  // console.log('\n🚀 PERPLEXITY LEGAL SEARCH');
   
   const addressParts = userAddress.split(',').map(s => s.trim());
   const state = addressParts.length >= 2 ? addressParts[addressParts.length - 2] : '';
   const city = addressParts.length >= 3 ? addressParts[addressParts.length - 3] : '';
   
-  console.log(`📍 Location: ${userAddress}`);
-  console.log(`📍 Parsed: ${city}, ${state}`);
+  // console.log(`📍 Location: ${userAddress}`);
+  // console.log(`📍 Parsed: ${city}, ${state}`);
 
   // Get legal information with Google search URLs
   const legalInfo = await getLegalInformationWithGoogleSearch(state, city, leaseContext, locale);
 
   if (legalInfo.length === 0) {
-    console.log('❌ No legal information found, returning empty');
+    // console.log('❌ No legal information found, returning empty');
     return {
       legalInfo: [],
       searchMetadata: {
@@ -223,7 +223,7 @@ export async function searchLegalInfoWithGoogleSearch(
     };
   }
   
-  console.log(`✅ Returning ${legalInfo.length} categories with Google search URLs\n`);
+  // console.log(`✅ Returning ${legalInfo.length} categories with Google search URLs\n`);
   
   return {
     legalInfo,

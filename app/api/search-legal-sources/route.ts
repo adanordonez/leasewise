@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { searchLegalSources, searchMultipleLegalSources } from '@/lib/legal-search';
 
 export async function POST(request: NextRequest) {
-  console.log('🔍 Legal sources search API called');
+  // console.log('🔍 Legal sources search API called');
   
   try {
     const body = await request.json();
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     
     // Single right search
     if (singleRight) {
-      console.log(`📚 Searching for single right: ${singleRight.right}`);
+      // console.log(`📚 Searching for single right: ${singleRight.right}`);
       
       const result = await searchLegalSources(
         userAddress,
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     
     // Multiple rights search
     if (tenantRights && Array.isArray(tenantRights)) {
-      console.log(`📚 Searching for ${tenantRights.length} tenant rights`);
+      // console.log(`📚 Searching for ${tenantRights.length} tenant rights`);
       
       const results = await searchMultipleLegalSources(userAddress, tenantRights);
       
