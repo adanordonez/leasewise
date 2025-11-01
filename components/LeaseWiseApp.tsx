@@ -1374,15 +1374,15 @@ export default function LeaseWiseApp() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <HugeiconsIcon icon={AlertSquareIcon} size={32} strokeWidth={1.5} className={
-                  analysisResult.redFlags === null ? "text-blue-600" : 
+                  analysisResult.redFlags === null ? "text-red-600" : 
                   analysisResult.redFlags?.length > 0 ? "text-red-600" : "text-green-600"
                 } />
                 <h2 className="text-xl font-semibold text-slate-900">{t('ResultsPage.propertyInfo.redFlags')}</h2>
               </div>
               <div className="flex items-center gap-3">
                 {analysisResult.redFlags === null ? (
-                  <span className="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-700">
-                    Click to Analyze
+                  <span className="px-3 py-1 text-sm font-medium rounded-full bg-red-100 text-red-700">
+                    Load Info
                   </span>
                 ) : (
                   <span className={`px-3 py-1 text-sm font-medium rounded-full ${
@@ -1414,7 +1414,7 @@ export default function LeaseWiseApp() {
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full"
+                      className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full"
                     />
                     <p className="text-slate-600 font-medium">Analyzing Red Flags...</p>
                     <p className="text-sm text-slate-500">Scanning your lease for potential concerns...</p>
@@ -1479,7 +1479,7 @@ export default function LeaseWiseApp() {
               <div className="flex items-center gap-3">
                 {!legalTableExpanded && (
                   <span className="px-3 py-1 text-sm font-medium rounded-full bg-purple-100 text-purple-700">
-                    Click to Analyze
+                    Load Info
                   </span>
                 )}
                 <HugeiconsIcon 
@@ -1526,7 +1526,7 @@ export default function LeaseWiseApp() {
                 <div className="flex items-center gap-3">
                   {!scenarios && (
                     <span className="px-3 py-1 text-sm font-medium rounded-full bg-indigo-100 text-indigo-700">
-                      Click to Analyze
+                    Load Info
                     </span>
                   )}
                   <HugeiconsIcon 

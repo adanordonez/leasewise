@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ExternalLink, Search, AlertCircle, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { CourtLawIcon } from '@hugeicons-pro/core-stroke-rounded';
+import { ExternalLink, Search, AlertCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { VerifiedLegalInfo } from '@/lib/verified-legal-search-simple';
 
@@ -28,14 +27,11 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [metadata, setMetadata] = useState<{ state: string; city: string; totalSources: number; verifiedSources?: number; rejectedSources?: number } | null>(null);
-  const [isCollapsed, setIsCollapsed] = useState(false); // Start expanded for auto-load
   const hasLoadedRef = useRef(false); // Track if data has ever been loaded
 
   const fetchLegalInfo = async () => {
     setIsLoading(true);
     setError(null);
-    setIsCollapsed(false); // Expand when fetching
     
     try {
       // console.log('📡 Fetching comprehensive legal info...');
@@ -61,12 +57,11 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
       
       setLegalInfo(data.legalInfo);
       setFilteredInfo(data.legalInfo);
-      setMetadata(data.searchMetadata);
       hasLoadedRef.current = true; // Mark as loaded
       
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('❌ Error fetching legal info:', err);
-      setError(err.message || 'Failed to load legal information');
+      setError(err instanceof Error ? err.message : 'Failed to load legal information');
     } finally {
       setIsLoading(false);
     }
@@ -106,63 +101,6 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
 
   return (
     <div className="w-full space-y-4">
-      {/* Header - Always visible */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex-1">
-          <button
-            onClick={() => legalInfo.length > 0 && setIsCollapsed(!isCollapsed)}
-            className="flex items-center gap-3 text-left hover:opacity-80 transition-opacity w-full"
-          >
-            <HugeiconsIcon icon={CourtLawIcon} size={32} strokeWidth={1.5} className="text-purple-600 flex-shrink-0" />
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-slate-900">
-                {t('ResultsPage.rights.title')}
-              </h3>
-              {metadata && (
-                <p className="text-sm text-slate-600">
-                  {metadata.city && `${metadata.city}, `}{metadata.state} · 10 {t('ResultsPage.rights.keyCategories')}
-                </p>
-              )}
-              {!legalInfo.length && !isLoading && (
-                <p className="text-sm text-slate-500">
-                  Get comprehensive legal information tailored to your lease
-                </p>
-              )}
-            </div>
-            {legalInfo.length > 0 && (
-              isCollapsed ? (
-                <ChevronDown className="w-5 h-5 text-slate-400 flex-shrink-0" />
-              ) : (
-                <ChevronUp className="w-5 h-5 text-slate-400 flex-shrink-0" />
-              )
-            )}
-          </button>
-        </div>
-        
-        <div className="flex gap-2">
-          {legalInfo.length > 0 && (
-            <Button
-              onClick={fetchLegalInfo}
-              variant="outline"
-              size="sm"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {t('ResultsPage.rights.refresh')}...
-                </>
-              ) : (
-                t('ResultsPage.rights.refresh')
-              )}
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Collapsible Content */}
-      {!isCollapsed && (
-        <>
           {/* Search Bar */}
           {legalInfo.length > 0 && (
             <div className="relative">
@@ -179,11 +117,15 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
       {/* Loading State */}
       {isLoading && (
         <div className="flex flex-col items-center justify-center py-16 gap-4">
-          <Loader2 className="w-12 h-12 text-purple-600 animate-spin" />
-          <p className="text-sm text-slate-600">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full"
+          />
+          <p className="text-slate-600 font-medium">
             Searching authoritative legal sources...
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-sm text-slate-500">
             This may take 10-20 seconds
           </p>
         </div>
@@ -324,7 +266,7 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
       {/* No Results */}
       {!isLoading && filteredInfo.length === 0 && legalInfo.length > 0 && (
         <div className="text-center py-12">
-          <p className="text-slate-600">No results found for "{searchTerm}"</p>
+          <p className="text-slate-600">No results found for &quot;{searchTerm}&quot;</p>
           <Button
             variant="outline"
             size="sm"
@@ -350,8 +292,6 @@ export default function ComprehensiveLegalTable({ userAddress, pdfUrl, leaseCont
               </div>
             </div>
           )}
-        </>
-      )}
     </div>
   );
 }
