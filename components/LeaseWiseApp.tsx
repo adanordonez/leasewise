@@ -73,6 +73,43 @@ interface AnalysisResult {
       noticePeriod?: number;
     };
   };
+
+  detailedSummary?: {
+    tenant_names?: string[];
+    apartment_unit?: string;
+    administrative_fee?: number;
+    rent_concession?: number;
+    late_fee_day?: number;
+    late_fee_amount?: number;
+    late_fee_formula?: string;
+    returned_payment_fee?: number;
+    lease_renewal_type?: string;
+    move_out_notice_days?: number;
+    move_out_notice_consequence?: string;
+    insurance_required?: boolean;
+    insurance_min_coverage?: number;
+    insurance_violation_fee?: number;
+    utilities?: {
+      resident_responsibility?: string[];
+      owner_allocated?: string[];
+      owner_flat_rate?: string[];
+    };
+    utility_admin_fee?: number;
+    utility_setup_fee?: number;
+    utility_processing_fee?: number;
+    early_termination?: {
+      notice_days?: number;
+      buyout_fee?: number;
+      buyout_formula?: string;
+      concession_repayment?: number;
+    };
+    smoking_policy?: string;
+    smoking_violation_fee?: number;
+    guest_policy?: string;
+    guest_limit_days?: number;
+    pet_policy?: string;
+    pet_fees_paid?: number;
+  };
   // ⚡ These can be null (loaded on-demand)
   redFlags: Array<{ issue: string; severity: string; explanation: string; source?: string; page_number?: number }> | null;
   rights: Array<{ right: string; law: string; source?: string; page_number?: number }> | null;
@@ -1358,6 +1395,334 @@ export default function LeaseWiseApp() {
             </div>
           </div>
         </div>
+
+        {/* Detailed Lease Summary Section - Category Cards */}
+        {analysisResult.detailedSummary && (() => {
+          const ds = analysisResult.detailedSummary;
+          
+          // Check what categories have content
+          const hasFinancialTerms = (
+            (ds.administrative_fee && ds.administrative_fee > 0) ||
+            (ds.rent_concession !== undefined && ds.rent_concession !== null) ||
+            ds.late_fee_formula ||
+            (ds.returned_payment_fee && ds.returned_payment_fee > 0)
+          );
+          
+          const hasPolicies = (
+            ds.smoking_policy ||
+            ds.guest_policy ||
+            ds.pet_policy ||
+            ds.insurance_required
+          );
+          
+          const hasUtilities = (
+            ds.utilities && (
+              (ds.utilities.resident_responsibility?.length ?? 0) > 0 ||
+              (ds.utilities.owner_allocated?.length ?? 0) > 0 ||
+              (ds.utilities.owner_flat_rate?.length ?? 0) > 0 ||
+              ds.utility_admin_fee ||
+              ds.utility_setup_fee ||
+              ds.utility_processing_fee
+            )
+          );
+          
+          const hasImportantTerms = (
+            (ds.tenant_names && ds.tenant_names.length > 0) ||
+            ds.apartment_unit ||
+            ds.lease_renewal_type ||
+            ds.move_out_notice_days
+          );
+          
+          const hasTermination = (
+            ds.early_termination && (
+              ds.early_termination.notice_days ||
+              ds.early_termination.buyout_fee !== undefined ||
+              ds.early_termination.concession_repayment !== undefined
+            )
+          );
+          
+          // Don't render section if no content
+          if (!hasFinancialTerms && !hasPolicies && !hasUtilities && !hasImportantTerms && !hasTermination) {
+            return null;
+          }
+          
+          return (
+            <div className="mb-8">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-slate-900">Key Lease Terms</h2>
+                <p className="text-slate-600 mt-1">Essential information from your lease agreement</p>
+              </div>
+              
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 divide-y divide-slate-200/60">
+                {/* Important Terms Section */}
+                {hasImportantTerms && (
+                  <div className="p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                        <HugeiconsIcon icon={DocumentValidationIcon} size={20} strokeWidth={1.5} className="text-slate-700" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-900">Important Terms</h3>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
+                      {ds.tenant_names && ds.tenant_names.length > 0 && (
+                        <div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">Lessees (Residents)</div>
+                          <div className="text-base text-slate-900">{ds.tenant_names.join(' and ')}</div>
+                        </div>
+                      )}
+                      
+                      {ds.apartment_unit && (
+                        <div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">Apartment</div>
+                          <div className="text-base font-semibold text-slate-900">{ds.apartment_unit}</div>
+                        </div>
+                      )}
+                      
+                      {ds.lease_renewal_type && (
+                        <div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">Lease Renewal</div>
+                          <div className="text-base text-slate-900">
+                            {ds.lease_renewal_type === 'automatic' ? 'Automatically renews' : 'Does not automatically renew'}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {ds.move_out_notice_days && (
+                        <div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">Move-Out Notice</div>
+                          <div className="text-base text-slate-900">
+                            At least {ds.move_out_notice_days} days written notice required
+                            {ds.move_out_notice_consequence && (
+                              <span className="block mt-1 text-sm text-slate-600">{ds.move_out_notice_consequence}</span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Financial Terms Section */}
+                {hasFinancialTerms && (
+                  <div className="p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                        <HugeiconsIcon icon={ChartHistogramIcon} size={20} strokeWidth={1.5} className="text-slate-700" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-900">Financial Terms</h3>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
+                      {ds.administrative_fee && ds.administrative_fee > 0 && (
+                        <div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">Administrative Fee</div>
+                          <div className="text-xl font-bold text-slate-900">${ds.administrative_fee.toLocaleString()}</div>
+                        </div>
+                      )}
+                      
+                      {ds.rent_concession !== undefined && ds.rent_concession !== null && (
+                        <div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">Rent Concession</div>
+                          <div className="text-xl font-bold text-slate-900">${ds.rent_concession.toLocaleString()}</div>
+                        </div>
+                      )}
+                      
+                      {ds.returned_payment_fee && ds.returned_payment_fee > 0 && (
+                        <div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">Returned Payment Fee</div>
+                          <div className="text-xl font-bold text-slate-900">${ds.returned_payment_fee.toLocaleString()}</div>
+                        </div>
+                      )}
+                      
+                      {ds.late_fee_formula && (
+                        <div className="md:col-span-2">
+                          <div className="text-sm font-medium text-slate-500 mb-1">Late Rent</div>
+                          <div className="text-base text-slate-900 leading-relaxed">
+                            {ds.late_fee_day && `If not paid by day ${ds.late_fee_day}, `}
+                            {ds.late_fee_formula}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Utilities Section */}
+                {hasUtilities && (
+                  <div className="p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                        <HugeiconsIcon icon={LinkSquare02Icon} size={20} strokeWidth={1.5} className="text-slate-700" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-900">Utilities</h3>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
+                      {ds.utilities?.resident_responsibility && ds.utilities.resident_responsibility.length > 0 && (
+                        <div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">Your Responsibility</div>
+                          <div className="text-base text-slate-900">{ds.utilities.resident_responsibility.join(', ')}</div>
+                        </div>
+                      )}
+                      
+                      {ds.utilities?.owner_allocated && ds.utilities.owner_allocated.length > 0 && (
+                        <div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">Owner-Provided (Allocated)</div>
+                          <div className="text-base text-slate-900">{ds.utilities.owner_allocated.join(', ')}</div>
+                        </div>
+                      )}
+                      
+                      {ds.utilities?.owner_flat_rate && ds.utilities.owner_flat_rate.length > 0 && (
+                        <div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">Owner-Provided (Flat Rate)</div>
+                          <div className="text-base text-slate-900">{ds.utilities.owner_flat_rate.join(', ')}</div>
+                        </div>
+                      )}
+                      
+                      {(ds.utility_admin_fee || ds.utility_setup_fee || ds.utility_processing_fee) && (
+                        <div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">Utility Fees</div>
+                          <div className="text-base text-slate-900 space-y-1">
+                            {ds.utility_admin_fee && (
+                              <div>Monthly admin: ${ds.utility_admin_fee.toLocaleString()}</div>
+                            )}
+                            {ds.utility_setup_fee && (
+                              <div>Setup fee: ${ds.utility_setup_fee.toLocaleString()}</div>
+                            )}
+                            {ds.utility_processing_fee && (
+                              <div>Processing fee: ${ds.utility_processing_fee.toLocaleString()}</div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Policies & Rules Section */}
+                {hasPolicies && (
+                  <div className="p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                        <HugeiconsIcon icon={AlertSquareIcon} size={20} strokeWidth={1.5} className="text-slate-700" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-900">Policies & Rules</h3>
+                    </div>
+                    
+                    <div className="space-y-5">
+                      {ds.smoking_policy && (
+                        <div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">Smoking</div>
+                          <div className="text-base text-slate-900">
+                            {ds.smoking_policy}
+                            {ds.smoking_violation_fee && (
+                              <span className="block mt-1 text-sm text-red-600 font-medium">
+                                Violation fee: ${ds.smoking_violation_fee.toLocaleString()}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {ds.guest_policy && (
+                        <div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">Guests</div>
+                          <div className="text-base text-slate-900">
+                            {ds.guest_policy}
+                            {ds.guest_limit_days && ` (max ${ds.guest_limit_days} days)`}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {ds.pet_policy && (
+                        <div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">Animals</div>
+                          <div className="text-base text-slate-900">
+                            {ds.pet_policy}
+                            {ds.pet_fees_paid !== undefined && (
+                              <span className="block mt-1 text-sm text-slate-600">
+                                {ds.pet_fees_paid > 0 
+                                  ? `Pet fees paid: $${ds.pet_fees_paid.toLocaleString()}`
+                                  : 'No pet fees paid at signing'
+                                }
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {ds.insurance_required && (
+                        <div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">Liability Insurance</div>
+                          <div className="text-base text-slate-900">
+                            Required
+                            {ds.insurance_min_coverage && (
+                              <span className="block text-sm text-slate-600">
+                                Min coverage: ${ds.insurance_min_coverage.toLocaleString()}
+                              </span>
+                            )}
+                            {ds.insurance_violation_fee && (
+                              <span className="block mt-1 text-sm text-red-600 font-medium">
+                                No proof fee: ${ds.insurance_violation_fee.toLocaleString()}/month
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Early Termination Section */}
+                {hasTermination && (
+                  <div className="p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                        <HugeiconsIcon icon={Calendar03Icon} size={20} strokeWidth={1.5} className="text-slate-700" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-900">Early Termination</h3>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      {ds.early_termination?.notice_days && (
+                        <div className="flex items-start gap-3">
+                          <HugeiconsIcon icon={CircleIcon} size={8} strokeWidth={2} className="text-slate-400 mt-2 flex-shrink-0" />
+                          <div className="text-base text-slate-900">
+                            Give at least {ds.early_termination.notice_days} days written notice
+                          </div>
+                        </div>
+                      )}
+                      
+                      {ds.early_termination?.buyout_fee !== undefined && (
+                        <div className="flex items-start gap-3">
+                          <HugeiconsIcon icon={CircleIcon} size={8} strokeWidth={2} className="text-slate-400 mt-2 flex-shrink-0" />
+                          <div className="text-base text-slate-900">
+                            Pay a buy-out fee of ${ds.early_termination.buyout_fee.toLocaleString()}
+                            {ds.early_termination.buyout_formula && (
+                              <span className="block text-sm text-slate-600 mt-1">
+                                ({ds.early_termination.buyout_formula})
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {ds.early_termination?.concession_repayment !== undefined && (
+                        <div className="flex items-start gap-3">
+                          <HugeiconsIcon icon={CircleIcon} size={8} strokeWidth={2} className="text-slate-400 mt-2 flex-shrink-0" />
+                          <div className="text-base text-slate-900">
+                            Repay concessions: ${ds.early_termination.concession_repayment.toLocaleString()}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Red Flags Section - On-Demand Loading ⚡ */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 mb-8">
