@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeLeaseStructured, generateActionableScenarios } from '@/lib/lease-analysis';
-import { extractBasicLeaseInfo } from '@/lib/lease-extraction';
+import { extractBasicLeaseInfo, extractDetailedSummary } from '@/lib/lease-extraction';
 import { getDownloadUrl } from '@vercel/blob';
 import { supabase } from '@/lib/supabase';
 import { extractTextWithPageNumbers, findPageNumber } from '@/lib/llamaparse-utils';
@@ -198,8 +198,13 @@ async function performAnalysis(request: NextRequest) {
     //   avgPageLength: Math.round(leaseText.length / pdfData.pages.length)
     // });
 
-    // Extract basic lease info first (for map data)
-    const basicInfo = await extractBasicLeaseInfo(leaseText, address);
+    // ⚡ PARALLEL EXTRACTION: Extract both basic AND detailed info at the same time
+  
+    const [basicInfo, detailedSummary] = await Promise.all([
+      extractBasicLeaseInfo(leaseText, address),      // Basic info (4 sec)
+      extractDetailedSummary(leaseText, address)       // Detailed summary (10 sec)
+    ]);
+   
     
     // ⚡ OPTIMIZED: Create RAG WITHOUT embeddings for initial load (much faster!)
     // Embeddings will be created on-demand when user clicks Red Flags/Rights/Chat
@@ -246,7 +251,7 @@ async function performAnalysis(request: NextRequest) {
       
       // console.log(`💾 Preparing to store ${chunksToStore.length} chunks (no embeddings yet - will create on-demand)...`);
       
-      // Prepare lease data object (basic info only - heavy analysis done on-demand)
+      // Prepare lease data object (basic info + detailed summary - heavy analysis done on-demand)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const leaseDataToInsert: any = {
         user_name: userName,
@@ -259,13 +264,13 @@ async function performAnalysis(request: NextRequest) {
         security_deposit: basicInfo.security_deposit,
         lease_start_date: basicInfo.lease_start_date,
         lease_end_date: basicInfo.lease_end_date,
-        notice_period_days: 30, // Default - to be analyzed on-demand
+        notice_period_days: detailedSummary.move_out_notice_days || 30,
         property_type: basicInfo.property_type,
         square_footage: basicInfo.square_footage,
         bedrooms: basicInfo.bedrooms,
         bathrooms: basicInfo.bathrooms,
         parking_spaces: 0, // Default - to be analyzed on-demand
-        pet_policy: 'Not specified', // Default - to be analyzed on-demand
+        pet_policy: detailedSummary.pet_policy || 'Not specified',
         utilities_included: basicInfo.utilities_included,
         amenities: basicInfo.amenities,
         landlord_name: basicInfo.landlord_name,
@@ -283,7 +288,11 @@ async function performAnalysis(request: NextRequest) {
         red_flags: null, // Will be populated by /api/analyze-red-flags
         tenant_rights: null, // Will be populated by /api/analyze-rights
         key_dates: [],
-        raw_analysis: basicInfo,
+   
+        raw_analysis: {
+          ...basicInfo,
+          detailed_summary: detailedSummary,
+        },
       };
       
       // Only add chunks if we have them (requires database migration)
@@ -358,7 +367,7 @@ async function performAnalysis(request: NextRequest) {
       console.warn('⚠️ Continuing analysis without database save...');
     }
 
-    // ⚡ OPTIMIZED RESPONSE: Return basic info immediately
+    // ⚡ OPTIMIZED RESPONSE: Return basic info + detailed summary immediately
     // Heavy analysis (red flags, rights) will be loaded on-demand
     const analysis = {
       summary: {
@@ -366,7 +375,7 @@ async function performAnalysis(request: NextRequest) {
         securityDeposit: `$${basicInfo.security_deposit.toLocaleString()}`,
         leaseStart: basicInfo.lease_start_date,
         leaseEnd: basicInfo.lease_end_date,
-        noticePeriod: '30 days', // Default - to be analyzed on-demand
+        noticePeriod: detailedSummary.move_out_notice_days ? `${detailedSummary.move_out_notice_days} days` : '30 days',
         buildingName: basicInfo.building_name,
         propertyAddress: basicInfo.property_address,
         propertyType: basicInfo.property_type,
@@ -375,12 +384,14 @@ async function performAnalysis(request: NextRequest) {
         squareFootage: basicInfo.square_footage,
         amenities: basicInfo.amenities,
         utilitiesIncluded: basicInfo.utilities_included,
-        petPolicy: 'Not specified', // Default - to be analyzed on-demand
+        petPolicy: detailedSummary.pet_policy || 'Not specified',
         landlordName: basicInfo.landlord_name,
         managementCompany: basicInfo.management_company,
         contactEmail: basicInfo.contact_email,
         contactPhone: basicInfo.contact_phone,
       },
+      // ✨ NEW: Detailed lease summary (loaded immediately)
+      detailedSummary: detailedSummary,
       // These are not ready yet - will be loaded on-demand
       redFlags: null,
       rights: null,

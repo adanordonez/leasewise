@@ -73,6 +73,43 @@ interface AnalysisResult {
       noticePeriod?: number;
     };
   };
+
+  detailedSummary?: {
+    tenant_names?: string[];
+    apartment_unit?: string;
+    administrative_fee?: number;
+    rent_concession?: number;
+    late_fee_day?: number;
+    late_fee_amount?: number;
+    late_fee_formula?: string;
+    returned_payment_fee?: number;
+    lease_renewal_type?: string;
+    move_out_notice_days?: number;
+    move_out_notice_consequence?: string;
+    insurance_required?: boolean;
+    insurance_min_coverage?: number;
+    insurance_violation_fee?: number;
+    utilities?: {
+      resident_responsibility?: string[];
+      owner_allocated?: string[];
+      owner_flat_rate?: string[];
+    };
+    utility_admin_fee?: number;
+    utility_setup_fee?: number;
+    utility_processing_fee?: number;
+    early_termination?: {
+      notice_days?: number;
+      buyout_fee?: number;
+      buyout_formula?: string;
+      concession_repayment?: number;
+    };
+    smoking_policy?: string;
+    smoking_violation_fee?: number;
+    guest_policy?: string;
+    guest_limit_days?: number;
+    pet_policy?: string;
+    pet_fees_paid?: number;
+  };
   // ⚡ These can be null (loaded on-demand)
   redFlags: Array<{ issue: string; severity: string; explanation: string; source?: string; page_number?: number }> | null;
   rights: Array<{ right: string; law: string; source?: string; page_number?: number }> | null;
@@ -1358,6 +1395,198 @@ export default function LeaseWiseApp() {
             </div>
           </div>
         </div>
+
+        {/* Detailed Lease Summary Section - ✨ NEW */}
+        {analysisResult.detailedSummary && (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 mb-8">
+            <div className="border-b border-slate-200/60 px-6 py-5">
+              <div className="flex items-center gap-3">
+                <HugeiconsIcon icon={DocumentValidationIcon} size={32} strokeWidth={1.5} className="text-indigo-600" />
+                <h2 className="text-xl font-semibold text-slate-900">Key Lease Terms</h2>
+              </div>
+            </div>
+            
+            <div className="px-6 py-6 space-y-5">
+              {/* Lessees/Residents */}
+              {analysisResult.detailedSummary.tenant_names && analysisResult.detailedSummary.tenant_names.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-900 mb-2">Lessees (Residents):</h3>
+                  <p className="text-slate-600">{analysisResult.detailedSummary.tenant_names.join(' and ')}</p>
+                </div>
+              )}
+
+              {/* Apartment Unit */}
+              {analysisResult.detailedSummary.apartment_unit && (
+                <div>
+                  <h3 className="font-semibold text-slate-900 mb-2">Apartment:</h3>
+                  <p className="text-slate-600">{analysisResult.detailedSummary.apartment_unit}</p>
+                </div>
+              )}
+
+              {/* Administrative Fee - Only show if > 0 */}
+              {analysisResult.detailedSummary.administrative_fee && analysisResult.detailedSummary.administrative_fee > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-900 mb-2">Administrative Fee:</h3>
+                  <p className="text-slate-600">${analysisResult.detailedSummary.administrative_fee.toLocaleString()}</p>
+                </div>
+              )}
+
+              {/* Rent Concession - Only show if exists */}
+              {analysisResult.detailedSummary.rent_concession !== undefined && analysisResult.detailedSummary.rent_concession !== null && (
+                <div>
+                  <h3 className="font-semibold text-slate-900 mb-2">Rent Concession:</h3>
+                  <p className="text-slate-600">${analysisResult.detailedSummary.rent_concession.toLocaleString()}</p>
+                </div>
+              )}
+
+              {/* Late Rent - Only show if formula exists */}
+              {analysisResult.detailedSummary.late_fee_formula && (
+                <div>
+                  <h3 className="font-semibold text-slate-900 mb-2">Late Rent:</h3>
+                  <p className="text-slate-600">
+                    {analysisResult.detailedSummary.late_fee_day && `If rent is not paid by the ${analysisResult.detailedSummary.late_fee_day}${analysisResult.detailedSummary.late_fee_day === 1 ? 'st' : analysisResult.detailedSummary.late_fee_day === 2 ? 'nd' : analysisResult.detailedSummary.late_fee_day === 3 ? 'rd' : 'th'} day of the month, a late fee is automatically added. `}
+                    {analysisResult.detailedSummary.late_fee_formula}
+                  </p>
+                </div>
+              )}
+
+              {/* Returned Payments - Only show if > 0 */}
+              {analysisResult.detailedSummary.returned_payment_fee && analysisResult.detailedSummary.returned_payment_fee > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-900 mb-2">Returned Payments:</h3>
+                  <p className="text-slate-600">There is a ${analysisResult.detailedSummary.returned_payment_fee.toLocaleString()} charge for each returned check or rejected electronic payment.</p>
+                </div>
+              )}
+
+              {/* Lease Renewal - Only show if specified */}
+              {analysisResult.detailedSummary.lease_renewal_type && (
+                <div>
+                  <h3 className="font-semibold text-slate-900 mb-2">Lease Renewal:</h3>
+                  <p className="text-slate-600">
+                    This lease {analysisResult.detailedSummary.lease_renewal_type === 'automatic' ? 'automatically renews' : 'does not automatically renew'}.
+                  </p>
+                </div>
+              )}
+
+              {/* Move-Out Notice - Only show if specified */}
+              {analysisResult.detailedSummary.move_out_notice_days && (
+                <div>
+                  <h3 className="font-semibold text-slate-900 mb-2">Move-Out Notice:</h3>
+                  <p className="text-slate-600">
+                    You must give the owner at least {analysisResult.detailedSummary.move_out_notice_days} days&apos; written notice before the lease end date.
+                    {analysisResult.detailedSummary.move_out_notice_consequence && ` ${analysisResult.detailedSummary.move_out_notice_consequence}`}
+                  </p>
+                </div>
+              )}
+
+              {/* Liability Insurance - Only show if required */}
+              {analysisResult.detailedSummary.insurance_required && (
+                <div>
+                  <h3 className="font-semibold text-slate-900 mb-2">Liability Insurance:</h3>
+                  <p className="text-slate-600">
+                    You are required to purchase and maintain a personal liability insurance policy
+                    {analysisResult.detailedSummary.insurance_min_coverage && ` with a minimum coverage of $${analysisResult.detailedSummary.insurance_min_coverage.toLocaleString()} per occurrence`}.
+                    {analysisResult.detailedSummary.insurance_violation_fee && ` If you fail to provide proof of insurance, you will be charged a $${analysisResult.detailedSummary.insurance_violation_fee.toLocaleString()} lease violation fee each month.`}
+                  </p>
+                </div>
+              )}
+
+              {/* Utilities - Only show if any utility info exists */}
+              {analysisResult.detailedSummary.utilities && (
+                ((analysisResult.detailedSummary.utilities.resident_responsibility?.length ?? 0) > 0 ||
+                 (analysisResult.detailedSummary.utilities.owner_allocated?.length ?? 0) > 0 ||
+                 (analysisResult.detailedSummary.utilities.owner_flat_rate?.length ?? 0) > 0 ||
+                 analysisResult.detailedSummary.utility_admin_fee ||
+                 analysisResult.detailedSummary.utility_setup_fee ||
+                 analysisResult.detailedSummary.utility_processing_fee) && (
+                  <div>
+                    <h3 className="font-semibold text-slate-900 mb-2">Utilities:</h3>
+                    <div className="space-y-2 text-slate-600">
+                      {analysisResult.detailedSummary.utilities.resident_responsibility && analysisResult.detailedSummary.utilities.resident_responsibility.length > 0 && (
+                        <p><span className="font-medium">Resident Responsibility:</span> {analysisResult.detailedSummary.utilities.resident_responsibility.join(', ')}</p>
+                      )}
+                      {analysisResult.detailedSummary.utilities.owner_allocated && analysisResult.detailedSummary.utilities.owner_allocated.length > 0 && (
+                        <p><span className="font-medium">Owner-Provided (Allocated):</span> {analysisResult.detailedSummary.utilities.owner_allocated.join(', ')}</p>
+                      )}
+                      {analysisResult.detailedSummary.utilities.owner_flat_rate && analysisResult.detailedSummary.utilities.owner_flat_rate.length > 0 && (
+                        <p><span className="font-medium">Owner-Provided (Flat Rate):</span> {analysisResult.detailedSummary.utilities.owner_flat_rate.join(', ')}</p>
+                      )}
+                      {(analysisResult.detailedSummary.utility_admin_fee || analysisResult.detailedSummary.utility_setup_fee || analysisResult.detailedSummary.utility_processing_fee) && (
+                        <p><span className="font-medium">Utility Fees:</span> 
+                          {analysisResult.detailedSummary.utility_admin_fee && ` Monthly admin charge: $${analysisResult.detailedSummary.utility_admin_fee.toLocaleString()}.`}
+                          {analysisResult.detailedSummary.utility_setup_fee && ` One-time setup fee: $${analysisResult.detailedSummary.utility_setup_fee.toLocaleString()}.`}
+                          {analysisResult.detailedSummary.utility_processing_fee && ` One-time processing fee: $${analysisResult.detailedSummary.utility_processing_fee.toLocaleString()}.`}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )
+              )}
+
+              {/* Early Termination - Only show if any early termination info exists */}
+              {analysisResult.detailedSummary.early_termination && (
+                (analysisResult.detailedSummary.early_termination.notice_days ||
+                 analysisResult.detailedSummary.early_termination.buyout_fee !== undefined ||
+                 analysisResult.detailedSummary.early_termination.concession_repayment !== undefined) && (
+                  <div>
+                    <h3 className="font-semibold text-slate-900 mb-2">Early Termination (Buy-Out):</h3>
+                    <div className="space-y-1 text-slate-600">
+                      {analysisResult.detailedSummary.early_termination.notice_days && (
+                        <p>• Give at least {analysisResult.detailedSummary.early_termination.notice_days} days&apos; written notice</p>
+                      )}
+                      {analysisResult.detailedSummary.early_termination.buyout_fee !== undefined && (
+                        <p>• Pay a Buy-Out Fee of ${analysisResult.detailedSummary.early_termination.buyout_fee.toLocaleString()}
+                          {analysisResult.detailedSummary.early_termination.buyout_formula && ` (${analysisResult.detailedSummary.early_termination.buyout_formula})`}
+                        </p>
+                      )}
+                      {analysisResult.detailedSummary.early_termination.concession_repayment !== undefined && (
+                        <p>• Repay any rent concessions received (${analysisResult.detailedSummary.early_termination.concession_repayment.toLocaleString()})</p>
+                      )}
+                    </div>
+                  </div>
+                )
+              )}
+
+              {/* Smoking Policy - Only show if exists */}
+              {analysisResult.detailedSummary.smoking_policy && (
+                <div>
+                  <h3 className="font-semibold text-slate-900 mb-2">Smoking:</h3>
+                  <p className="text-slate-600">
+                    {analysisResult.detailedSummary.smoking_policy}
+                    {analysisResult.detailedSummary.smoking_violation_fee && ` A violation will result in a $${analysisResult.detailedSummary.smoking_violation_fee.toLocaleString()} non-compliance fee for each offense.`}
+                  </p>
+                </div>
+              )}
+
+              {/* Guest Policy - Only show if exists */}
+              {analysisResult.detailedSummary.guest_policy && (
+                <div>
+                  <h3 className="font-semibold text-slate-900 mb-2">Guests:</h3>
+                  <p className="text-slate-600">
+                    {analysisResult.detailedSummary.guest_policy}
+                    {analysisResult.detailedSummary.guest_limit_days && ` (max ${analysisResult.detailedSummary.guest_limit_days} days)`}
+                  </p>
+                </div>
+              )}
+
+              {/* Pet/Animal Policy - Only show if exists */}
+              {analysisResult.detailedSummary.pet_policy && (
+                <div>
+                  <h3 className="font-semibold text-slate-900 mb-2">Animals:</h3>
+                  <p className="text-slate-600">
+                    {analysisResult.detailedSummary.pet_policy}
+                    {analysisResult.detailedSummary.pet_fees_paid !== undefined && analysisResult.detailedSummary.pet_fees_paid > 0 
+                      ? ` Pet fees paid: $${analysisResult.detailedSummary.pet_fees_paid.toLocaleString()}.`
+                      : analysisResult.detailedSummary.pet_fees_paid === 0 
+                        ? ' No pet fees were paid at signing.'
+                        : ''
+                    }
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Red Flags Section - On-Demand Loading ⚡ */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 mb-8">
