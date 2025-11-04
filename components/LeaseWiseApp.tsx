@@ -387,17 +387,55 @@ export default function LeaseWiseApp() {
       const fileName = `${timestamp}-${uploadedFile.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
       const filePath = `leases/${fileName}`;
 
-      // Upload file to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('lease-documents')
-        .upload(filePath, uploadedFile, {
-          contentType: uploadedFile.type,
-          upsert: false
-        });
+      // Upload file to Supabase Storage with retry logic
+      let uploadData;
+      let uploadError;
+      const maxRetries = 3;
+      
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        const result = await supabase.storage
+          .from('lease-documents')
+          .upload(filePath, uploadedFile, {
+            contentType: uploadedFile.type,
+            upsert: false
+          });
+        
+        uploadData = result.data;
+        uploadError = result.error;
+        
+        if (!uploadError) {
+          break;
+        }
+        
+        // Don't retry on certain errors
+        if (uploadError.message.includes('row-level security') || 
+            uploadError.message.includes('RLS') ||
+            uploadError.message.includes('size') ||
+            uploadError.message.includes('large') ||
+            uploadError.message.includes('quota')) {
+          break;
+        }
+        
+        // Wait before retry (exponential backoff)
+        if (attempt < maxRetries) {
+          const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+      }
 
       if (uploadError) {
-        console.error('Supabase upload error:', uploadError);
-        throw new Error(`Failed to upload file to Supabase: ${uploadError.message}`);
+        // Provide specific error messages based on error type
+        if (uploadError.message.includes('row-level security') || uploadError.message.includes('RLS')) {
+          throw new Error('Storage access denied. Please check Supabase storage policies.');
+        } else if (uploadError.message.includes('size') || uploadError.message.includes('large')) {
+          throw new Error(`File too large (${(uploadedFile.size / 1024 / 1024).toFixed(2)} MB). Maximum size is 50MB.`);
+        } else if (uploadError.message.includes('quota') || uploadError.message.includes('limit')) {
+          throw new Error('Storage quota exceeded. Please try upgrading your Supabase plan or contact support.');
+        } else if ((uploadError as { statusCode?: number }).statusCode === 500) {
+          throw new Error(`Storage service error after ${maxRetries} attempts. File size: ${(uploadedFile.size / 1024 / 1024).toFixed(2)} MB. Please try again later or try a smaller file.`);
+        }
+        
+        throw new Error(`Failed to upload file to Supabase after ${maxRetries} attempts: ${uploadError.message}`);
       }
 
       setAnalysisProgress(20);

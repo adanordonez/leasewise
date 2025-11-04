@@ -3,7 +3,19 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: false, // Don't persist sessions in serverless
+  },
+  db: {
+    schema: 'public',
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'leasewise-app',
+    },
+  },
+})
 
 // Database types
 export interface LeaseData {
@@ -51,7 +63,7 @@ export interface LeaseData {
     date: string
     description: string
   }>
-  raw_analysis: any
+  raw_analysis: unknown
 }
 
 export interface PDFUpload {
