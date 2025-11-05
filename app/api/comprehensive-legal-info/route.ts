@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { searchLegalInfoWithGoogleSearch } from '@/lib/perplexity-legal-search';
+import { searchLegalInfoWithPerplexity } from '@/lib/perplexity-legal-search-real';
 import { createLeaseRAG } from '@/lib/rag-system';
 import { analyzeLawApplications } from '@/lib/lease-law-application';
 import { extractTextWithPageNumbers } from '@/lib/llamaparse-utils';
@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
     // console.log(`📄 Lease context:`, leaseContext);
     // console.log(`📄 PDF URL:`, pdfUrl ? 'Provided' : 'Not provided');
     
-    // Use Google search URLs for statutes (more reliable than Justia)
-    const result = await searchLegalInfoWithGoogleSearch(userAddress, leaseContext, locale);
+    // Use Perplexity to find real legal sources
+    const result = await searchLegalInfoWithPerplexity(userAddress, leaseContext, locale);
     
     // console.log(`✅ Got ${result.legalInfo.length} legal categories with Google search URLs`);
     // console.log(`📊 Search stats: ${result.searchMetadata.totalSources} total sources`);
