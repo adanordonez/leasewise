@@ -27,7 +27,7 @@ export default function Footer({ showDisclaimer = false }: FooterProps) {
           {/* Logo and Navigation */}
           <div className="flex flex-col items-center gap-4">
             <a href="/" className="hover:opacity-80 transition-opacity">
-              <span className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'var(--font-comfortaa)' }}>LeaseWise</span>
+              <span className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'var(--font-comfortaa)' }}>LeaseChat</span>
             </a>
             
             <div className="flex flex-wrap items-center justify-center gap-8">

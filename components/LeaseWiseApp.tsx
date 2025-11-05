@@ -603,7 +603,7 @@ export default function LeaseWiseApp() {
                 onClick={() => setCurrentPage('landing')}
                 className="hover:opacity-80 transition-opacity"
               >
-              <span className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'var(--font-comfortaa)' }}>LeaseWise</span>
+              <span className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'var(--font-comfortaa)' }}>LeaseChat</span>
             </button>
             
             <div className="hidden md:flex items-center gap-2">

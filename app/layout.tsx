@@ -12,7 +12,7 @@ const comfortaa = Comfortaa({
 });
 
 export const metadata: Metadata = {
-  title: "LeaseWise - AI Lease Analysis | Know Your Rights",
+  title: "LeaseChat - AI Lease Analysis | Know Your Rights",
   description: "Upload your lease PDF and get instant AI analysis of terms, rights, and red flags. Know your lease, know your rights. Powered by University of Chicago Law School AI Lab.",
   keywords: [
     "lease analysis", 
@@ -30,22 +30,22 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "University of Chicago Law School AI Lab" }],
   creator: "University of Chicago Law School AI Lab",
-  publisher: "LeaseWise",
-  applicationName: "LeaseWise",
+  publisher: "LeaseChat",
+  applicationName: "LeaseChat",
   category: "Legal Technology",
   
   // Open Graph tags for social media sharing
   openGraph: {
-    title: "LeaseWise - AI Lease Analysis | Know Your Rights",
+    title: "LeaseChat - AI Lease Analysis | Know Your Rights",
     description: "Upload your lease PDF and get instant AI analysis of terms, rights, and red flags. Know your lease, know your rights. Powered by University of Chicago Law School AI Lab.",
-    url: "https://getleasewise.com",
-    siteName: "LeaseWise",
+    url: "https://getleasechat.com ",
+    siteName: "LeaseChat",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "LeaseWise - AI Lease Analysis Platform showing lease document analysis interface",
+        alt: "LeaseChat - AI Lease Analysis Platform showing lease document analysis interface",
         type: "image/png",
       },
     ],
@@ -57,12 +57,12 @@ export const metadata: Metadata = {
   // Twitter Card tags
   twitter: {
     card: "summary_large_image",
-    title: "LeaseWise - AI Lease Analysis | Know Your Rights",
+    title: "LeaseChat - AI Lease Analysis | Know Your Rights",
     description: "Upload your lease PDF and get instant AI analysis of terms, rights, and red flags. Know your lease, know your rights.",
     images: ["/og-image.png"],
     creator: "@UChicagoLaw",
-    site: "@LeaseWiseApp",
-    imageAlt: "LeaseWise - AI Lease Analysis Platform showing lease document analysis interface",
+    site: "@LeaseChatApp",
+    imageAlt: "LeaseChat - AI Lease Analysis Platform showing lease document analysis interface",
   },
   
   // Additional meta tags for SEO
@@ -84,16 +84,16 @@ export const metadata: Metadata = {
     'og:image:width': '1200',
     'og:image:height': '630',
     'og:image:type': 'image/png',
-    'og:image:secure_url': 'https://getleasewise.com/og-image.png',
+    'og:image:secure_url': 'https://getleasechat.com/og-image.png',
     'og:updated_time': new Date().toISOString(),
     
     // Twitter additional tags
-    'twitter:image:alt': 'LeaseWise - AI Lease Analysis Platform showing lease document analysis interface',
-    'twitter:site': '@LeaseWiseApp',
-    'twitter:domain': 'getleasewise.com',
-    'twitter:app:name:iphone': 'LeaseWise',
-    'twitter:app:name:ipad': 'LeaseWise',
-    'twitter:app:name:googleplay': 'LeaseWise',
+    'twitter:image:alt': 'LeaseChat - AI Lease Analysis Platform showing lease document analysis interface',
+    'twitter:site': '@LeaseChatApp',
+    'twitter:domain': 'getleasechat.com',
+    'twitter:app:name:iphone': 'LeaseChat',
+    'twitter:app:name:ipad': 'LeaseChat',
+    'twitter:app:name:googleplay': 'LeaseChat',
     
     // Additional SEO tags
     'theme-color': '#8b5cf6',
@@ -101,8 +101,8 @@ export const metadata: Metadata = {
     'msapplication-config': '/browserconfig.xml',
     
     // App-specific tags
-    'application-name': 'LeaseWise',
-    'apple-mobile-web-app-title': 'LeaseWise',
+    'application-name': 'LeaseChat',
+    'apple-mobile-web-app-title': 'LeaseChat',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'default',
     

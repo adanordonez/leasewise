@@ -4,10 +4,10 @@ export default function Home() {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "LeaseWise",
-    "alternateName": "LeaseWise AI Lease Analysis",
+    "name": "LeaseChat",
+    "alternateName": "LeaseChat AI Lease Analysis",
     "description": "Upload your lease PDF and get instant AI analysis of terms, rights, and red flags. Know your lease, know your rights.",
-    "url": "https://getleasewise.com",
+    "url": "https://getleasechat.com",
     "applicationCategory": "LegalTechApplication",
     "operatingSystem": "Web Browser",
     "offers": {
@@ -23,8 +23,8 @@ export default function Home() {
     },
     "publisher": {
       "@type": "Organization",
-      "name": "LeaseWise",
-      "url": "https://getleasewise.com"
+      "name": "LeaseChat",
+      "url": "https://getleasechat.com"
     },
     "featureList": [
       "AI-powered lease analysis",

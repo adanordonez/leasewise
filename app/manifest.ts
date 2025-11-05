@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'LeaseWise - AI Lease Analysis',
-    short_name: 'LeaseWise',
+    name: 'LeaseChat - AI Lease Analysis',
+    short_name: 'LeaseChat',
     description: 'Upload your lease PDF and get instant AI analysis of terms, rights, and red flags. Know your lease, know your rights.',
     start_url: '/',
     display: 'standalone',

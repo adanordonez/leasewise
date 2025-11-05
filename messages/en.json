@@ -1,6 +1,6 @@
 {
   "Nav": {
-    "brand": "LeaseWise",
+    "brand": "LeaseChat",
     "getStarted": "Get Started",
     "home": "Home",
     "analyze": "Analyze",
@@ -47,10 +47,10 @@
     }
   },
   "Disclaimer": {
-    "text": "This is a beta product. It uses AI and may provide wrong information. Anything you upload will be shared with ChatGPT. LeaseWise provides legal information, not legal advice. Using LeaseWise does not create an attorney-client relationship. LeaseWise is not your attorney."
+    "text": "This is a beta product. It uses AI and may provide wrong information. Anything you upload will be shared with ChatGPT. LeaseChat provides legal information, not legal advice. Using LeaseChat does not create an attorney-client relationship. LeaseChat is not your attorney."
   },
   "Footer": {
-    "copyright": "© 2025 LeaseWise. All rights reserved.",
+    "copyright": "© 2025 LeaseChat. All rights reserved.",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service"
   },
