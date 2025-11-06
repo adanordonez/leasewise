@@ -45,11 +45,13 @@ import PropertyStreetView from '@/components/PropertyStreetView';
 import LanguageToggle from '@/components/LanguageToggle';
 import LeaseChat from '@/components/LeaseChat';
 import LegalLetters from '@/components/LegalLetters';
+import AddressOnlyResults from '@/components/AddressOnlyResults';
 import { exportLeaseReportHTML } from '@/lib/export-pdf-html';
 import Image from 'next/image';
 import { BlurReveal } from '@/components/BlurReveal';
 
-type Page = 'landing' | 'upload' | 'results';
+type Page = 'landing' | 'upload' | 'results' | 'address-only-results';
+type AnalysisMode = 'address-only' | 'full-analysis';
 
 interface AnalysisResult {
   summary: { 
@@ -137,6 +139,7 @@ interface Scenarios {
 export default function LeaseWiseApp() {
   const t = useTranslations();
   const [currentPage, setCurrentPage] = useState<Page>('landing');
+  const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('full-analysis');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [address, setAddress] = useState('');
   const [userName, setUserName] = useState('');
@@ -583,6 +586,27 @@ export default function LeaseWiseApp() {
     }
   };
 
+  const handleAddressOnlyAnalysis = () => {
+    if (!address || !userName || !userEmail) {
+      setError('Please fill in all required fields: name, email, and address');
+      return;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(userEmail)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+    
+    setError(null);
+    setCurrentPage('address-only-results');
+  };
+
+  const handleUpgradeToFullAnalysis = () => {
+    setAnalysisMode('full-analysis');
+    setCurrentPage('upload');
+  };
+
     return (
       <div className="min-h-screen gradient-bg-modern">
       {/* Analysis Loading Modal - Always rendered */}
@@ -1005,6 +1029,79 @@ export default function LeaseWiseApp() {
             </p>
           </div>
 
+          {/* Mode Selection */}
+          <div className="mb-8">
+            <div className="grid md:grid-cols-2 gap-4">
+              <button
+                onClick={() => setAnalysisMode('full-analysis')}
+                className={`relative p-6 rounded-xl border-2 transition-all duration-200 text-left ${
+                  analysisMode === 'full-analysis'
+                    ? 'border-purple-500 bg-purple-50 shadow-lg'
+                    : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-md'
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <div className={`flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center ${
+                    analysisMode === 'full-analysis' ? 'bg-purple-100' : 'bg-slate-100'
+                  }`}>
+                    <HugeiconsIcon icon={DocumentAttachmentIcon} size={24} strokeWidth={1.5} className={
+                      analysisMode === 'full-analysis' ? 'text-purple-600' : 'text-slate-600'
+                    } />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className={`text-lg font-semibold mb-2 ${
+                      analysisMode === 'full-analysis' ? 'text-purple-900' : 'text-slate-900'
+                    }`}>
+                      Analyze My Lease
+                    </h3>
+                    <p className={`text-sm ${
+                      analysisMode === 'full-analysis' ? 'text-purple-700' : 'text-slate-600'
+                    }`}>
+                      Full analysis with red flags, AI chat, and personalized insights
+                    </p>
+                  </div>
+                  {analysisMode === 'full-analysis' && (
+                    <HugeiconsIcon icon={CheckmarkCircle01Icon} size={24} strokeWidth={2} className="text-purple-600 flex-shrink-0" />
+                  )}
+                </div>
+              </button>
+
+              <button
+                onClick={() => setAnalysisMode('address-only')}
+                className={`relative p-6 rounded-xl border-2 transition-all duration-200 text-left ${
+                  analysisMode === 'address-only'
+                    ? 'border-purple-500 bg-purple-50 shadow-lg'
+                    : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-md'
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <div className={`flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center ${
+                    analysisMode === 'address-only' ? 'bg-purple-100' : 'bg-slate-100'
+                  }`}>
+                    <HugeiconsIcon icon={Location03Icon} size={24} strokeWidth={1.5} className={
+                      analysisMode === 'address-only' ? 'text-purple-600' : 'text-slate-600'
+                    } />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className={`text-lg font-semibold mb-2 ${
+                      analysisMode === 'address-only' ? 'text-purple-900' : 'text-slate-900'
+                    }`}>
+                      Know My Rights
+                    </h3>
+                    <p className={`text-sm ${
+                      analysisMode === 'address-only' ? 'text-purple-700' : 'text-slate-600'
+                    }`}>
+                      Quick lookup of tenant rights for your area (no lease needed)
+                    </p>
+                  </div>
+                  {analysisMode === 'address-only' && (
+                    <HugeiconsIcon icon={CheckmarkCircle01Icon} size={24} strokeWidth={2} className="text-purple-600 flex-shrink-0" />
+                  )}
+                </div>
+              </button>
+            </div>
+          </div>
+
           {error && (
             <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
               <HugeiconsIcon icon={AlertCircleIcon} size={20} strokeWidth={1.5} className="text-red-600 flex-shrink-0 mt-0.5" />
@@ -1018,7 +1115,8 @@ export default function LeaseWiseApp() {
           )}
 
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-8 lg:p-12 space-y-10">
-            {/* File Upload Section */}
+            {/* File Upload Section - Only for Full Analysis */}
+            {analysisMode === 'full-analysis' && (
             <div className="space-y-4">
               <div className="flex items-center gap-3 mb-4">
                 <HugeiconsIcon icon={DocumentAttachmentIcon} size={28} strokeWidth={1.5} className="text-slate-700" />
@@ -1089,6 +1187,7 @@ export default function LeaseWiseApp() {
                 </div>
               )}
             </div>
+            )}
 
             {/* User Information Section */}
             <div className="space-y-4">
@@ -1150,8 +1249,12 @@ export default function LeaseWiseApp() {
             {/* Analyze Button */}
             <div className="pt-4">
               <button
-                onClick={handleAnalyze}
-                disabled={!address || !uploadedFile || !userName || !userEmail || isAnalyzing || uploadProgress < 100}
+                onClick={analysisMode === 'address-only' ? handleAddressOnlyAnalysis : handleAnalyze}
+                disabled={
+                  analysisMode === 'address-only'
+                    ? !address || !userName || !userEmail || isAnalyzing
+                    : !address || !uploadedFile || !userName || !userEmail || isAnalyzing || uploadProgress < 100
+                }
                 className="w-full inline-flex h-12 px-6 py-3 justify-center items-center gap-2 rounded-[10px] bg-[#6039B3] text-white font-semibold text-lg hover:bg-[#5030A0] active:bg-[#4829A0] disabled:bg-slate-300 disabled:cursor-not-allowed transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] disabled:shadow-none transform hover:-translate-y-0.5 disabled:transform-none"
               >
                 {isAnalyzing ? (
@@ -1160,7 +1263,7 @@ export default function LeaseWiseApp() {
                     {t('AnalyzePage.analyzing')}
                   </>
                 ) : (
-                  t('AnalyzePage.cta')
+                  analysisMode === 'address-only' ? 'View My Rights' : t('AnalyzePage.cta')
                 )}
               </button>
               
@@ -2094,6 +2197,22 @@ export default function LeaseWiseApp() {
       <Footer showDisclaimer />
         </>
         )}
+
+      {currentPage === 'address-only-results' && (
+        <AddressOnlyResults
+          userAddress={address}
+          userName={userName}
+          userEmail={userEmail}
+          onBackToHome={() => {
+            setCurrentPage('landing');
+            setAddress('');
+            setUserName('');
+            setUserEmail('');
+            setAnalysisMode('full-analysis');
+          }}
+          onUpgradeToFull={handleUpgradeToFullAnalysis}
+        />
+      )}
     </div>
   );
 }
