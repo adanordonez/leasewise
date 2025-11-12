@@ -21,6 +21,7 @@ export default function LeaseChat({ leaseDataId, userEmail, pdfUrl, analysisResu
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false); // For Perplexity search animation
   const [suggestedQuestions, setSuggestedQuestions] = useState<SuggestedQuestion[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -83,6 +84,14 @@ export default function LeaseChat({ leaseDataId, userEmail, pdfUrl, analysisResu
     setInput('');
     setIsLoading(true);
     
+    // Show search animation only after 15 seconds (means very complex Perplexity query)
+    // Lease-only queries finish in ~2s
+    // Simple hybrid queries take ~5-8s
+    // Only extremely complex queries with web search take 15+ seconds
+    const searchTimer = setTimeout(() => {
+      setIsSearching(true);
+    }, 15000);
+    
     try {
       const response = await fetch('/api/chat-with-lease', {
         method: 'POST',
@@ -110,6 +119,8 @@ export default function LeaseChat({ leaseDataId, userEmail, pdfUrl, analysisResu
       
       setMessages(prev => [...prev, assistantMessage]);
       
+      clearTimeout(searchTimer);
+      
     } catch (error) {
       console.error('Error sending message:', error);
       const errorMessage: ChatMessage = {
@@ -118,8 +129,10 @@ export default function LeaseChat({ leaseDataId, userEmail, pdfUrl, analysisResu
         timestamp: new Date().toISOString(),
       };
       setMessages(prev => [...prev, errorMessage]);
+      clearTimeout(searchTimer);
     } finally {
       setIsLoading(false);
+      setIsSearching(false);
     }
   };
   
@@ -194,19 +207,59 @@ export default function LeaseChat({ leaseDataId, userEmail, pdfUrl, analysisResu
               <div className="space-y-2">
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
                 
-                {/* Sources - Inline */}
+                {/* Sources - Inline with clear attribution */}
                 {message.role === 'assistant' && message.sources && message.sources.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 items-center pt-1">
-                    <span className="text-xs font-medium text-slate-500">{t('LeaseChat.messages.sources')}</span>
-                    {message.sources.map((source, sourceIdx) => (
-                      <SourceCitation
-                        key={sourceIdx}
-                        sourceText={source.text}
-                        pageNumber={source.pageNumber}
-                        pdfUrl={pdfUrl}
-                        label={`${t('LeaseChat.messages.page')} ${source.pageNumber}`}
-                      />
-                    ))}
+                  <div className="space-y-2 pt-2">
+                    {/* Lease Sources */}
+                    {message.sources.some(s => s.type === 'lease') && (
+                      <div className="flex flex-wrap gap-1.5 items-center">
+                        <div className="flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
+                          <span className="text-xs font-medium text-slate-600">From Your Lease:</span>
+                        </div>
+                        {message.sources
+                          .filter(s => s.type === 'lease')
+                          .map((source, sourceIdx) => (
+                            <SourceCitation
+                              key={sourceIdx}
+                              sourceText={source.text}
+                              pageNumber={source.pageNumber || 0}
+                              pdfUrl={pdfUrl}
+                              label={`Page ${source.pageNumber}`}
+                            />
+                          ))}
+                      </div>
+                    )}
+                    
+                    {/* Web Sources */}
+                    {message.sources.some(s => s.type === 'web') && (
+                      <div className="flex flex-wrap gap-1.5 items-start">
+                        <div className="flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                          <span className="text-xs font-medium text-slate-600">From Web Search:</span>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {message.sources
+                            .filter(s => s.type === 'web')
+                            .map((source, sourceIdx) => (
+                              <a
+                                key={sourceIdx}
+                                href={source.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 hover:bg-blue-100 
+                                         text-blue-700 rounded text-xs transition-colors border border-blue-200"
+                              >
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                                Source {sourceIdx + 1}
+                              </a>
+                            ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -221,9 +274,27 @@ export default function LeaseChat({ leaseDataId, userEmail, pdfUrl, analysisResu
         {isLoading && (
           <div className="flex justify-start">
             <div className="max-w-[80%] rounded-2xl px-4 py-3 bg-slate-100">
-              <div className="flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin text-slate-600" />
-                <p className="text-sm text-slate-600">{t('LeaseChat.messages.thinking')}</p>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-slate-600" />
+                  <p className="text-sm text-slate-600">
+                    {t('LeaseChat.messages.thinking')}
+                  </p>
+                </div>
+                
+                {/* Show search animation only when Perplexity is being used (takes longer) */}
+                {isSearching && (
+                  <div className="flex items-center gap-2 mt-1 pl-6">
+                    <div className="flex gap-1">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    </div>
+                    <p className="text-xs text-blue-600 font-medium">
+                      Searching web for additional context...
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
