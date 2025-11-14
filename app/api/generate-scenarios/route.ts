@@ -9,11 +9,20 @@ const openai = new OpenAI({
 
 export const maxDuration = 120; // 2 minutes for scenarios generation
 
+// Type for stored chunks
+interface StoredChunk {
+  text: string;
+  pageNumber: number;
+  embedding?: number[];
+  chunkIndex: number;
+  startIndex: number;
+  endIndex: number;
+}
+
 // Helper function to get comprehensive context for a scenario using multiple RAG queries
 async function getScenarioContext(
-  rag: any,
-  question: string,
-  scenarioType: string
+  rag: LeaseRAGSystem,
+  question: string
 ): Promise<Array<{ text: string; pageNumber: number }>> {
   const allChunks: Array<{ text: string; pageNumber: number }> = [];
   const seenTexts = new Set<string>();
@@ -271,7 +280,7 @@ export async function POST(request: NextRequest) {
     // Rebuild RAG from stored chunks
     // console.log(`🔄 Rebuilding RAG system from ${leaseData.chunks.length} stored chunks...`);
     const rag = new LeaseRAGSystem(true);
-    rag['chunks'] = leaseData.chunks.map((chunk: any) => ({
+    rag['chunks'] = leaseData.chunks.map((chunk: StoredChunk) => ({
       text: chunk.text,
       pageNumber: chunk.pageNumber,
       embedding: chunk.embedding || [],
@@ -279,6 +288,45 @@ export async function POST(request: NextRequest) {
       startIndex: chunk.startIndex || 0,
       endIndex: chunk.endIndex || 0
     }));
+    
+    // ⚡ Check if embeddings exist - if not, create them now!
+    const hasEmbeddings = leaseData.chunks.some((c: StoredChunk) => 
+      c.embedding && c.embedding.length > 0
+    );
+    
+    if (!hasEmbeddings) {
+      // console.log('⚡ No embeddings found - creating them now for scenarios (this will take 10-15s)...');
+      
+      // Import the embedding creation function
+      const { createEmbeddingsBatch } = await import('@/lib/rag-embeddings');
+      
+      // Create embeddings for all chunks
+      const chunksWithEmbeddings = await createEmbeddingsBatch(rag.getAllChunks());
+      
+      // Update the RAG system with new embeddings
+      // @ts-expect-error - accessing private property
+      rag.chunks = chunksWithEmbeddings;
+      
+      // Save embeddings to database for future use
+      const updatedChunks = chunksWithEmbeddings.map(chunk => ({
+        text: chunk.text,
+        pageNumber: chunk.pageNumber,
+        embedding: chunk.embedding,
+        chunkIndex: chunk.chunkIndex,
+        startIndex: chunk.startIndex,
+        endIndex: chunk.endIndex
+      }));
+      
+      await supabase
+        .from('lease_data')
+        .update({ chunks: updatedChunks })
+        .eq('id', leaseDataId);
+      
+      // console.log('✅ Embeddings created and saved to database');
+    } else {
+      // console.log('✅ Embeddings already exist - reusing them');
+    }
+    
     // console.log('✅ RAG system rebuilt successfully');
     
     // Generate scenarios
@@ -303,7 +351,7 @@ export async function POST(request: NextRequest) {
       try {
         // Gather context with timeout protection
         const allRelevantChunks = await Promise.race([
-          getScenarioContext(rag, question, question),
+          getScenarioContext(rag, question),
           new Promise<never>((_, reject) => 
             setTimeout(() => reject(new Error('Context gathering timeout')), 15000)
           )

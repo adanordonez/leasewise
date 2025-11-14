@@ -2212,7 +2212,7 @@ export default function LeaseWiseApp() {
           }}
           onUpgradeToFull={handleUpgradeToFullAnalysis}
         />
-      )}
+        )}
     </div>
   );
 }
