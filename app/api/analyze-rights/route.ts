@@ -8,8 +8,8 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Set timeout for this analysis (1 minute should be enough)
-export const maxDuration = 60;
+// Set timeout for this analysis
+export const maxDuration = 800; // 13 minutes (Pro plan maximum)
 
 /**
  * On-Demand Tenant Rights Analysis

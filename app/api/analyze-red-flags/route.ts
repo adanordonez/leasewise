@@ -3,8 +3,8 @@ import { supabase } from '@/lib/supabase';
 import { rebuildRAGFromChunks, validateChunks } from '@/lib/rag-rebuild';
 import { analyzeRedFlagsWithRAG } from '@/lib/red-flags-analysis';
 
-// Set timeout for this analysis (1 minute should be enough)
-export const maxDuration = 60;
+// Set timeout for this analysis
+export const maxDuration = 800; // 13 minutes (Pro plan maximum)
 
 /**
  * On-Demand Red Flags Analysis

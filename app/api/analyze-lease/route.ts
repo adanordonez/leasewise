@@ -11,7 +11,7 @@ import OpenAI from 'openai';
 // import { generateRAGScenarios } from '@/lib/rag-scenarios';
 
 // Set maximum duration for Vercel serverless functions
-export const maxDuration = 480; // 8 minutes for complex lease analysis
+export const maxDuration = 800; // 13 minutes (Pro plan maximum)
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -57,7 +57,7 @@ function chunkText(text: string, maxChunkSize: number = 50000): string[] {
 export async function POST(request: NextRequest) {
   // Set a global timeout for the entire operation
   const globalTimeout = new Promise<never>((_, reject) => 
-    setTimeout(() => reject(new Error('Analysis timeout - please try with a smaller file')), 480000) // 8 minutes
+    setTimeout(() => reject(new Error('Analysis timeout - please try with a smaller file')), 800000) // 13 minutes
   );
   
   const analysisPromise = performAnalysis(request);

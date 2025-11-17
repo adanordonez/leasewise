@@ -491,7 +491,7 @@ export default function LeaseWiseApp() {
         if (!controller.signal.aborted) {
           controller.abort('timeout');
         }
-      }, 180000); // 3 minutes timeout for complex analysis
+      }, 780000); // 13 minutes timeout for complex analysis (slightly less than backend 800s)
       
       // Simulate progress during API call
       const progressInterval = setInterval(() => {

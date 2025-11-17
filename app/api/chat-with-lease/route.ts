@@ -7,7 +7,7 @@ import { searchWithPerplexity } from '@/lib/perplexity-chat';
 import { enhanceQuery } from '@/lib/query-rewriter';
 import { routeQuestion } from '@/lib/intelligent-router';
 
-export const maxDuration = 60; // 60 seconds for chat
+export const maxDuration = 800; // 13 minutes (Pro plan maximum)
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,

@@ -4,7 +4,7 @@ import { createLeaseRAG } from '@/lib/rag-system';
 import { analyzeLawApplications } from '@/lib/lease-law-application';
 import { extractTextWithPageNumbers } from '@/lib/llamaparse-utils';
 
-export const maxDuration = 90; // 90 seconds for Jina AI + RAG analysis
+export const maxDuration = 800; // 13 minutes (Pro plan maximum)
 
 export async function POST(request: NextRequest) {
   // console.log('🔍 Enhanced legal sources API called');

@@ -7,7 +7,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export const maxDuration = 120; // 2 minutes for scenarios generation
+export const maxDuration = 800; // 13 minutes (Pro plan maximum)
 
 // Type for stored chunks
 interface StoredChunk {

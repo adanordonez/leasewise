@@ -8,6 +8,8 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+export const maxDuration = 800; // 13 minutes (Pro plan maximum)
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
