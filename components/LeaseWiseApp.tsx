@@ -675,7 +675,11 @@ export default function LeaseWiseApp() {
                 </BlurReveal>
               
                 <h1 className="text-5xl sm:text-6xl font-bold text-center text-slate-900 leading-tight">
-                  {t.rich('Hero.title', {
+                  {t.rich('Hero.title.line1', {
+                    minutes: (chunks) => <span className="text-[#6039B3] font-bold">{chunks}</span>
+                  })}
+                  <br />
+                  {t.rich('Hero.title.line2', {
                     minutes: (chunks) => <span className="text-[#6039B3] font-bold">{chunks}</span>
                   })}
               </h1>
@@ -817,7 +821,109 @@ export default function LeaseWiseApp() {
               </div>
             </div>
 
-            {/* Feature 2: Know Your Rights - Image Left on Desktop */}
+            {/* Feature 2: AI Chat - Image Left on Desktop */}
+            <div className="container mx-auto max-w-6xl px-6">
+              {/* Mobile Layout */}
+              <div className="lg:hidden flex flex-col items-start justify-start gap-12 max-w-2xl mx-auto">
+                <div className="flex flex-col items-start justify-start gap-10 w-full">
+                  <div className="flex flex-col items-start justify-start gap-6 w-full">
+                    <h1 className="text-3xl font-bold text-foreground">
+                      {t('Features.aiChat.title')}
+                    </h1>
+                    <p className="text-base text-muted-foreground">
+                      {t('Features.aiChat.description')}
+                    </p>
+                  </div>
+                  
+                  <div className="flex flex-col items-start justify-start gap-6 w-full">
+                    <div className="flex flex-col items-start justify-start gap-4 w-full">
+                      <h3 className="text-xl font-bold text-foreground">{t('Features.aiChat.stat1Label')}</h3>
+                      <p className="text-base text-muted-foreground">
+                        {t('Features.aiChat.stat1Description')}
+                      </p>
+                    </div>
+                    
+                    <div className="flex flex-col items-start justify-start gap-4 w-full">
+                      <h3 className="text-xl font-bold text-foreground">{t('Features.aiChat.stat2Label')}</h3>
+                      <p className="text-base text-muted-foreground">
+                        {t('Features.aiChat.stat2Description')}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <button 
+                      onClick={() => setCurrentPage('upload')}
+                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
+                    >
+                      {t('Features.aiChat.cta')}
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
+                  <Image 
+                    src="/pictures/chat.png" 
+                    alt="Chat with AI about your lease" 
+                    width={1200} 
+                    height={900}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Desktop Layout - Image Left */}
+              <div className="hidden lg:flex flex-row-reverse justify-between items-center gap-20">
+                <div className="flex flex-col gap-8 flex-1 max-w-xl">
+                  <div className="flex flex-col gap-6">
+                    <h1 className="text-4xl font-bold text-foreground">
+                      {t('Features.aiChat.title')}
+                    </h1>
+                    <p className="text-base text-muted-foreground">
+                      {t('Features.aiChat.description')}
+                    </p>
+                  </div>
+                  
+                  <div className="flex gap-8">
+                    <div className="flex flex-col gap-2 flex-1">
+                      <h2 className="text-3xl font-bold text-foreground">{t('Features.aiChat.stat1Label')}</h2>
+                      <p className="text-base text-muted-foreground">
+                        {t('Features.aiChat.stat1Description')}
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-2 flex-1">
+                      <h2 className="text-3xl font-bold text-foreground">{t('Features.aiChat.stat2Label')}</h2>
+                      <p className="text-base text-muted-foreground">
+                        {t('Features.aiChat.stat2Description')}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <button 
+                      onClick={() => setCurrentPage('upload')}
+                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
+                    >
+                      {t('Features.aiChat.cta')}
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="flex-1 flex justify-center">
+                  <div className="w-full max-w-2xl aspect-[4/3] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
+                    <Image 
+                      src="/pictures/chat.png" 
+                      alt="Chat with AI about your lease" 
+                      width={1200} 
+                      height={900}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature 3: Know Your Rights - Image Right on Desktop */}
             <div className="container mx-auto max-w-6xl px-6">
               {/* Mobile Layout */}
               <div className="lg:hidden flex flex-col items-start justify-start gap-12 max-w-2xl mx-auto">
@@ -865,8 +971,8 @@ export default function LeaseWiseApp() {
                 </div>
               </div>
 
-              {/* Desktop Layout - Image Left */}
-              <div className="hidden lg:flex flex-row-reverse justify-between items-center gap-20">
+              {/* Desktop Layout - Image Right */}
+              <div className="hidden lg:flex justify-between items-center gap-20">
                 <div className="flex flex-col gap-8 flex-1 max-w-xl">
                   <div className="flex flex-col gap-6">
                     <h1 className="text-4xl font-bold text-foreground">
@@ -913,7 +1019,7 @@ export default function LeaseWiseApp() {
               </div>
             </div>
 
-            {/* Feature 3: Market Dashboard */}
+            {/* Feature 4: Market Dashboard */}
             <div className="container mx-auto max-w-6xl px-6">
               {/* Mobile Layout */}
               <div className="lg:hidden flex flex-col items-start justify-start gap-12 max-w-2xl mx-auto">
@@ -952,7 +1058,7 @@ export default function LeaseWiseApp() {
                 
                 <div className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
                   <Image 
-                    src="/pictures/dashboard.png" 
+                    src="/pictures/rent.png" 
                     alt="Market Dashboard" 
                     width={1200} 
                     height={900}
@@ -961,8 +1067,8 @@ export default function LeaseWiseApp() {
                 </div>
               </div>
 
-              {/* Desktop Layout - Image Right */}
-              <div className="hidden lg:flex justify-between items-center gap-20">
+              {/* Desktop Layout - Image Left */}
+              <div className="hidden lg:flex flex-row-reverse justify-between items-center gap-20">
                 <div className="flex flex-col gap-8 flex-1 max-w-xl">
                   <div className="flex flex-col gap-6">
                     <h1 className="text-4xl font-bold text-foreground">
@@ -998,7 +1104,7 @@ export default function LeaseWiseApp() {
                 <div className="flex-1 flex justify-center">
                   <div className="w-full max-w-2xl aspect-[4/3] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
                     <Image 
-                      src="/pictures/dashboard.png" 
+                      src="/pictures/rent.png" 
                       alt="Market Dashboard" 
                       width={1200} 
                       height={900}

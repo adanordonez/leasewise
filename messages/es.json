@@ -8,7 +8,10 @@
   },
   "Hero": {
     "badge": "Análisis de Contratos con IA",
-    "title": "Entiende tu contrato en <minutes>minutos</minutes>",
+    "title": {
+      "line1": "Entiende tu <minutes>contrato</minutes>.",
+      "line2": "Conoce tus derechos en <minutes>minutos</minutes>."
+    },
     "titleHighlight": "minutos",
     "description": "Sube tu contrato de alquiler en PDF y obtén análisis instantáneo con IA de los términos, derechos y señales de alerta. Toma decisiones informadas de alquiler con confianza y claridad.",
     "cta": "Analiza tu contrato"
@@ -26,6 +29,15 @@
       "stat2Label": "Gratis",
       "stat2Description": "No requiere registro. Sube tu contrato y obtén análisis instantáneo con desglose detallado e información personalizada.",
       "cta": "Analiza tu contrato ahora"
+    },
+    "aiChat": {
+      "title": "Chatea con IA sobre tu contrato",
+      "description": "Entiende cualquier cláusula chateando con IA entrenada para leer tu contrato. Pregunta lo que sea, desde políticas de mascotas hasta cancelación del contrato, y obtén respuestas claras rápidamente.",
+      "stat1Label": "Respuestas instantáneas",
+      "stat1Description": "Obtén respuestas a preguntas específicas en segundos con fuentes citadas.",
+      "stat2Label": "Consciente del contexto",
+      "stat2Description": "La IA recuerda tu conversación y entiende los detalles de tu contrato.",
+      "cta": "Comienza a chatear ahora"
     },
     "stateLaws": {
       "title": "Comprende las leyes de alquiler de tu estado",

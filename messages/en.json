@@ -8,10 +8,13 @@
   },
   "Hero": {
     "badge": "AI-Powered Lease Analysis",
-    "title": "Understand your lease in <minutes>minutes</minutes>",
+    "title": {
+      "line1": "Understand your <minutes>lease</minutes>",
+      "line2": "Know your rights in <minutes>minutes</minutes>."
+    },
     "titleHighlight": "minutes",
     "description": "Upload your lease PDF and get instant AI analysis of terms, rights, and red flags. Make informed rental decisions with confidence and clarity.",
-    "cta": "Analyze your lease"
+    "cta": "Get Started"
   },
   "Creator": {
     "createdBy": "Created by",
@@ -20,34 +23,43 @@
   "Features": {
     "aiAnalysis": {
       "title": "Get instant AI analysis of your lease",
-      "description": "Upload your lease PDF and receive comprehensive analysis in minutes. Our AI detects red flags, explains complex terms, identifies important dates, and provides actionable insights about your rental agreement.",
+      "description": "Upload your PDF and get a full report in under 2 minutes. Our AI scans every clause, spots potential issues, and delivers a clear summary you can actually use.",
       "stat1Label": "Under 2 min",
-      "stat1Description": "Fast analysis that examines every clause, identifies potential issues, and explains what matters most in plain English.",
-      "stat2Label": "Free",
-      "stat2Description": "No signup required. Upload your lease and get instant analysis with detailed breakdowns and personalized insights.",
+      "stat1Description": "Fast analysis that explains what matters most in plain English.",
+      "stat2Label": "Real-time",
+      "stat2Description": "Up-to-date data helps you make informed decisions.",
       "cta": "Analyze your lease now"
     },
+    "aiChat": {
+      "title": "Chat with AI about your lease",
+      "description": "Understand any clause by chatting with AI trained to read your lease. Ask anything, from pet policies to lease breaks, and get clear answers fast.",
+      "stat1Label": "Instant answers",
+      "stat1Description": "Get answers to specific questions in seconds with cited sources.",
+      "stat2Label": "Context-aware",
+      "stat2Description": "AI remembers your conversation and understands your lease details.",
+      "cta": "Start chatting now"
+    },
     "stateLaws": {
-      "title": "Understand your state's landlord-renter laws",
-      "description": "Access comprehensive information about your rights as a renter. Learn about security deposits, lease terminations, maintenance obligations, and legal protections specific to your state and city.",
+      "title": "Understand your state’s renter laws",
+      "description": "See exactly which state and city laws apply to you. Learn about the rules around security-deposits, lease terminations, maintenance obligations, and legal protections in your state and city.",
       "stat1Label": "50 States",
-      "stat1Description": "Complete coverage of landlord-renter laws across all US states with city-specific regulations and requirements.",
+      "stat1Description": "Complete coverage of renter laws across all US states with city-specific regulations.",
       "stat2Label": "Updated",
-      "stat2Description": "Current legal information with sources cited, so you always have accurate and reliable renter law guidance.",
-      "status": "Coming Soon"
+      "stat2Description": "Current legal information with sources cited, so you always have reliable renter law guidance.",
+      "status": "Available Now"
     },
     "marketData": {
-      "title": "Compare your rental data with market trends",
-      "description": "See how your lease compares to thousands of rentals in your area. Get instant insights on market rates, price percentiles, and whether you're getting a fair deal on your rental agreement.",
-      "stat1Label": "3,200+",
-      "stat1Description": "Active leases analyzed to provide you with accurate market comparisons and pricing insights for your area.",
-      "stat2Label": "Real-time",
-      "stat2Description": "Up-to-date market data helps you understand if your rent is competitive and make informed decisions.",
+      "title": "Generate letters to help with your rental issues",
+      "description": "Need repairs to your apartment? Want to get your deposit back? Get tailored, professional-quality letters to address issues with your landlord, lease, or repairs.",
+      "stat1Label": "10+ Templates",
+      "stat1Description": "Comprehensive topics for letter-generation, from repair requests to deposit disputes.",
+      "stat2Label": "Trusted Insight",
+      "stat2Description": "Developed by the University of Chicago Law School’s AI Lab with expert-backed insight.",
       "status": "Coming Soon"
     }
   },
   "Disclaimer": {
-    "text": "This is a beta product. It uses AI and may provide wrong information. Anything you upload will be shared with ChatGPT. LeaseChat provides legal information, not legal advice. Using LeaseChat does not create an attorney-client relationship. LeaseChat is not your attorney."
+    "text": "This is a beta product. It uses AI and may provide incorrect information. Anything you upload may be shared with ChatGPT. Do not upload sensitive personal information. LeaseChat provides legal information, not legal advice, and does not create an attorney-client relationship. LeaseChat is not your attorney."
   },
   "Footer": {
     "copyright": "© 2025 LeaseChat. All rights reserved.",
