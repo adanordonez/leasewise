@@ -9,11 +9,11 @@
   "Hero": {
     "badge": "Análisis de Contratos con IA",
     "title": {
-      "line1": "Entiende tu <minutes>contrato</minutes>.",
-      "line2": "Conoce tus derechos en <minutes>minutos</minutes>."
+      "line1": "Entiende tu <minutes>contrato.</minutes>",
+      "line2": "Conoce tus derechos en <minutes>minutos.</minutes>"
     },
     "titleHighlight": "minutos",
-    "description": "Analiza tu contrato. Chatea con IA sobre lo que significa. Conoce la ley en tu ciudad y estado. Y escribe cartas a tu propietario para protegerte. Gratis.",
+    "description": "LeaseChat te ayuda a analizar tu contrato, chatear con IA sobre lo que significa, explicar la ley en tu ciudad y estado, y escribir cartas a tu propietario para protegerte. Gratis.",
     "cta": "Analiza tu contrato"
   },
   "Creator": {

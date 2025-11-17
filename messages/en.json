@@ -9,11 +9,11 @@
   "Hero": {
     "badge": "AI-Powered Lease Analysis",
     "title": {
-      "line1": "Understand your <minutes>lease</minutes>",
-      "line2": "Know your rights in <minutes>minutes</minutes>."
+      "line1": "Understand your <minutes>lease.</minutes>",
+      "line2": "Know your rights in <minutes>minutes.</minutes>"
     },
     "titleHighlight": "minutes",
-    "description": "Analyze your lease. Chat with AI about what it means. Know the law in your city and state. And write letters to your landlord to protect yourself. For free.",
+    "description": "LeaseChat helps you analyze your lease, chat with AI about what it means, explain the law in your city and state, and write letters to your landlord to protect yourself. For free.",
     "cta": "Get Started"
   },
   "Creator": {

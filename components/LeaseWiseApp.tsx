@@ -675,13 +675,17 @@ export default function LeaseWiseApp() {
                 </BlurReveal>
               
                 <h1 className="text-5xl sm:text-6xl font-bold text-center text-slate-900 leading-tight">
-                  {t.rich('Hero.title.line1', {
-                    minutes: (chunks) => <span className="text-[#6039B3] font-bold">{chunks}</span>
-                  })}
+                  <span className="inline lg:whitespace-nowrap">
+                    {t.rich('Hero.title.line1', {
+                      minutes: (chunks) => <span className="text-[#6039B3] font-bold">{chunks}</span>
+                    })}
+                  </span>
                   <br />
-                  {t.rich('Hero.title.line2', {
-                    minutes: (chunks) => <span className="text-[#6039B3] font-bold">{chunks}</span>
-                  })}
+                  <span className="inline lg:whitespace-nowrap">
+                    {t.rich('Hero.title.line2', {
+                      minutes: (chunks) => <span className="text-[#6039B3] font-bold">{chunks}</span>
+                    })}
+                  </span>
               </h1>
               
                 <p className="text-lg text-center text-slate-600 leading-7 max-w-xl">
