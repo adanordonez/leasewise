@@ -13,7 +13,7 @@
       "line2": "Know your rights in <minutes>minutes</minutes>."
     },
     "titleHighlight": "minutes",
-    "description": "Upload your lease PDF and get instant AI analysis of terms, rights, and red flags. Make informed rental decisions with confidence and clarity.",
+    "description": "Analyze your lease. Chat with AI about what it means. Know the law in your city and state. And write letters to your landlord to protect yourself. For free.",
     "cta": "Get Started"
   },
   "Creator": {
@@ -24,7 +24,7 @@
     "aiAnalysis": {
       "title": "Get instant AI analysis of your lease",
       "description": "Upload your PDF and get a full report in under 2 minutes. Our AI scans every clause, spots potential issues, and delivers a clear summary you can actually use.",
-      "stat1Label": "Under 2 min",
+      "stat1Label": "Under 2 Minutes",
       "stat1Description": "Fast analysis that explains what matters most in plain English.",
       "stat2Label": "Real-time",
       "stat2Description": "Up-to-date data helps you make informed decisions.",
@@ -46,7 +46,8 @@
       "stat1Description": "Complete coverage of renter laws across all US states with city-specific regulations.",
       "stat2Label": "Updated",
       "stat2Description": "Current legal information with sources cited, so you always have reliable renter law guidance.",
-      "status": "Available Now"
+      "status": "Available Now",
+      "cta": "Available Now"
     },
     "marketData": {
       "title": "Generate letters to help with your rental issues",

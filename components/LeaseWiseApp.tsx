@@ -735,7 +735,7 @@ export default function LeaseWiseApp() {
                   
                   <div className="flex flex-col items-start justify-start gap-6 w-full">
                     <div className="flex flex-col items-start justify-start gap-4 w-full">
-                      <h3 className="text-xl font-bold text-foreground">{t('Features.aiAnalysis.stat1Label')}</h3>
+                      <h3 className="text-xl font-bold text-foreground whitespace-nowrap">{t('Features.aiAnalysis.stat1Label')}</h3>
                       <p className="text-base text-muted-foreground">
                         {t('Features.aiAnalysis.stat1Description')}
                       </p>
@@ -784,7 +784,7 @@ export default function LeaseWiseApp() {
                   
                   <div className="flex gap-8">
                     <div className="flex flex-col gap-2 flex-1">
-                      <h2 className="text-3xl font-bold text-foreground">{t('Features.aiAnalysis.stat1Label')}</h2>
+                      <h2 className="text-3xl font-bold text-foreground whitespace-nowrap">{t('Features.aiAnalysis.stat1Label')}</h2>
                       <p className="text-base text-muted-foreground">
                         {t('Features.aiAnalysis.stat1Description')}
                       </p>
@@ -954,9 +954,12 @@ export default function LeaseWiseApp() {
                   </div>
                   
                   <div>
-                    <div className="inline-flex h-10 items-center justify-center gap-2 px-6 py-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
-                      <p className="text-sm font-medium text-[#800000]">{t('Features.stateLaws.status')}</p>
-                    </div>
+                    <button 
+                      onClick={() => setCurrentPage('upload')}
+                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
+                    >
+                      {t('Features.stateLaws.cta')}
+                    </button>
                   </div>
                 </div>
                 
@@ -999,9 +1002,12 @@ export default function LeaseWiseApp() {
                   </div>
                   
                   <div>
-                    <div className="inline-flex h-10 items-center justify-center gap-2 px-6 py-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
-                      <p className="text-sm font-medium text-[#800000]">{t('Features.stateLaws.status')}</p>
-                    </div>
+                    <button 
+                      onClick={() => setCurrentPage('upload')}
+                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
+                    >
+                      {t('Features.stateLaws.cta')}
+                    </button>
                   </div>
                 </div>
                 
