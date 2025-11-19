@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { LeaseRAG } from './rag-system';
+import { LeaseRAGSystem } from './rag-system';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -11,7 +11,7 @@ const openai = new OpenAI({
 export async function analyzeHowLawAppliesToLease(
   lawText: string,
   lawType: string,
-  leaseRAG: LeaseRAG,
+  leaseRAG: LeaseRAGSystem,
   leaseContext?: {
     monthlyRent?: string;
     securityDeposit?: string;
@@ -54,7 +54,7 @@ export async function analyzeHowLawAppliesToLease(
     if (relevantChunks.length === 0) {
       // console.log('⚠️ No relevant lease clauses found');
       return {
-        application: `Your lease does not appear to have specific terms about ${lawType.toLowerCase()}. The law still applies to your tenancy.`,
+        application: `Your lease doesn't specify ${lawType.toLowerCase()}; law still applies.`,
         hasMatch: false
       };
     }
@@ -74,17 +74,20 @@ export async function analyzeHowLawAppliesToLease(
       messages: [
         {
           role: 'system',
-          content: `You are a tenant rights advisor. Compare what the LAW says with what the LEASE says, and explain how this applies to the tenant.
+          content: `You are a tenant rights advisor. Compare what the LAW says with what the LEASE says, and provide a VERY BRIEF example.
 
-IMPORTANT:
-- Be specific about how the lease complies or conflicts with the law
-- Use the tenant's actual numbers (rent, deposit, dates) when relevant
-- If lease is silent on something the law requires, point that out
-- If lease violates the law, clearly state that
-- Provide detailed explanation (80-120 words) with full context
-- Write in second person ("Your lease says...", "You are entitled to...")
-- Include specific examples from the lease text
-- Explain the practical implications for the tenant`
+CRITICAL RULES:
+- Maximum 40 words total
+- ONE to TWO sentence only
+- Use actual numbers from lease (rent, deposit, dates)
+- Be specific but EXTREMELY concise
+- Format: "Your lease [states fact] which [complies/conflicts] with [law]."
+- If no match: "Your lease doesn't specify this; law still applies."
+
+Examples of good responses:
+- "Your $2,400 deposit equals 2 months rent, complying with the state's maximum limit."
+- "Your lease requires 12-hour entry notice, less than the 24-hour legal minimum."
+- "Your lease doesn't specify repair timelines; landlord must fix within reasonable time."`
         },
         {
           role: 'user',
@@ -103,11 +106,11 @@ ${leaseContext ? `
 RELEVANT LEASE TEXT:
 "${leaseText}"
 
-Explain in 80-120 words how this law specifically applies to THIS tenant's lease. Include specific examples from the lease text and explain the practical implications for the tenant. Be thorough and provide full context.${languageInstruction}`
+Provide ONE to TWO SENTENCE (maximum 50 words) explaining how this law applies to THIS lease. Use actual numbers from the lease context.${languageInstruction}`
         }
       ],
       temperature: 0.3,
-      max_tokens: 200 // Increased for longer explanations
+      max_tokens: 50 // Short and concise examples only
     });
 
     const application = completion.choices[0].message.content || 
@@ -117,14 +120,14 @@ Explain in 80-120 words how this law specifically applies to THIS tenant's lease
     
     return {
       application: application.trim(),
-      relevantLeaseText: leaseText.slice(0, 800), // First 800 chars for reference (increased for more context)
+      relevantLeaseText: leaseText.slice(0, 300), // First 300 chars for reference
       hasMatch: true
     };
     
   } catch (error) {
     console.error('❌ Error analyzing law application:', error);
     return {
-      application: `Unable to analyze how this law applies to your lease. The law still protects your rights as a tenant.`,
+      application: `Unable to analyze this law for your lease.`,
       hasMatch: false
     };
   }
@@ -139,7 +142,7 @@ export async function analyzeLawApplications(
     lawText: string;
     explanation: string;
   }>,
-  leaseRAG: LeaseRAG,
+  leaseRAG: LeaseRAGSystem,
   leaseContext?: {
     monthlyRent?: string;
     securityDeposit?: string;
