@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { MapPin } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface AddressAutocompleteProps {
   onAddressSelect: (address: string) => void;
@@ -9,6 +10,7 @@ interface AddressAutocompleteProps {
 }
 
 export default function AddressAutocomplete({ onAddressSelect, value }: AddressAutocompleteProps) {
+  const t = useTranslations();
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -59,7 +61,7 @@ export default function AddressAutocomplete({ onAddressSelect, value }: AddressA
             onAddressSelect(e.target.value);
             searchAddress(e.target.value);
           }}
-          placeholder="Start typing your address..."
+          placeholder={t('AnalyzePage.userInfo.placeholders.address')}
           className="w-full px-4 py-2 pl-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
           required
         />

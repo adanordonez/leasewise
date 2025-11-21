@@ -39,7 +39,7 @@ export default function AddressOnlyResults({
         {/* Header Section */}
         <div className="text-center mb-8">
           <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">
-            Know Your Renter Rights
+            {t('ResultsPage.rights.title')}
           </h1>
           <div className="flex items-center justify-center gap-2 text-lg text-slate-600">
             <HugeiconsIcon icon={Location03Icon} size={20} strokeWidth={1.5} />
@@ -51,15 +51,15 @@ export default function AddressOnlyResults({
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 mb-8">
           <div className="flex items-center gap-3 mb-4">
             <HugeiconsIcon icon={UserListIcon} size={24} strokeWidth={1.5} className="text-slate-700" />
-            <h2 className="text-lg font-semibold text-slate-900">Your Information</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{t('AnalyzePage.userInfo.title')}</h2>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <p className="text-sm font-medium text-slate-500 mb-1">Name</p>
+              <p className="text-sm font-medium text-slate-500 mb-1">{t('AnalyzePage.userInfo.fullName')}</p>
               <p className="text-slate-900">{userName}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-500 mb-1">Email</p>
+              <p className="text-sm font-medium text-slate-500 mb-1">{t('AnalyzePage.userInfo.email')}</p>
               <p className="text-slate-900">{userEmail}</p>
             </div>
           </div>

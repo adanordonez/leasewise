@@ -118,7 +118,11 @@ IMPORTANT:
   return JSON.parse(result || '{}');
 }
 
-export async function extractDetailedSummary(leaseText: string, userAddress: string): Promise<DetailedLeaseSummary> {
+export async function extractDetailedSummary(leaseText: string, userAddress: string, locale: string = 'en'): Promise<DetailedLeaseSummary> {
+  const languageInstruction = locale === 'es' 
+    ? '\n\nIMPORTANT: All text descriptions (policies, formulas, consequences) must be written in SPANISH. Numbers, dates, and field names remain in English for the JSON structure, but all descriptive text content should be in Spanish.'
+    : '';
+  
   const prompt = `You are a detailed lease information extraction specialist. Extract ALL specific terms, fees, policies, and requirements from the lease.
 
 LEASE TEXT:
@@ -126,7 +130,7 @@ ${leaseText}
 
 USER ADDRESS (for context): ${userAddress}
 
-Extract detailed lease information and return it as a JSON object. Be extremely precise with numbers, formulas, and policy details. If a field is not found, use null.
+Extract detailed lease information and return it as a JSON object. Be extremely precise with numbers, formulas, and policy details. If a field is not found, use null.${languageInstruction}
 
 {
   "tenant_names": ["array of full tenant/lessee/resident names"],
@@ -177,12 +181,16 @@ IMPORTANT EXTRACTION RULES:
 - If a section doesn't exist in the lease, use null for that field
 - Extract monetary amounts as numbers only (e.g., 550, not $550)`;
 
+  const systemContent = locale === 'es'
+    ? "You are a detailed lease extraction specialist. Extract all specific terms, fees, policies, and requirements accurately. All text descriptions must be in SPANISH. Return only valid JSON."
+    : "You are a detailed lease extraction specialist. Extract all specific terms, fees, policies, and requirements accurately. Return only valid JSON.";
+  
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
       {
         role: "system",
-        content: "You are a detailed lease extraction specialist. Extract all specific terms, fees, policies, and requirements accurately. Return only valid JSON."
+        content: systemContent
       },
       {
         role: "user",

@@ -23,7 +23,7 @@ interface LegalLettersProps {
   analysisResult: any;
 }
 
-type LetterType = 'securityDeposit';
+type LetterType = 'securityDeposit' | 'lateRent' | 'repairRequest' | 'emergencyRepair' | 'leaseNonRenewal';
 
 export default function LegalLetters({ 
   leaseDataId, 
@@ -43,6 +43,19 @@ export default function LegalLetters({
   const [isEditing, setIsEditing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isExtractingInfo, setIsExtractingInfo] = useState(false);
+  
+  // Late Rent Letter specific fields
+  const [paymentDate, setPaymentDate] = useState('');
+  const [partialPaymentAmount, setPartialPaymentAmount] = useState('');
+  
+  // Repair Request Letter specific fields
+  const [repairIssues, setRepairIssues] = useState(['', '', '']);
+  
+  // Emergency Repair Letter specific field
+  const [emergencyIssue, setEmergencyIssue] = useState('');
+  
+  // Lease Non-Renewal specific fields
+  const [moveOutDate, setMoveOutDate] = useState('');
 
   // Auto-extract landlord info when a letter type is selected
   useEffect(() => {
@@ -83,6 +96,25 @@ export default function LegalLetters({
       return;
     }
 
+    // Validate letter-specific required fields
+    if (selectedLetter === 'lateRent' && !paymentDate.trim()) {
+      alert('Please specify when you can make the payment.');
+      return;
+    }
+
+    if (selectedLetter === 'repairRequest') {
+      const validIssues = repairIssues.filter(issue => issue.trim() !== '');
+      if (validIssues.length === 0) {
+        alert('Please describe at least one repair issue.');
+        return;
+      }
+    }
+
+    if (selectedLetter === 'emergencyRepair' && !emergencyIssue.trim()) {
+      alert('Please describe the emergency repair issue.');
+      return;
+    }
+
     setIsGenerating(true);
     let response;
     try {
@@ -98,6 +130,15 @@ export default function LegalLetters({
           userName,
           userEmail,
           tenantAddress: address,
+          // Late Rent specific
+          paymentDate: paymentDate.trim(),
+          partialPaymentAmount: partialPaymentAmount.trim(),
+          // Repair Request specific
+          repairIssues: repairIssues.filter(issue => issue.trim() !== ''),
+          // Emergency Repair specific
+          emergencyIssue: emergencyIssue.trim(),
+          // Lease Non-Renewal specific
+          moveOutDate: moveOutDate.trim(),
         }),
       });
 
@@ -181,6 +222,11 @@ export default function LegalLetters({
     setGeneratedLetter(null);
     setEditedLetter('');
     setIsEditing(false);
+    setPaymentDate('');
+    setPartialPaymentAmount('');
+    setRepairIssues(['', '', '']);
+    setEmergencyIssue('');
+    setMoveOutDate('');
   };
 
   const handleEdit = () => {
@@ -336,6 +382,82 @@ export default function LegalLetters({
                     </div>
                   </div>
                 </button>
+
+                <button
+                  onClick={() => setSelectedLetter('lateRent')}
+                  className="w-full text-left p-6 border-2 border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex items-center justify-center w-12 h-12 bg-amber-100 rounded-lg group-hover:bg-amber-200 transition-colors">
+                      <HugeiconsIcon icon={QuillWrite02Icon} size={24} strokeWidth={1.5} className="text-amber-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="text-base font-semibold text-slate-900 mb-1">
+                        {t('LegalLetters.letterTypes.lateRent.name')}
+                      </h5>
+                      <p className="text-sm text-slate-600">
+                        {t('LegalLetters.letterTypes.lateRent.description')}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setSelectedLetter('repairRequest')}
+                  className="w-full text-left p-6 border-2 border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
+                      <HugeiconsIcon icon={QuillWrite02Icon} size={24} strokeWidth={1.5} className="text-green-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="text-base font-semibold text-slate-900 mb-1">
+                        {t('LegalLetters.letterTypes.repairRequest.name')}
+                      </h5>
+                      <p className="text-sm text-slate-600">
+                        {t('LegalLetters.letterTypes.repairRequest.description')}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setSelectedLetter('emergencyRepair')}
+                  className="w-full text-left p-6 border-2 border-slate-200 rounded-xl hover:border-red-500 hover:bg-red-50 transition-all group"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex items-center justify-center w-12 h-12 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors">
+                      <HugeiconsIcon icon={QuillWrite02Icon} size={24} strokeWidth={1.5} className="text-red-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="text-base font-semibold text-slate-900 mb-1">
+                        {t('LegalLetters.letterTypes.emergencyRepair.name')}
+                      </h5>
+                      <p className="text-sm text-slate-600">
+                        {t('LegalLetters.letterTypes.emergencyRepair.description')}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setSelectedLetter('leaseNonRenewal')}
+                  className="w-full text-left p-6 border-2 border-slate-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all group"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
+                      <HugeiconsIcon icon={QuillWrite02Icon} size={24} strokeWidth={1.5} className="text-purple-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="text-base font-semibold text-slate-900 mb-1">
+                        {t('LegalLetters.letterTypes.leaseNonRenewal.name')}
+                      </h5>
+                      <p className="text-sm text-slate-600">
+                        {t('LegalLetters.letterTypes.leaseNonRenewal.description')}
+                      </p>
+                    </div>
+                  </div>
+                </button>
               </div>
             </div>
           ) : (
@@ -418,6 +540,118 @@ export default function LegalLetters({
                   </p>
                 </div>
 
+                {/* Late Rent Specific Fields */}
+                {selectedLetter === 'lateRent' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        {t('LegalLetters.form.paymentDate')} *
+                      </label>
+                      <input
+                        type="date"
+                        value={paymentDate}
+                        onChange={(e) => setPaymentDate(e.target.value)}
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                      />
+                      <p className="text-xs text-slate-500 mt-1">
+                        {t('LegalLetters.form.paymentDateHelp')}
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        {t('LegalLetters.form.partialPayment')}
+                      </label>
+                      <input
+                        type="text"
+                        value={partialPaymentAmount}
+                        onChange={(e) => setPartialPaymentAmount(e.target.value)}
+                        placeholder="$500"
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                      />
+                      <p className="text-xs text-slate-500 mt-1">
+                        {t('LegalLetters.form.partialPaymentHelp')}
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Repair Request Specific Fields */}
+                {selectedLetter === 'repairRequest' && (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      {t('LegalLetters.form.repairIssues')} *
+                    </label>
+                    {repairIssues.map((issue, index) => (
+                      <div key={index} className="mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-slate-600 min-w-[80px]">
+                            {t('LegalLetters.form.issue')} {index + 1}:
+                          </span>
+                          <input
+                            type="text"
+                            value={issue}
+                            onChange={(e) => {
+                              const newIssues = [...repairIssues];
+                              newIssues[index] = e.target.value;
+                              setRepairIssues(newIssues);
+                            }}
+                            placeholder={t('LegalLetters.form.repairIssuePlaceholder')}
+                            className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setRepairIssues([...repairIssues, ''])}
+                      className="mt-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      + {t('LegalLetters.form.addAnotherIssue')}
+                    </button>
+                    <p className="text-xs text-slate-500 mt-2">
+                      {t('LegalLetters.form.repairIssuesHelp')}
+                    </p>
+                  </div>
+                )}
+
+                {/* Emergency Repair Specific Fields */}
+                {selectedLetter === 'emergencyRepair' && (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      {t('LegalLetters.form.emergencyIssue')} *
+                    </label>
+                    <textarea
+                      value={emergencyIssue}
+                      onChange={(e) => setEmergencyIssue(e.target.value)}
+                      placeholder={t('LegalLetters.form.emergencyIssuePlaceholder')}
+                      rows={4}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all resize-none"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">
+                      {t('LegalLetters.form.emergencyIssueHelp')}
+                    </p>
+                  </div>
+                )}
+
+                {/* Lease Non-Renewal Specific Fields */}
+                {selectedLetter === 'leaseNonRenewal' && (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      {t('LegalLetters.form.moveOutDate')}
+                    </label>
+                    <input
+                      type="date"
+                      value={moveOutDate}
+                      onChange={(e) => setMoveOutDate(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">
+                      {t('LegalLetters.form.moveOutDateHelp')}
+                    </p>
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     {t('LegalLetters.form.additionalDetails')}
@@ -433,7 +667,13 @@ export default function LegalLetters({
 
                 <button
                   onClick={handleGenerate}
-                  disabled={isGenerating || !landlordName.trim()}
+                  disabled={
+                    isGenerating || 
+                    !landlordName.trim() ||
+                    (selectedLetter === 'lateRent' && !paymentDate.trim()) ||
+                    (selectedLetter === 'repairRequest' && repairIssues.filter(i => i.trim()).length === 0) ||
+                    (selectedLetter === 'emergencyRepair' && !emergencyIssue.trim())
+                  }
                   className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium flex items-center justify-center gap-2"
                 >
                   {isGenerating ? (

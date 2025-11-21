@@ -54,6 +54,7 @@ function chunkText(text: string, maxChunkSize: number = 50000): string[] {
   return chunks;
 }
 
+
 export async function POST(request: NextRequest) {
   // Set a global timeout for the entire operation
   const globalTimeout = new Promise<never>((_, reject) => 
@@ -81,8 +82,8 @@ async function performAnalysis(request: NextRequest) {
     // console.log('🔍 Starting lease analysis...');
     
     // Get locale from cookies (for Spanish output)
-    // const locale = request.cookies.get('locale')?.value || 'en';
-    // console.log(`🌐 Detected locale: ${locale}`);
+    const locale = request.cookies.get('locale')?.value || 'en';
+    console.log(`🌐 Detected locale: ${locale}`);
     
     // Validate request headers
     const contentType = request.headers.get('content-type');
@@ -200,10 +201,14 @@ async function performAnalysis(request: NextRequest) {
 
     // ⚡ PARALLEL EXTRACTION: Extract both basic AND detailed info at the same time
   
+    console.log(`📝 Extracting lease details with locale: ${locale}`);
+    
     const [basicInfo, detailedSummary] = await Promise.all([
       extractBasicLeaseInfo(leaseText, address),      // Basic info (4 sec)
-      extractDetailedSummary(leaseText, address)       // Detailed summary (10 sec)
+      extractDetailedSummary(leaseText, address, locale)       // Detailed summary (10 sec) with locale
     ]);
+    
+    console.log(`✅ Extraction complete. Sample policy: ${detailedSummary.smoking_policy?.substring(0, 100)}...`);
    
     
     // ⚡ OPTIMIZED: Create RAG WITHOUT embeddings for initial load (much faster!)

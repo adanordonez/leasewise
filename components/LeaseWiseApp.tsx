@@ -28,7 +28,11 @@ import {
   DownloadSquare02Icon,
   AlertSquareIcon,
   CourtLawIcon,
-  MapsSearchIcon
+  MapsSearchIcon,
+  DollarCircleIcon,
+  Settings02Icon,
+  DoorIcon,
+  DocumentCodeIcon
 } from '@hugeicons-pro/core-stroke-rounded';
 import { CircleIcon, Alert02Icon } from '@hugeicons-pro/core-solid-rounded';
 import { useTranslations } from 'next-intl';
@@ -142,6 +146,7 @@ export default function LeaseWiseApp() {
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('full-analysis');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [address, setAddress] = useState('');
+  const [activeUseCase, setActiveUseCase] = useState<string>('unfair-charges');
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -608,7 +613,7 @@ export default function LeaseWiseApp() {
   };
 
     return (
-      <div className="min-h-screen gradient-bg-modern">
+      <div className="min-h-screen bg-slate-50">
       {/* Analysis Loading Modal - Always rendered */}
       <SimpleLoadingModal
         isOpen={isAnalyzing}
@@ -621,8 +626,8 @@ export default function LeaseWiseApp() {
         <>
         {/* Navbar - Hidden when analyzing */}
         {!isAnalyzing && (
-        <nav className="container mx-auto max-w-7xl py-6 px-6 relative z-50">
-          <div className="flex justify-between items-center">
+        <nav className="py-6 px-6 md:px-12 lg:px-20 relative z-50">
+          <div className="flex justify-between items-center max-w-7xl mx-auto">
               <button 
                 onClick={() => setCurrentPage('landing')}
                 className="hover:opacity-80 transition-opacity"
@@ -664,8 +669,8 @@ export default function LeaseWiseApp() {
         )}
 
         {/* Hero Section */}
-        <main className="container mx-auto max-w-7xl px-6 relative z-10">
-          <div className="pt-12 pb-8 flex justify-center items-start">
+        <main className="px-6 md:px-12 lg:px-20 relative z-10">
+          <div className="pt-12 pb-8 flex justify-center items-start max-w-7xl mx-auto">
             <div className="max-w-2xl flex flex-col items-center gap-8">
               <div className="w-full flex flex-col items-center gap-6">
                 <BlurReveal duration={1800} blur={12}>
@@ -721,408 +726,699 @@ export default function LeaseWiseApp() {
             </div>
           </div>
 
-          {/* Features Section - Three Features */}
-          <div className="pt-8 pb-24 flex flex-col items-center gap-20 lg:gap-32">
-            {/* Feature 1: AI Analysis - Image Right on Desktop */}
-            <div className="container mx-auto max-w-6xl px-6">
-              {/* Mobile Layout */}
-              <div className="lg:hidden flex flex-col items-start justify-start gap-12 max-w-2xl mx-auto">
-                <div className="flex flex-col items-start justify-start gap-10 w-full">
-                  <div className="flex flex-col items-start justify-start gap-6 w-full">
-                    <h1 className="text-3xl font-bold text-foreground">
-                      {t('Features.aiAnalysis.title')}
-                    </h1>
-                    <p className="text-base text-muted-foreground">
-                      {t('Features.aiAnalysis.description')}
-                    </p>
-                    </div>
-                  
-                  <div className="flex flex-col items-start justify-start gap-6 w-full">
-                    <div className="flex flex-col items-start justify-start gap-4 w-full">
-                      <h3 className="text-xl font-bold text-foreground whitespace-nowrap">{t('Features.aiAnalysis.stat1Label')}</h3>
-                      <p className="text-base text-muted-foreground">
-                        {t('Features.aiAnalysis.stat1Description')}
-                      </p>
-                  </div>
-                    
-                    <div className="flex flex-col items-start justify-start gap-4 w-full">
-                      <h3 className="text-xl font-bold text-foreground">{t('Features.aiAnalysis.stat2Label')}</h3>
-                      <p className="text-base text-muted-foreground">
-                        {t('Features.aiAnalysis.stat2Description')}
-                      </p>
-                </div>
-                  </div>
-                  
-                  <div>
-                    <button 
-                      onClick={() => setCurrentPage('upload')}
-                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
-                    >
-                      {t('Features.aiAnalysis.cta')}
-                    </button>
-            </div>
-          </div>
-
-                <div className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
-                  <Image 
-                    src="/pictures/lease.png" 
-                    alt="Lease Analysis" 
-                    width={1200} 
-                    height={900}
-                    className="w-full h-full object-cover"
-                  />
-            </div>
-          </div>
-
-              {/* Desktop Layout - Image Right */}
-              <div className="hidden lg:flex justify-between items-center gap-20">
-                <div className="flex flex-col gap-8 flex-1 max-w-xl">
-                  <div className="flex flex-col gap-6">
-                    <h1 className="text-4xl font-bold text-foreground">
-                      {t('Features.aiAnalysis.title')}
-                    </h1>
-                    <p className="text-base text-muted-foreground">
-                      {t('Features.aiAnalysis.description')}
-                    </p>
-      </div>
-                  
-                  <div className="flex gap-8">
-                    <div className="flex flex-col gap-2 flex-1">
-                      <h2 className="text-3xl font-bold text-foreground whitespace-nowrap">{t('Features.aiAnalysis.stat1Label')}</h2>
-                      <p className="text-base text-muted-foreground">
-                        {t('Features.aiAnalysis.stat1Description')}
-                      </p>
-                </div>
-                    <div className="flex flex-col gap-2 flex-1">
-                      <h2 className="text-3xl font-bold text-foreground">{t('Features.aiAnalysis.stat2Label')}</h2>
-                      <p className="text-base text-muted-foreground">
-                        {t('Features.aiAnalysis.stat2Description')}
-                      </p>
-              </div>
-                  </div>
-                  
-                  <div>
-              <button 
-                      onClick={() => setCurrentPage('upload')}
-                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
+          {/* Features Section - Grid Layout */}
+          <div data-section="features" className="py-20 bg-slate-50">
+            <div className="px-6 md:px-12 lg:px-20">
+              {/* Section Header */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+                className="text-center mb-12 max-w-3xl mx-auto"
               >
-                      {t('Features.aiAnalysis.cta')}
-              </button>
-            </div>
-          </div>
-                
-                <div className="flex-1 flex justify-center">
-                  <div className="w-full max-w-2xl aspect-[4/3] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
-                    <Image 
-                      src="/pictures/lease.png" 
-                      alt="Lease Analysis" 
-                      width={1200} 
-                      height={900}
+                <div className="inline-flex items-center justify-center px-3 py-1 mb-4 text-sm font-medium text-[#6039B3] bg-[#6039B3]/10 rounded-full border border-[#6039B3]/20">
+                  {t('Landing.features.badge')}
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
+                  {t('Landing.features.title')}
+                </h2>
+                <p className="text-base text-slate-600">
+                  {t('Landing.features.subtitle')}
+                </p>
+              </motion.div>
+
+              <div className="grid md:grid-cols-5 gap-4 items-stretch max-w-7xl mx-auto">
+                {/* Feature 1: AI Lease Analysis */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  className="md:col-span-2 bg-white rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-slate-200/60 p-6 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] hover:-translate-y-6 hover:scale-[1.06] hover:border-slate-300 transition-all duration-400 ease-out cursor-pointer group flex flex-col"
+                >
+                  <div className="relative w-full overflow-hidden rounded-lg border border-slate-200 mb-4">
+                    <img 
+                      src="/leaseanalysis.png" 
+                      alt="AI Lease Analysis"
+                      className="w-full h-auto"
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white/40 via-white/10 via-50% to-transparent"></div>
+                  </div>
+                  <div className="space-y-2 mt-auto">
+                    <h3 className="text-lg font-bold text-slate-900">
+                      {t('Landing.features.aiAnalysis.title')}
+                    </h3>
+                    <p className="text-sm text-slate-600 line-clamp-2">
+                      {t('Landing.features.aiAnalysis.description')}
+                    </p>
+                    <button 
+                      onClick={() => setCurrentPage('upload')}
+                      className="inline-flex items-center gap-2 text-[#6039B3] hover:text-[#5030A0] font-medium text-sm pt-1"
+                    >
+                      {t('Landing.features.aiAnalysis.cta')}
+                      <HugeiconsIcon icon={ArrowRight01Icon} size={14} strokeWidth={2} className="transition-transform group-hover:translate-x-1" />
+                    </button>
+                  </div>
+                </motion.div>
+
+                {/* Feature 2: Chat with AI */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  className="md:col-span-3 bg-white rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-slate-200/60 p-6 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] hover:-translate-y-6 hover:scale-[1.06] hover:border-slate-300 transition-all duration-400 ease-out cursor-pointer group flex flex-col"
+                >
+                  <div className="relative w-full overflow-hidden rounded-lg border border-slate-200 mb-4 min-h-[350px]">
+                    <img 
+                      src="/chat.png" 
+                      alt="AI Chat interface"
                       className="w-full h-full object-cover"
                     />
+                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white/40 via-white/10 via-50% to-transparent"></div>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Feature 2: AI Chat - Image Left on Desktop */}
-            <div className="container mx-auto max-w-6xl px-6">
-              {/* Mobile Layout */}
-              <div className="lg:hidden flex flex-col items-start justify-start gap-12 max-w-2xl mx-auto">
-                <div className="flex flex-col items-start justify-start gap-10 w-full">
-                  <div className="flex flex-col items-start justify-start gap-6 w-full">
-                    <h1 className="text-3xl font-bold text-foreground">
-                      {t('Features.aiChat.title')}
-                    </h1>
-                    <p className="text-base text-muted-foreground">
-                      {t('Features.aiChat.description')}
+                  <div className="space-y-2 mt-auto">
+                    <h3 className="text-lg font-bold text-slate-900">
+                      {t('Landing.features.aiChat.title')}
+                    </h3>
+                    <p className="text-sm text-slate-600 line-clamp-2">
+                      {t('Landing.features.aiChat.description')}
                     </p>
-                  </div>
-                  
-                  <div className="flex flex-col items-start justify-start gap-6 w-full">
-                    <div className="flex flex-col items-start justify-start gap-4 w-full">
-                      <h3 className="text-xl font-bold text-foreground">{t('Features.aiChat.stat1Label')}</h3>
-                      <p className="text-base text-muted-foreground">
-                        {t('Features.aiChat.stat1Description')}
-                      </p>
-                    </div>
-                    
-                    <div className="flex flex-col items-start justify-start gap-4 w-full">
-                      <h3 className="text-xl font-bold text-foreground">{t('Features.aiChat.stat2Label')}</h3>
-                      <p className="text-base text-muted-foreground">
-                        {t('Features.aiChat.stat2Description')}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div>
                     <button 
                       onClick={() => setCurrentPage('upload')}
-                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
+                      className="inline-flex items-center gap-2 text-[#6039B3] hover:text-[#5030A0] font-medium text-sm pt-1"
                     >
-                      {t('Features.aiChat.cta')}
+                      {t('Landing.features.aiChat.cta')}
+                      <HugeiconsIcon icon={ArrowRight01Icon} size={14} strokeWidth={2} className="transition-transform group-hover:translate-x-1" />
                     </button>
                   </div>
-                </div>
-                
-                <div className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
-                  <Image 
-                    src="/pictures/chat.png" 
-                    alt="Chat with AI about your lease" 
-                    width={1200} 
-                    height={900}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
+                </motion.div>
 
-              {/* Desktop Layout - Image Left */}
-              <div className="hidden lg:flex flex-row-reverse justify-between items-center gap-20">
-                <div className="flex flex-col gap-8 flex-1 max-w-xl">
-                  <div className="flex flex-col gap-6">
-                    <h1 className="text-4xl font-bold text-foreground">
-                      {t('Features.aiChat.title')}
-                    </h1>
-                    <p className="text-base text-muted-foreground">
-                      {t('Features.aiChat.description')}
+                {/* Feature 3: State Renter Laws */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  className="md:col-span-3 bg-white rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-slate-200/60 p-6 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] hover:-translate-y-6 hover:scale-[1.06] hover:border-slate-300 transition-all duration-400 ease-out cursor-pointer group flex flex-col"
+                >
+                  <div className="relative w-full overflow-hidden rounded-lg border border-slate-200 mb-4">
+                    <img 
+                      src="/renterlaws.png" 
+                      alt="State renter laws"
+                      className="w-full h-auto"
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white/40 via-white/10 via-50% to-transparent"></div>
+                  </div>
+                  <div className="space-y-2 mt-auto">
+                    <h3 className="text-lg font-bold text-slate-900">
+                      {t('Landing.features.stateLaws.title')}
+                    </h3>
+                    <p className="text-sm text-slate-600 line-clamp-2">
+                      {t('Landing.features.stateLaws.description')}
                     </p>
-                  </div>
-                  
-                  <div className="flex gap-8">
-                    <div className="flex flex-col gap-2 flex-1">
-                      <h2 className="text-3xl font-bold text-foreground">{t('Features.aiChat.stat1Label')}</h2>
-                      <p className="text-base text-muted-foreground">
-                        {t('Features.aiChat.stat1Description')}
-                      </p>
-                    </div>
-                    <div className="flex flex-col gap-2 flex-1">
-                      <h2 className="text-3xl font-bold text-foreground">{t('Features.aiChat.stat2Label')}</h2>
-                      <p className="text-base text-muted-foreground">
-                        {t('Features.aiChat.stat2Description')}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div>
                     <button 
                       onClick={() => setCurrentPage('upload')}
-                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
+                      className="inline-flex items-center gap-2 text-[#6039B3] hover:text-[#5030A0] font-medium text-sm pt-1"
                     >
-                      {t('Features.aiChat.cta')}
+                      {t('Landing.features.stateLaws.cta')}
+                      <HugeiconsIcon icon={ArrowRight01Icon} size={14} strokeWidth={2} className="transition-transform group-hover:translate-x-1" />
                     </button>
                   </div>
-                </div>
-                
-                <div className="flex-1 flex justify-center">
-                  <div className="w-full max-w-2xl aspect-[4/3] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
-                    <Image 
-                      src="/pictures/chat.png" 
-                      alt="Chat with AI about your lease" 
-                      width={1200} 
-                      height={900}
+                </motion.div>
+
+                {/* Feature 4: Letter Generation */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  className="md:col-span-2 bg-white rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-slate-200/60 p-6 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] hover:-translate-y-6 hover:scale-[1.06] hover:border-slate-300 transition-all duration-400 ease-out cursor-pointer group flex flex-col"
+                >
+                  <div className="relative w-full overflow-hidden rounded-lg border border-slate-200 mb-4 min-h-[350px]">
+                    <img 
+                      src="/letters.png" 
+                      alt="Letter generation"
                       className="w-full h-full object-cover"
                     />
+                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white/40 via-white/10 via-50% to-transparent"></div>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Feature 3: Know Your Rights - Image Right on Desktop */}
-            <div className="container mx-auto max-w-6xl px-6">
-              {/* Mobile Layout */}
-              <div className="lg:hidden flex flex-col items-start justify-start gap-12 max-w-2xl mx-auto">
-                <div className="flex flex-col items-start justify-start gap-10 w-full">
-                  <div className="flex flex-col items-start justify-start gap-6 w-full">
-                    <h1 className="text-3xl font-bold text-foreground">
-                      {t('Features.stateLaws.title')}
-                    </h1>
-                    <p className="text-base text-muted-foreground">
-                      {t('Features.stateLaws.description')}
+                  <div className="space-y-2 mt-auto">
+                    <h3 className="text-lg font-bold text-slate-900">
+                      {t('Landing.features.letterGeneration.title')}
+                    </h3>
+                    <p className="text-sm text-slate-600 line-clamp-2">
+                      {t('Landing.features.letterGeneration.description')}
                     </p>
-                  </div>
-                  
-                  <div className="flex flex-col items-start justify-start gap-6 w-full">
-                    <div className="flex flex-col items-start justify-start gap-4 w-full">
-                      <h3 className="text-xl font-bold text-foreground">{t('Features.stateLaws.stat1Label')}</h3>
-                      <p className="text-base text-muted-foreground">
-                        {t('Features.stateLaws.stat1Description')}
-                      </p>
-                    </div>
-                    
-                    <div className="flex flex-col items-start justify-start gap-4 w-full">
-                      <h3 className="text-xl font-bold text-foreground">{t('Features.stateLaws.stat2Label')}</h3>
-                      <p className="text-base text-muted-foreground">
-                        {t('Features.stateLaws.stat2Description')}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div>
                     <button 
                       onClick={() => setCurrentPage('upload')}
-                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
+                      className="inline-flex items-center gap-2 text-[#6039B3] hover:text-[#5030A0] font-medium text-sm pt-1"
                     >
-                      {t('Features.stateLaws.cta')}
+                      {t('Landing.features.letterGeneration.cta')}
+                      <HugeiconsIcon icon={ArrowRight01Icon} size={14} strokeWidth={2} className="transition-transform group-hover:translate-x-1" />
                     </button>
                   </div>
-                </div>
-                
-                <div className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
-                  <Image 
-                    src="/pictures/laws.png" 
-                    alt="Know Your Renter Rights" 
-                    width={1200} 
-                    height={900}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+                </motion.div>
               </div>
-
-              {/* Desktop Layout - Image Right */}
-              <div className="hidden lg:flex justify-between items-center gap-20">
-                <div className="flex flex-col gap-8 flex-1 max-w-xl">
-                  <div className="flex flex-col gap-6">
-                    <h1 className="text-4xl font-bold text-foreground">
-                      {t('Features.stateLaws.title')}
-                    </h1>
-                    <p className="text-base text-muted-foreground">
-                      {t('Features.stateLaws.description')}
-                    </p>
-                  </div>
-                  
-                  <div className="flex gap-8">
-                    <div className="flex flex-col gap-2 flex-1">
-                      <h2 className="text-3xl font-bold text-foreground">{t('Features.stateLaws.stat1Label')}</h2>
-                      <p className="text-base text-muted-foreground">
-                        {t('Features.stateLaws.stat1Description')}
-                      </p>
-                    </div>
-                    <div className="flex flex-col gap-2 flex-1">
-                      <h2 className="text-3xl font-bold text-foreground">{t('Features.stateLaws.stat2Label')}</h2>
-                      <p className="text-base text-muted-foreground">
-                        {t('Features.stateLaws.stat2Description')}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <button 
-                      onClick={() => setCurrentPage('upload')}
-                      className="inline-flex h-10 items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#6039B3] text-sm font-medium text-white hover:bg-[#5030A0] active:bg-[#4829A0] transition-all duration-200 shadow-[0_-2px_4px_0_rgba(0,0,0,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset] hover:shadow-[0_-2px_6px_0_rgba(0,0,0,0.35)_inset,0_2px_6px_0_rgba(255,255,255,0.35)_inset] transform hover:-translate-y-0.5"
-                    >
-                      {t('Features.stateLaws.cta')}
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="flex-1 flex justify-center">
-                  <div className="w-full max-w-2xl aspect-[4/3] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
-                    <Image 
-                      src="/pictures/laws.png" 
-                      alt="Know Your Renter Rights" 
-                      width={1200} 
-                      height={900}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Feature 4: Market Dashboard */}
-            <div className="container mx-auto max-w-6xl px-6">
-              {/* Mobile Layout */}
-              <div className="lg:hidden flex flex-col items-start justify-start gap-12 max-w-2xl mx-auto">
-                <div className="flex flex-col items-start justify-start gap-10 w-full">
-                  <div className="flex flex-col items-start justify-start gap-6 w-full">
-                    <h1 className="text-3xl font-bold text-foreground">
-                      {t('Features.marketData.title')}
-                    </h1>
-                    <p className="text-base text-muted-foreground">
-                      {t('Features.marketData.description')}
-                    </p>
-                  </div>
-                  
-                  <div className="flex flex-col items-start justify-start gap-6 w-full">
-                    <div className="flex flex-col items-start justify-start gap-4 w-full">
-                      <h3 className="text-xl font-bold text-foreground">{t('Features.marketData.stat1Label')}</h3>
-                      <p className="text-base text-muted-foreground">
-                        {t('Features.marketData.stat1Description')}
-                      </p>
-                    </div>
-                    
-                    <div className="flex flex-col items-start justify-start gap-4 w-full">
-                      <h3 className="text-xl font-bold text-foreground">{t('Features.marketData.stat2Label')}</h3>
-                      <p className="text-base text-muted-foreground">
-                        {t('Features.marketData.stat2Description')}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="inline-flex h-10 items-center justify-center gap-2 px-6 py-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
-                      <p className="text-sm font-medium text-[#800000]">{t('Features.marketData.status')}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
-                  <Image 
-                    src="/pictures/rent.png" 
-                    alt="Market Dashboard" 
-                    width={1200} 
-                    height={900}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
-
-              {/* Desktop Layout - Image Left */}
-              <div className="hidden lg:flex flex-row-reverse justify-between items-center gap-20">
-                <div className="flex flex-col gap-8 flex-1 max-w-xl">
-                  <div className="flex flex-col gap-6">
-                    <h1 className="text-4xl font-bold text-foreground">
-                      {t('Features.marketData.title')}
-                    </h1>
-                    <p className="text-base text-muted-foreground">
-                      {t('Features.marketData.description')}
-                    </p>
-                  </div>
-                  
-                  <div className="flex gap-8">
-                    <div className="flex flex-col gap-2 flex-1">
-                      <h2 className="text-3xl font-bold text-foreground">{t('Features.marketData.stat1Label')}</h2>
-                      <p className="text-base text-muted-foreground">
-                        {t('Features.marketData.stat1Description')}
-                      </p>
-                    </div>
-                    <div className="flex flex-col gap-2 flex-1">
-                      <h2 className="text-3xl font-bold text-foreground">{t('Features.marketData.stat2Label')}</h2>
-                      <p className="text-base text-muted-foreground">
-                        {t('Features.marketData.stat2Description')}
-                      </p>
             </div>
           </div>
 
-                  <div>
-                    <div className="inline-flex h-10 items-center justify-center gap-2 px-6 py-2 rounded-[10px] bg-[#F5F1FD] shadow-[0_-2px_4px_0_rgba(203,197,237,0.30)_inset,0_2px_4px_0_rgba(255,255,255,0.30)_inset]">
-                      <p className="text-sm font-medium text-[#800000]">{t('Features.marketData.status')}</p>
+          {/* Use Cases Section */}
+          <div className="py-20 bg-slate-50">
+            <div className="px-6 md:px-12 lg:px-20">
+              {/* Use Case Boxes - Horizontal Row */}
+              <div className="flex flex-wrap justify-center gap-4 max-w-7xl mx-auto mb-12">
+                {/* Use Case 1: Unfair Charges */}
+                <motion.button
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  viewport={{ once: true }}
+                  onClick={() => setActiveUseCase(activeUseCase === 'unfair-charges' ? '' : 'unfair-charges')}
+                  className={`flex-1 min-w-[200px] max-w-[280px] text-center rounded-xl border-2 p-6 transition-all duration-300 cursor-pointer bg-white ${
+                    activeUseCase === 'unfair-charges' 
+                      ? 'border-[#6039B3] bg-[#6039B3]/5 shadow-lg' 
+                      : 'border-slate-300 hover:shadow-2xl hover:scale-105'
+                  }`}
+                >
+                  <div className="flex flex-col items-center gap-3">
+                    <div className={`flex items-center justify-center w-12 h-12 rounded-full ${
+                      activeUseCase === 'unfair-charges' ? 'bg-[#6039B3]' : 'bg-slate-100'
+                    }`}>
+                      <HugeiconsIcon 
+                        icon={DollarCircleIcon} 
+                        size={24} 
+                        strokeWidth={1.5} 
+                        className={activeUseCase === 'unfair-charges' ? 'text-white' : 'text-slate-600'} 
+                      />
                     </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-slate-900 mb-1">
+                        {t('Landing.useCases.unfairCharges.title')}
+                      </h3>
+                      <p className="text-xs text-slate-600">
+                        {t('Landing.useCases.unfairCharges.subtitle')}
+                      </p>
+                    </div>
+                  </div>
+                </motion.button>
+
+                {/* Use Case 2: Getting Repairs */}
+                <motion.button
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  viewport={{ once: true }}
+                  onClick={() => setActiveUseCase(activeUseCase === 'getting-repairs' ? '' : 'getting-repairs')}
+                  className={`flex-1 min-w-[200px] max-w-[280px] text-center rounded-xl border-2 p-6 transition-all duration-300 cursor-pointer bg-white ${
+                    activeUseCase === 'getting-repairs' 
+                      ? 'border-[#6039B3] bg-[#6039B3]/5 shadow-lg' 
+                      : 'border-slate-300 hover:shadow-2xl hover:scale-105'
+                  }`}
+                >
+                  <div className="flex flex-col items-center gap-3">
+                    <div className={`flex items-center justify-center w-12 h-12 rounded-full ${
+                      activeUseCase === 'getting-repairs' ? 'bg-[#6039B3]' : 'bg-slate-100'
+                    }`}>
+                      <HugeiconsIcon 
+                        icon={Settings02Icon} 
+                        size={24} 
+                        strokeWidth={1.5} 
+                        className={activeUseCase === 'getting-repairs' ? 'text-white' : 'text-slate-600'} 
+                      />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-slate-900 mb-1">
+                        {t('Landing.useCases.gettingRepairs.title')}
+                      </h3>
+                      <p className="text-xs text-slate-600">
+                        {t('Landing.useCases.gettingRepairs.subtitle')}
+                      </p>
+                    </div>
+                  </div>
+                </motion.button>
+
+                {/* Use Case 3: Breaking Lease */}
+                <motion.button
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  viewport={{ once: true }}
+                  onClick={() => setActiveUseCase(activeUseCase === 'breaking-lease' ? '' : 'breaking-lease')}
+                  className={`flex-1 min-w-[200px] max-w-[280px] text-center rounded-xl border-2 p-6 transition-all duration-300 cursor-pointer bg-white ${
+                    activeUseCase === 'breaking-lease' 
+                      ? 'border-[#6039B3] bg-[#6039B3]/5 shadow-lg' 
+                      : 'border-slate-300 hover:shadow-2xl hover:scale-105'
+                  }`}
+                >
+                  <div className="flex flex-col items-center gap-3">
+                    <div className={`flex items-center justify-center w-12 h-12 rounded-full ${
+                      activeUseCase === 'breaking-lease' ? 'bg-[#6039B3]' : 'bg-slate-100'
+                    }`}>
+                      <HugeiconsIcon 
+                        icon={DoorIcon} 
+                        size={24} 
+                        strokeWidth={1.5} 
+                        className={activeUseCase === 'breaking-lease' ? 'text-white' : 'text-slate-600'} 
+                      />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-slate-900 mb-1">
+                        {t('Landing.useCases.breakingLease.title')}
+                      </h3>
+                      <p className="text-xs text-slate-600">
+                        {t('Landing.useCases.breakingLease.subtitle')}
+                      </p>
+                    </div>
+                  </div>
+                </motion.button>
+
+                {/* Use Case 4: Before Signing */}
+                <motion.button
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  viewport={{ once: true }}
+                  onClick={() => setActiveUseCase(activeUseCase === 'before-signing' ? '' : 'before-signing')}
+                  className={`flex-1 min-w-[200px] max-w-[280px] text-center rounded-xl border-2 p-6 transition-all duration-300 cursor-pointer bg-white ${
+                    activeUseCase === 'before-signing' 
+                      ? 'border-[#6039B3] bg-[#6039B3]/5 shadow-lg' 
+                      : 'border-slate-300 hover:shadow-2xl hover:scale-105'
+                  }`}
+                >
+                  <div className="flex flex-col items-center gap-3">
+                    <div className={`flex items-center justify-center w-12 h-12 rounded-full ${
+                      activeUseCase === 'before-signing' ? 'bg-[#6039B3]' : 'bg-slate-100'
+                    }`}>
+                      <HugeiconsIcon 
+                        icon={DocumentCodeIcon} 
+                        size={24} 
+                        strokeWidth={1.5} 
+                        className={activeUseCase === 'before-signing' ? 'text-white' : 'text-slate-600'} 
+                      />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-slate-900 mb-1">
+                        {t('Landing.useCases.beforeSigning.title')}
+                      </h3>
+                      <p className="text-xs text-slate-600">
+                        {t('Landing.useCases.beforeSigning.subtitle')}
+                      </p>
+                    </div>
+                  </div>
+                </motion.button>
+              </div>
+
+              {/* Expanded Content Area */}
+              {activeUseCase && (
+                <motion.div
+                  key={activeUseCase}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                  className="max-w-7xl mx-auto mt-8"
+                >
+                  <div className="p-8 md:p-12">
+                    {activeUseCase === 'unfair-charges' && (
+                      <div className="grid md:grid-cols-2 gap-8 items-center">
+                        <div className="order-2 md:order-1">
+                          <div className="max-w-lg">
+                            <img
+                              src="/unfair-charges.png"
+                              alt="Unfair charges detection"
+                              className="w-full h-auto rounded-lg shadow-lg"
+                            />
+                          </div>
+                        </div>
+                        <div className="order-1 md:order-2 space-y-6">
+                          <h3 className="text-2xl md:text-3xl font-bold text-slate-900">
+                            {t('Landing.useCases.unfairCharges.heading')}
+                          </h3>
+                          <p className="text-base text-slate-600 leading-relaxed">
+                            {t('Landing.useCases.unfairCharges.description')}
+                          </p>
+                          <ul className="space-y-3">
+                            {[
+                              t('Landing.useCases.unfairCharges.feature1'),
+                              t('Landing.useCases.unfairCharges.feature2'),
+                              t('Landing.useCases.unfairCharges.feature3'),
+                              t('Landing.useCases.unfairCharges.feature4')
+                            ].map((feature, idx) => (
+                              <li key={idx} className="flex items-start gap-3">
+                                <HugeiconsIcon icon={CheckmarkCircle01Icon} size={20} strokeWidth={2} className="text-[#6039B3] mt-0.5 flex-shrink-0" />
+                                <span className="text-sm text-slate-700">{feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeUseCase === 'getting-repairs' && (
+                      <div className="grid md:grid-cols-2 gap-8 items-center">
+                        <div className="order-2 md:order-1">
+                          <div className="max-w-lg">
+                            <img
+                              src="/getting-repairs.png"
+                              alt="Repair rights and procedures"
+                              className="w-full h-auto rounded-lg shadow-lg"
+                            />
+                          </div>
+                        </div>
+                        <div className="order-1 md:order-2 space-y-6">
+                          <h3 className="text-2xl md:text-3xl font-bold text-slate-900">
+                            {t('Landing.useCases.gettingRepairs.heading')}
+                          </h3>
+                          <p className="text-base text-slate-600 leading-relaxed">
+                            {t('Landing.useCases.gettingRepairs.description')}
+                          </p>
+                          <ul className="space-y-3">
+                            {[
+                              t('Landing.useCases.gettingRepairs.feature1'),
+                              t('Landing.useCases.gettingRepairs.feature2'),
+                              t('Landing.useCases.gettingRepairs.feature3'),
+                              t('Landing.useCases.gettingRepairs.feature4')
+                            ].map((feature, idx) => (
+                              <li key={idx} className="flex items-start gap-3">
+                                <HugeiconsIcon icon={CheckmarkCircle01Icon} size={20} strokeWidth={2} className="text-[#6039B3] mt-0.5 flex-shrink-0" />
+                                <span className="text-sm text-slate-700">{feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeUseCase === 'breaking-lease' && (
+                      <div className="grid md:grid-cols-2 gap-8 items-center">
+                        <div className="order-2 md:order-1">
+                          <div className="max-w-lg">
+                            <img
+                              src="/breaking-lease.png"
+                              alt="Early lease termination"
+                              className="w-full h-auto rounded-lg shadow-lg"
+                            />
+                          </div>
+                        </div>
+                        <div className="order-1 md:order-2 space-y-6">
+                          <h3 className="text-2xl md:text-3xl font-bold text-slate-900">
+                            {t('Landing.useCases.breakingLease.heading')}
+                          </h3>
+                          <p className="text-base text-slate-600 leading-relaxed">
+                            {t('Landing.useCases.breakingLease.description')}
+                          </p>
+                          <ul className="space-y-3">
+                            {[
+                              t('Landing.useCases.breakingLease.feature1'),
+                              t('Landing.useCases.breakingLease.feature2'),
+                              t('Landing.useCases.breakingLease.feature3'),
+                              t('Landing.useCases.breakingLease.feature4')
+                            ].map((feature, idx) => (
+                              <li key={idx} className="flex items-start gap-3">
+                                <HugeiconsIcon icon={CheckmarkCircle01Icon} size={20} strokeWidth={2} className="text-[#6039B3] mt-0.5 flex-shrink-0" />
+                                <span className="text-sm text-slate-700">{feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeUseCase === 'before-signing' && (
+                      <div className="grid md:grid-cols-2 gap-8 items-center">
+                        <div className="order-2 md:order-1">
+                          <div className="max-w-lg">
+                            <img
+                              src="/before-signing.png"
+                              alt="Lease review before signing"
+                              className="w-full h-auto rounded-lg shadow-lg"
+                            />
+                          </div>
+                        </div>
+                        <div className="order-1 md:order-2 space-y-6">
+                          <h3 className="text-2xl md:text-3xl font-bold text-slate-900">
+                            {t('Landing.useCases.beforeSigning.heading')}
+                          </h3>
+                          <p className="text-base text-slate-600 leading-relaxed">
+                            {t('Landing.useCases.beforeSigning.description')}
+                          </p>
+                          <ul className="space-y-3">
+                            {[
+                              t('Landing.useCases.beforeSigning.feature1'),
+                              t('Landing.useCases.beforeSigning.feature2'),
+                              t('Landing.useCases.beforeSigning.feature3'),
+                              t('Landing.useCases.beforeSigning.feature4')
+                            ].map((feature, idx) => (
+                              <li key={idx} className="flex items-start gap-3">
+                                <HugeiconsIcon icon={CheckmarkCircle01Icon} size={20} strokeWidth={2} className="text-[#6039B3] mt-0.5 flex-shrink-0" />
+                                <span className="text-sm text-slate-700">{feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          </div>
+
+          {/* Testimonials Section */}
+          <div className="py-20 bg-slate-50 overflow-hidden">
+            {/* Section Header */}
+            <div className="px-6 md:px-12 lg:px-20 mb-12">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+                className="text-center max-w-3xl mx-auto"
+              >
+                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
+                  {t('Landing.testimonials.title')}
+                </h2>
+                <p className="text-base text-slate-600">
+                  {t('Landing.testimonials.subtitle')}
+                </p>
+              </motion.div>
+            </div>
+
+            {/* Dual Row Infinite Scroll - Full Width No Constraints */}
+            <div className="space-y-4 relative w-full">
+              {/* Left fade overlay */}
+              <div className="absolute left-0 top-0 bottom-0 w-32 md:w-40 bg-gradient-to-r from-slate-50 via-slate-50/90 to-transparent z-10 pointer-events-none" />
+              {/* Right fade overlay */}
+              <div className="absolute right-0 top-0 bottom-0 w-32 md:w-40 bg-gradient-to-l from-slate-50 via-slate-50/90 to-transparent z-10 pointer-events-none" />
+                {/* Row 1 - Scroll Left to Right */}
+                <div className="w-full overflow-hidden">
+                  <div className="flex gap-4 animate-scroll-right hover:pause-animation w-max">
+                    {/* Duplicate cards for seamless loop */}
+                    {[...Array(3)].map((_, setIndex) => (
+                      <div key={setIndex} className="flex gap-4 flex-shrink-0">
+                        {/* Review 1 */}
+                        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 w-[350px] flex-shrink-0">
+                          <div className="flex items-start gap-3 mb-4">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#6039B3] flex items-center justify-center text-white font-semibold text-sm">
+                              S
+                            </div>
+                            <div>
+                              <p className="font-semibold text-slate-900">Sarah M.</p>
+                              <p className="text-sm text-slate-600">Student, Chicago</p>
+                            </div>
+                          </div>
+                          <p className="text-base text-slate-700 leading-relaxed">
+                            "LeaseChat helped me catch unfair fees in my lease. Saved me $800!"
+                          </p>
+                        </div>
+
+                        {/* Review 2 */}
+                        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 w-[350px] flex-shrink-0">
+                          <div className="flex items-start gap-3 mb-4">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#6039B3] flex items-center justify-center text-white font-semibold text-sm">
+                              J
+                            </div>
+                            <div>
+                              <p className="font-semibold text-slate-900">James T.</p>
+                              <p className="text-sm text-slate-600">First-time renter, New York</p>
+                            </div>
+                          </div>
+                          <p className="text-base text-slate-700 leading-relaxed">
+                            "I finally understand my rights as a renter. This tool is incredible."
+                          </p>
+                        </div>
+
+                        {/* Review 3 */}
+                        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 w-[350px] flex-shrink-0">
+                          <div className="flex items-start gap-3 mb-4">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#6039B3] flex items-center justify-center text-white font-semibold text-sm">
+                              M
+                            </div>
+                            <div>
+                              <p className="font-semibold text-slate-900">Maria G.</p>
+                              <p className="text-sm text-slate-600">Young professional, Austin</p>
+                            </div>
+                          </div>
+                          <p className="text-base text-slate-700 leading-relaxed">
+                            "The AI explained complicated legal terms in plain English."
+                          </p>
+                        </div>
+
+                        {/* Review 4 */}
+                        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 w-[350px] flex-shrink-0">
+                          <div className="flex items-start gap-3 mb-4">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#6039B3] flex items-center justify-center text-white font-semibold text-sm">
+                              D
+                            </div>
+                            <div>
+                              <p className="font-semibold text-slate-900">David L.</p>
+                              <p className="text-sm text-slate-600">Teacher, Seattle</p>
+                            </div>
+                          </div>
+                          <p className="text-base text-slate-700 leading-relaxed">
+                            "Found out my landlord can't charge me for normal wear and tear."
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                <div className="flex-1 flex justify-center">
-                  <div className="w-full max-w-2xl aspect-[4/3] rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
-                    <Image 
-                      src="/pictures/rent.png" 
-                      alt="Market Dashboard" 
-                      width={1200} 
-                      height={900}
-                      className="w-full h-full object-cover"
-                    />
+                {/* Row 2 - Scroll Right to Left */}
+                <div className="w-full overflow-hidden">
+                  <div className="flex gap-4 animate-scroll-left hover:pause-animation w-max">
+                    {/* Duplicate cards for seamless loop */}
+                    {[...Array(3)].map((_, setIndex) => (
+                      <div key={setIndex} className="flex gap-4 flex-shrink-0">
+                        {/* Review 5 */}
+                        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 w-[350px] flex-shrink-0">
+                          <div className="flex items-start gap-3 mb-4">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#6039B3] flex items-center justify-center text-white font-semibold text-sm">
+                              A
+                            </div>
+                            <div>
+                              <p className="font-semibold text-slate-900">Alex R.</p>
+                              <p className="text-sm text-slate-600">Graduate student, Boston</p>
+                            </div>
+                          </div>
+                          <p className="text-base text-slate-700 leading-relaxed">
+                            "Best free tool for renters. Wish I had this years ago!"
+                          </p>
+                        </div>
+
+                        {/* Review 6 */}
+                        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 w-[350px] flex-shrink-0">
+                          <div className="flex items-start gap-3 mb-4">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#6039B3] flex items-center justify-center text-white font-semibold text-sm">
+                              E
+                            </div>
+                            <div>
+                              <p className="font-semibold text-slate-900">Emily W.</p>
+                              <p className="text-sm text-slate-600">Remote worker, Denver</p>
+                            </div>
+                          </div>
+                          <p className="text-base text-slate-700 leading-relaxed">
+                            "Helped me write a professional letter to my landlord about repairs."
+                          </p>
+                        </div>
+
+                        {/* Review 7 */}
+                        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 w-[350px] flex-shrink-0">
+                          <div className="flex items-start gap-3 mb-4">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#6039B3] flex items-center justify-center text-white font-semibold text-sm">
+                              K
+                            </div>
+                            <div>
+                              <p className="font-semibold text-slate-900">Kevin P.</p>
+                              <p className="text-sm text-slate-600">Freelancer, Los Angeles</p>
+                            </div>
+                          </div>
+                          <p className="text-base text-slate-700 leading-relaxed">
+                            "Straightforward interface and actually helpful AI. No legal jargon."
+                          </p>
+                        </div>
+
+                        {/* Review 8 */}
+                        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 w-[350px] flex-shrink-0">
+                          <div className="flex items-start gap-3 mb-4">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#6039B3] flex items-center justify-center text-white font-semibold text-sm">
+                              L
+                            </div>
+                            <div>
+                              <p className="font-semibold text-slate-900">Lisa H.</p>
+                              <p className="text-sm text-slate-600">Nurse, Miami</p>
+                            </div>
+                          </div>
+                          <p className="text-base text-slate-700 leading-relaxed">
+                            "Caught several red flags before signing my lease. Dodged a bullet!"
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
+          </div>
+
+          {/* Bottom CTA Section with Background Image */}
+          <div className="relative py-24 overflow-hidden bg-slate-50">
+            {/* Floating Card */}
+            <div className="relative z-20 px-6 md:px-12 lg:px-20">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                viewport={{ once: true }}
+                className="max-w-5xl mx-auto"
+              >
+                <div className="relative rounded-2xl shadow-lg p-10 md:p-14 text-center overflow-hidden">
+                  {/* Blurred Background Image */}
+                  <div className="absolute inset-0 z-0">
+                    <img
+                      src="/banner.png"
+                      alt="Background"
+                      className="w-full h-full object-cover blur-sm"
+                    />
+                  </div>
+                  
+                  {/* Purple Gradient Overlay */}
+                  <div className="absolute inset-0 z-10 bg-gradient-to-br from-purple-400/60 via-purple-300/50 to-blue-400/60" />
+                  
+                  {/* Content */}
+                  <div className="relative z-20">
+                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-5 leading-tight drop-shadow-md">
+                      {t('Landing.cta.heading')}
+                    </h2>
+                    <p className="text-base md:text-lg text-white/95 mb-8 max-w-2xl mx-auto drop-shadow">
+                      {t('Landing.cta.subtitle')}
+                    </p>
+
+                    {/* CTA Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                      <button
+                        onClick={() => setCurrentPage('upload')}
+                        className="px-7 py-3.5 bg-white text-[#6039B3] rounded-lg font-semibold text-base hover:bg-slate-50 transition-all shadow-md hover:shadow-lg hover:scale-[1.02] duration-200"
+                      >
+                        {t('Landing.cta.button1')}
+                      </button>
+                      <button
+                        onClick={() => {
+                          // Scroll to features section
+                          const featuresSection = document.querySelector('[data-section="features"]');
+                          if (featuresSection) {
+                            featuresSection.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
+                        className="px-7 py-3.5 bg-white/10 backdrop-blur-sm border-2 border-white/40 text-white rounded-lg font-semibold text-base hover:bg-white/20 transition-all hover:scale-[1.02] duration-200"
+                      >
+                        {t('Landing.cta.button2')}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
             </div>
           </div>
         </main>
@@ -1168,12 +1464,12 @@ export default function LeaseWiseApp() {
                     <h3 className={`text-lg font-semibold mb-2 ${
                       analysisMode === 'full-analysis' ? 'text-purple-900' : 'text-slate-900'
                     }`}>
-                      Analyze My Lease
+                      {t('AnalyzePage.featureSelection.analyzeTitle')}
                     </h3>
                     <p className={`text-sm ${
                       analysisMode === 'full-analysis' ? 'text-purple-700' : 'text-slate-600'
                     }`}>
-                      Full analysis with red flags, AI chat, and personalized insights
+                      {t('AnalyzePage.featureSelection.analyzeDescription')}
                     </p>
                   </div>
                   {analysisMode === 'full-analysis' && (
@@ -1202,12 +1498,12 @@ export default function LeaseWiseApp() {
                     <h3 className={`text-lg font-semibold mb-2 ${
                       analysisMode === 'address-only' ? 'text-purple-900' : 'text-slate-900'
                     }`}>
-                      Know My Rights
+                      {t('AnalyzePage.featureSelection.knowRightsTitle')}
                     </h3>
                     <p className={`text-sm ${
                       analysisMode === 'address-only' ? 'text-purple-700' : 'text-slate-600'
                     }`}>
-                      Quick lookup of tenant rights for your area (no lease needed)
+                      {t('AnalyzePage.featureSelection.knowRightsDescription')}
                     </p>
                   </div>
                   {analysisMode === 'address-only' && (
@@ -1322,7 +1618,7 @@ export default function LeaseWiseApp() {
                     id="userName"
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
-                    placeholder="Enter your full name"
+                    placeholder={t('AnalyzePage.userInfo.placeholders.fullName')}
                     className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                     required
                   />
@@ -1337,7 +1633,7 @@ export default function LeaseWiseApp() {
                     id="userEmail"
                     value={userEmail}
                     onChange={(e) => setUserEmail(e.target.value)}
-                    placeholder="Enter your email address"
+                    placeholder={t('AnalyzePage.userInfo.placeholders.email')}
                     className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                     required
                   />
@@ -1357,7 +1653,7 @@ export default function LeaseWiseApp() {
               {address && (
                 <div className="mt-4 flex items-center justify-center gap-2 text-green-700">
                   <HugeiconsIcon icon={CheckmarkCircle01Icon} size={20} strokeWidth={1.5} />
-                  <span className="text-sm font-medium">Address confirmed</span>
+                  <span className="text-sm font-medium">{t('AnalyzePage.userInfo.addressConfirmed')}</span>
                 </div>
               )}
             </div>
@@ -1706,8 +2002,8 @@ export default function LeaseWiseApp() {
           return (
             <div className="mb-8">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-slate-900">Key Lease Terms</h2>
-                <p className="text-slate-600 mt-1">Essential information from your lease agreement</p>
+                <h2 className="text-2xl font-bold text-slate-900">{t('ResultsPage.keyLeaseTerms.title')}</h2>
+                <p className="text-slate-600 mt-1">{t('ResultsPage.keyLeaseTerms.subtitle')}</p>
               </div>
               
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 divide-y divide-slate-200/60">
@@ -1718,38 +2014,38 @@ export default function LeaseWiseApp() {
                       <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
                         <HugeiconsIcon icon={DocumentValidationIcon} size={20} strokeWidth={1.5} className="text-slate-700" />
                       </div>
-                      <h3 className="text-lg font-semibold text-slate-900">Important Terms</h3>
+                      <h3 className="text-lg font-semibold text-slate-900">{t('ResultsPage.keyLeaseTerms.importantTerms')}</h3>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
                       {ds.tenant_names && ds.tenant_names.length > 0 && (
                         <div>
-                          <div className="text-sm font-medium text-slate-500 mb-1">Lessees (Residents)</div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">{t('ResultsPage.keyLeaseTerms.lessees')}</div>
                           <div className="text-base text-slate-900">{ds.tenant_names.join(' and ')}</div>
                         </div>
                       )}
                       
                       {ds.apartment_unit && (
                         <div>
-                          <div className="text-sm font-medium text-slate-500 mb-1">Apartment</div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">{t('ResultsPage.keyLeaseTerms.apartment')}</div>
                           <div className="text-base font-semibold text-slate-900">{ds.apartment_unit}</div>
                         </div>
                       )}
                       
                       {ds.lease_renewal_type && (
                         <div>
-                          <div className="text-sm font-medium text-slate-500 mb-1">Lease Renewal</div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">{t('ResultsPage.keyLeaseTerms.leaseRenewal')}</div>
                           <div className="text-base text-slate-900">
-                            {ds.lease_renewal_type === 'automatic' ? 'Automatically renews' : 'Does not automatically renew'}
+                            {ds.lease_renewal_type === 'automatic' ? t('ResultsPage.keyLeaseTerms.automaticallyRenews') : t('ResultsPage.keyLeaseTerms.doesNotRenew')}
                           </div>
                         </div>
                       )}
                       
                       {ds.move_out_notice_days && (
                         <div>
-                          <div className="text-sm font-medium text-slate-500 mb-1">Move-Out Notice</div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">{t('ResultsPage.keyLeaseTerms.moveOutNotice')}</div>
                           <div className="text-base text-slate-900">
-                            At least {ds.move_out_notice_days} days written notice required
+                            {t('ResultsPage.keyLeaseTerms.atLeastDaysNotice', { days: ds.move_out_notice_days })}
                             {ds.move_out_notice_consequence && (
                               <span className="block mt-1 text-sm text-slate-600">{ds.move_out_notice_consequence}</span>
                             )}
@@ -1767,36 +2063,36 @@ export default function LeaseWiseApp() {
                       <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
                         <HugeiconsIcon icon={ChartHistogramIcon} size={20} strokeWidth={1.5} className="text-slate-700" />
                       </div>
-                      <h3 className="text-lg font-semibold text-slate-900">Financial Terms</h3>
+                      <h3 className="text-lg font-semibold text-slate-900">{t('ResultsPage.keyLeaseTerms.financialTerms')}</h3>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
                       {ds.administrative_fee && ds.administrative_fee > 0 && (
                         <div>
-                          <div className="text-sm font-medium text-slate-500 mb-1">Administrative Fee</div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">{t('ResultsPage.keyLeaseTerms.administrativeFee')}</div>
                           <div className="text-xl font-bold text-slate-900">${ds.administrative_fee.toLocaleString()}</div>
                         </div>
                       )}
                       
                       {ds.rent_concession !== undefined && ds.rent_concession !== null && (
                         <div>
-                          <div className="text-sm font-medium text-slate-500 mb-1">Rent Concession</div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">{t('ResultsPage.keyLeaseTerms.rentConcession')}</div>
                           <div className="text-xl font-bold text-slate-900">${ds.rent_concession.toLocaleString()}</div>
                         </div>
                       )}
                       
                       {ds.returned_payment_fee && ds.returned_payment_fee > 0 && (
                         <div>
-                          <div className="text-sm font-medium text-slate-500 mb-1">Returned Payment Fee</div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">{t('ResultsPage.keyLeaseTerms.returnedPaymentFee')}</div>
                           <div className="text-xl font-bold text-slate-900">${ds.returned_payment_fee.toLocaleString()}</div>
                         </div>
                       )}
                       
                       {ds.late_fee_formula && (
                         <div className="md:col-span-2">
-                          <div className="text-sm font-medium text-slate-500 mb-1">Late Rent</div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">{t('ResultsPage.keyLeaseTerms.lateRent')}</div>
                           <div className="text-base text-slate-900 leading-relaxed">
-                            {ds.late_fee_day && `If not paid by day ${ds.late_fee_day}, `}
+                            {ds.late_fee_day && t('ResultsPage.keyLeaseTerms.ifNotPaidByDay', { day: ds.late_fee_day })}
                             {ds.late_fee_formula}
                           </div>
                         </div>
@@ -1812,43 +2108,43 @@ export default function LeaseWiseApp() {
                       <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
                         <HugeiconsIcon icon={LinkSquare02Icon} size={20} strokeWidth={1.5} className="text-slate-700" />
                       </div>
-                      <h3 className="text-lg font-semibold text-slate-900">Utilities</h3>
+                      <h3 className="text-lg font-semibold text-slate-900">{t('ResultsPage.keyLeaseTerms.utilities')}</h3>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
                       {ds.utilities?.resident_responsibility && ds.utilities.resident_responsibility.length > 0 && (
                         <div>
-                          <div className="text-sm font-medium text-slate-500 mb-1">Your Responsibility</div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">{t('ResultsPage.keyLeaseTerms.yourResponsibility')}</div>
                           <div className="text-base text-slate-900">{ds.utilities.resident_responsibility.join(', ')}</div>
                         </div>
                       )}
                       
                       {ds.utilities?.owner_allocated && ds.utilities.owner_allocated.length > 0 && (
                         <div>
-                          <div className="text-sm font-medium text-slate-500 mb-1">Owner-Provided (Allocated)</div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">{t('ResultsPage.keyLeaseTerms.ownerProvidedAllocated')}</div>
                           <div className="text-base text-slate-900">{ds.utilities.owner_allocated.join(', ')}</div>
                         </div>
                       )}
                       
                       {ds.utilities?.owner_flat_rate && ds.utilities.owner_flat_rate.length > 0 && (
                         <div>
-                          <div className="text-sm font-medium text-slate-500 mb-1">Owner-Provided (Flat Rate)</div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">{t('ResultsPage.keyLeaseTerms.ownerProvidedFlatRate')}</div>
                           <div className="text-base text-slate-900">{ds.utilities.owner_flat_rate.join(', ')}</div>
                         </div>
                       )}
                       
                       {(ds.utility_admin_fee || ds.utility_setup_fee || ds.utility_processing_fee) && (
                         <div>
-                          <div className="text-sm font-medium text-slate-500 mb-1">Utility Fees</div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">{t('ResultsPage.keyLeaseTerms.utilityFees')}</div>
                           <div className="text-base text-slate-900 space-y-1">
                             {ds.utility_admin_fee && (
-                              <div>Monthly admin: ${ds.utility_admin_fee.toLocaleString()}</div>
+                              <div>{t('ResultsPage.keyLeaseTerms.monthlyAdmin')}: ${ds.utility_admin_fee.toLocaleString()}</div>
                             )}
                             {ds.utility_setup_fee && (
-                              <div>Setup fee: ${ds.utility_setup_fee.toLocaleString()}</div>
+                              <div>{t('ResultsPage.keyLeaseTerms.setupFee')}: ${ds.utility_setup_fee.toLocaleString()}</div>
                             )}
                             {ds.utility_processing_fee && (
-                              <div>Processing fee: ${ds.utility_processing_fee.toLocaleString()}</div>
+                              <div>{t('ResultsPage.keyLeaseTerms.processingFee')}: ${ds.utility_processing_fee.toLocaleString()}</div>
                             )}
                           </div>
                         </div>
@@ -1864,18 +2160,18 @@ export default function LeaseWiseApp() {
                       <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
                         <HugeiconsIcon icon={AlertSquareIcon} size={20} strokeWidth={1.5} className="text-slate-700" />
                       </div>
-                      <h3 className="text-lg font-semibold text-slate-900">Policies & Rules</h3>
+                      <h3 className="text-lg font-semibold text-slate-900">{t('ResultsPage.keyLeaseTerms.policiesAndRules')}</h3>
                     </div>
                     
                     <div className="space-y-5">
                       {ds.smoking_policy && (
                         <div>
-                          <div className="text-sm font-medium text-slate-500 mb-1">Smoking</div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">{t('ResultsPage.keyLeaseTerms.smoking')}</div>
                           <div className="text-base text-slate-900">
                             {ds.smoking_policy}
                             {ds.smoking_violation_fee && (
                               <span className="block mt-1 text-sm text-red-600 font-medium">
-                                Violation fee: ${ds.smoking_violation_fee.toLocaleString()}
+                                {t('ResultsPage.keyLeaseTerms.violationFee')}: ${ds.smoking_violation_fee.toLocaleString()}
                               </span>
                             )}
                           </div>
@@ -1884,24 +2180,24 @@ export default function LeaseWiseApp() {
                       
                       {ds.guest_policy && (
                         <div>
-                          <div className="text-sm font-medium text-slate-500 mb-1">Guests</div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">{t('ResultsPage.keyLeaseTerms.guests')}</div>
                           <div className="text-base text-slate-900">
                             {ds.guest_policy}
-                            {ds.guest_limit_days && ` (max ${ds.guest_limit_days} days)`}
+                            {ds.guest_limit_days && ` (${t('ResultsPage.keyLeaseTerms.maxDays', { days: ds.guest_limit_days })})`}
                           </div>
                         </div>
                       )}
                       
                       {ds.pet_policy && (
                         <div>
-                          <div className="text-sm font-medium text-slate-500 mb-1">Animals</div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">{t('ResultsPage.keyLeaseTerms.animals')}</div>
                           <div className="text-base text-slate-900">
                             {ds.pet_policy}
                             {ds.pet_fees_paid !== undefined && (
                               <span className="block mt-1 text-sm text-slate-600">
                                 {ds.pet_fees_paid > 0 
-                                  ? `Pet fees paid: $${ds.pet_fees_paid.toLocaleString()}`
-                                  : 'No pet fees paid at signing'
+                                  ? `${t('ResultsPage.keyLeaseTerms.petFeesPaid')}: $${ds.pet_fees_paid.toLocaleString()}`
+                                  : t('ResultsPage.keyLeaseTerms.noPetFeesPaid')
                                 }
                               </span>
                             )}
@@ -1911,17 +2207,17 @@ export default function LeaseWiseApp() {
                       
                       {ds.insurance_required && (
                         <div>
-                          <div className="text-sm font-medium text-slate-500 mb-1">Liability Insurance</div>
+                          <div className="text-sm font-medium text-slate-500 mb-1">{t('ResultsPage.keyLeaseTerms.liabilityInsurance')}</div>
                           <div className="text-base text-slate-900">
-                            Required
+                            {t('ResultsPage.keyLeaseTerms.required')}
                             {ds.insurance_min_coverage && (
                               <span className="block text-sm text-slate-600">
-                                Min coverage: ${ds.insurance_min_coverage.toLocaleString()}
+                                {t('ResultsPage.keyLeaseTerms.minCoverage')}: ${ds.insurance_min_coverage.toLocaleString()}
                               </span>
                             )}
                             {ds.insurance_violation_fee && (
                               <span className="block mt-1 text-sm text-red-600 font-medium">
-                                No proof fee: ${ds.insurance_violation_fee.toLocaleString()}/month
+                                {t('ResultsPage.keyLeaseTerms.violationFeeAmount')}: ${ds.insurance_violation_fee.toLocaleString()}/month
                               </span>
                             )}
                           </div>
@@ -1938,7 +2234,7 @@ export default function LeaseWiseApp() {
                       <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
                         <HugeiconsIcon icon={Calendar03Icon} size={20} strokeWidth={1.5} className="text-slate-700" />
                       </div>
-                      <h3 className="text-lg font-semibold text-slate-900">Early Termination</h3>
+                      <h3 className="text-lg font-semibold text-slate-900">{t('ResultsPage.keyLeaseTerms.earlyTermination')}</h3>
                     </div>
                     
                     <div className="space-y-3">
@@ -1946,7 +2242,7 @@ export default function LeaseWiseApp() {
                         <div className="flex items-start gap-3">
                           <HugeiconsIcon icon={CircleIcon} size={8} strokeWidth={2} className="text-slate-400 mt-2 flex-shrink-0" />
                           <div className="text-base text-slate-900">
-                            Give at least {ds.early_termination.notice_days} days written notice
+                            {t('ResultsPage.keyLeaseTerms.giveAtLeastDaysNotice', { days: ds.early_termination.notice_days })}
                           </div>
                         </div>
                       )}
@@ -1955,7 +2251,7 @@ export default function LeaseWiseApp() {
                         <div className="flex items-start gap-3">
                           <HugeiconsIcon icon={CircleIcon} size={8} strokeWidth={2} className="text-slate-400 mt-2 flex-shrink-0" />
                           <div className="text-base text-slate-900">
-                            Pay a buy-out fee of ${ds.early_termination.buyout_fee.toLocaleString()}
+                            {t('ResultsPage.keyLeaseTerms.payBuyoutFee')} ${ds.early_termination.buyout_fee.toLocaleString()}
                             {ds.early_termination.buyout_formula && (
                               <span className="block text-sm text-slate-600 mt-1">
                                 ({ds.early_termination.buyout_formula})
@@ -1969,7 +2265,7 @@ export default function LeaseWiseApp() {
                         <div className="flex items-start gap-3">
                           <HugeiconsIcon icon={CircleIcon} size={8} strokeWidth={2} className="text-slate-400 mt-2 flex-shrink-0" />
                           <div className="text-base text-slate-900">
-                            Repay concessions: ${ds.early_termination.concession_repayment.toLocaleString()}
+                            {t('ResultsPage.keyLeaseTerms.repayConcessions')}: ${ds.early_termination.concession_repayment.toLocaleString()}
                           </div>
                         </div>
                       )}
@@ -2004,7 +2300,7 @@ export default function LeaseWiseApp() {
               <div className="flex items-center gap-3">
                 {analysisResult.redFlags === null ? (
                   <span className="px-3 py-1 text-sm font-medium rounded-full bg-red-100 text-red-700">
-                    Load Info
+                    {t('ResultsPage.rights.loadInfo')}
                   </span>
                 ) : (
                   <span className={`px-3 py-1 text-sm font-medium rounded-full ${
@@ -2096,12 +2392,12 @@ export default function LeaseWiseApp() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <HugeiconsIcon icon={CourtLawIcon} size={32} strokeWidth={1.5} className="text-purple-600" />
-                <h2 className="text-xl font-semibold text-slate-900">Know Your Renter Rights</h2>
+                <h2 className="text-xl font-semibold text-slate-900">{t('ResultsPage.rights.title')}</h2>
               </div>
               <div className="flex items-center gap-3">
                 {!legalTableExpanded && (
                   <span className="px-3 py-1 text-sm font-medium rounded-full bg-purple-100 text-purple-700">
-                    Load Info
+                    {t('ResultsPage.rights.loadInfo')}
                   </span>
                 )}
                 <HugeiconsIcon 
@@ -2148,7 +2444,7 @@ export default function LeaseWiseApp() {
                 <div className="flex items-center gap-3">
                   {!scenarios && (
                     <span className="px-3 py-1 text-sm font-medium rounded-full bg-indigo-100 text-indigo-700">
-                    Load Info
+                    {t('ResultsPage.rights.loadInfo')}
                     </span>
                   )}
                   <HugeiconsIcon 
@@ -2171,8 +2467,8 @@ export default function LeaseWiseApp() {
                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                         className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full"
                       />
-                      <p className="text-slate-600 font-medium">Loading Common Scenarios...</p>
-                      <p className="text-sm text-slate-500">Analyzing your lease for specific situations...</p>
+                      <p className="text-slate-600 font-medium">{t('ResultsPage.scenarios.loading')}</p>
+                      <p className="text-sm text-slate-500">{t('ResultsPage.scenarios.loadingSubtitle')}</p>
                     </div>
                   </div>
                 ) : scenarios && scenarios.scenarios && scenarios.scenarios.length > 0 ? (

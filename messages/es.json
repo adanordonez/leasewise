@@ -20,6 +20,125 @@
     "createdBy": "Creado por",
     "institution": "Universidad de Chicago Facultad de Derecho • Laboratorio de IA"
   },
+  "Landing": {
+    "features": {
+      "badge": "Características",
+      "title": "Todo lo que necesitas para conocer tus derechos",
+      "subtitle": "Herramientas potentes para ayudarte a entender tu contrato y comunicarte con tu propietario.",
+      "aiAnalysis": {
+        "title": "Análisis de Contrato con IA",
+        "description": "Obtén análisis instantáneo con IA de tu contrato. Sube tu PDF y recibe un informe completo en menos de 2 minutos.",
+        "cta": "Más información"
+      },
+      "aiChat": {
+        "title": "Chatea con IA",
+        "description": "Haz preguntas y obtén respuestas instantáneas con contexto de tu documento de contrato.",
+        "cta": "Más información"
+      },
+      "stateLaws": {
+        "title": "Leyes de Alquiler Estatales",
+        "description": "Cobertura completa para los 50 estados con regulaciones específicas de cada ciudad.",
+        "cta": "Más información"
+      },
+      "letterGeneration": {
+        "title": "Generación de Cartas",
+        "description": "Plantillas profesionales para comunicación con el propietario, incluyendo devolución de depósitos y reparaciones.",
+        "cta": "Más información"
+      }
+    },
+    "useCases": {
+      "unfairCharges": {
+        "title": "Atrapó Cargos Injustos",
+        "subtitle": "Descubre tarifas ocultas",
+        "heading": "Detecta cargos injustos antes de pagar",
+        "description": "Sube tu contrato y la IA de LeaseWise identifica instantáneamente tarifas cuestionables, violaciones de depósito de seguridad y cargos que pueden violar las leyes locales de inquilinos. Obtén citas específicas de estatutos para respaldar tus reclamos.",
+        "feature1": "La IA escanea en busca de tarifas ocultas",
+        "feature2": "Compara con las leyes locales de inquilinos",
+        "feature3": "Obtén explicaciones respaldadas por citas",
+        "feature4": "Genera cartas de disputa"
+      },
+      "gettingRepairs": {
+        "title": "Lograr Reparaciones",
+        "subtitle": "Forzar acción del propietario",
+        "heading": "Conoce tus derechos de reparación y mantenimiento",
+        "description": "Entiende exactamente de qué es responsable tu propietario y el plazo legal que debe seguir. Genera cartas profesionales de solicitud de reparación con respaldo legal de la ley de inquilinos de tu estado.",
+        "feature1": "Identifica responsabilidades del propietario",
+        "feature2": "Aprende plazos de reparación",
+        "feature3": "Requisitos legales específicos del estado",
+        "feature4": "Genera solicitudes formales de reparación"
+      },
+      "breakingLease": {
+        "title": "Romper Tu Contrato",
+        "subtitle": "Comprende las penalidades",
+        "heading": "Rompe tu contrato de la manera correcta",
+        "description": "¿Planeas irte antes? LeaseWise analiza tu contrato para mostrarte exactamente cuánto costará, tus obligaciones legales y razones válidas que pueden permitirte romper el contrato sin penalización según la ley estatal.",
+        "feature1": "Calcula costos de terminación anticipada",
+        "feature2": "Entiende tus obligaciones",
+        "feature3": "Encuentra cláusulas de salida legales",
+        "feature4": "Genera avisos de terminación"
+      },
+      "beforeSigning": {
+        "title": "Revisión Antes de Firmar",
+        "subtitle": "Atrapa problemas temprano",
+        "heading": "Revisa antes de firmar",
+        "description": "Analiza tu contrato antes de comprometerte. Nuestra IA revisa cada cláusula, resalta posibles señales de alerta y asegura que entiendas exactamente a qué estás aceptando—antes de que sea demasiado tarde.",
+        "feature1": "Identifica señales de alerta temprano",
+        "feature2": "Entiende todas las obligaciones",
+        "feature3": "Compara con términos estándar",
+        "feature4": "Toma decisiones informadas"
+      }
+    },
+    "testimonials": {
+      "title": "Lo que dicen los inquilinos",
+      "subtitle": "Únete a miles de inquilinos que están protegiendo sus derechos",
+      "review1": {
+        "name": "Sarah M.",
+        "role": "Estudiante, Chicago",
+        "quote": "¡LeaseChat me ayudó a detectar tarifas injustas en mi contrato. Me ahorró $800!"
+      },
+      "review2": {
+        "name": "James T.",
+        "role": "Ingeniero, Austin",
+        "quote": "¡Finalmente entiendo lo que firmé. La función de chat con IA es increíble!"
+      },
+      "review3": {
+        "name": "Maria G.",
+        "role": "Maestra, NYC",
+        "quote": "¡Recuperé mi depósito de seguridad completo usando el generador de cartas!"
+      },
+      "review4": {
+        "name": "David R.",
+        "role": "Diseñador, SF",
+        "quote": "Ojalá hubiera tenido esto antes de firmar mi último contrato. Habría ahorrado mucho estrés."
+      },
+      "review5": {
+        "name": "Emily K.",
+        "role": "Enfermera, Boston",
+        "quote": "¡La sección de leyes estatales me ayudó a entender mis derechos. Muy útil!"
+      },
+      "review6": {
+        "name": "Alex P.",
+        "role": "Desarrollador, Seattle",
+        "quote": "¡Rápido, preciso y gratis. No puedo creer que esto exista!"
+      },
+      "review7": {
+        "name": "Taylor S.",
+        "role": "Estudiante, LA",
+        "quote": "¡Me ayudó a negociar mejores términos antes de firmar. Altamente recomendado!"
+      },
+      "review8": {
+        "name": "Lisa H.",
+        "role": "Enfermera, Miami",
+        "quote": "¡Atrapé varias señales de alerta antes de firmar mi contrato. Esquivé una bala!"
+      }
+    },
+    "cta": {
+      "heading": "Comienza a proteger tus derechos hoy",
+      "subtitle": "Análisis de contratos gratuito con IA en el que confían inquilinos en todo el país",
+      "button1": "Comienza Gratis",
+      "button2": "Más Información"
+    }
+  },
   "Features": {
     "aiAnalysis": {
       "title": "Obtén análisis instantáneo con IA de tu contrato",
@@ -70,6 +189,12 @@
   "AnalyzePage": {
     "title": "Analiza tu contrato",
     "subtitle": "Sube tu contrato de alquiler en PDF e ingresa la dirección de tu propiedad para obtener análisis instantáneo con IA",
+    "featureSelection": {
+      "analyzeTitle": "Analiza Tu Contrato",
+      "analyzeDescription": "Análisis completo con señales de alerta, chat de IA e información personalizada",
+      "knowRightsTitle": "Conoce Tus Derechos",
+      "knowRightsDescription": "Consulta rápida de derechos de inquilino en tu área (no se necesita contrato)"
+    },
     "documentUpload": {
       "title": "Documento de Alquiler",
       "dragDrop": "Haz clic para subir o arrastra y suelta el PDF",
@@ -82,7 +207,13 @@
       "title": "Tu Información",
       "fullName": "Nombre Completo",
       "email": "Correo Electrónico",
-      "address": "Dirección de la Propiedad"
+      "address": "Dirección de la Propiedad",
+      "placeholders": {
+        "fullName": "Ingresa tu nombre completo",
+        "email": "Ingresa tu correo electrónico",
+        "address": "Comienza a escribir tu dirección..."
+      },
+      "addressConfirmed": "Dirección confirmada"
     },
     "cta": "Analizar Contrato",
     "analyzing": "Analizando...",
@@ -148,6 +279,48 @@
       "detected": "detectadas",
       "notSpecified": "No especificado"
     },
+    "keyLeaseTerms": {
+      "title": "Términos Clave del Contrato",
+      "subtitle": "Información esencial de tu contrato de alquiler",
+      "importantTerms": "Términos Importantes",
+      "financialTerms": "Términos Financieros",
+      "utilities": "Servicios Públicos",
+      "lessees": "Arrendatarios (Residentes)",
+      "apartment": "Apartamento",
+      "leaseRenewal": "Renovación del Contrato",
+      "moveOutNotice": "Aviso de Mudanza",
+      "administrativeFee": "Cargo Administrativo",
+      "rentConcession": "Concesión de Renta",
+      "returnedPaymentFee": "Cargo por Pago Devuelto",
+      "lateRent": "Renta Atrasada",
+      "automaticallyRenews": "Se renueva automáticamente",
+      "doesNotRenew": "No se renueva automáticamente",
+      "atLeastDaysNotice": "Se requiere aviso por escrito de al menos {days} días",
+      "ifNotPaidByDay": "Si no se paga antes del día {day}, ",
+      "yourResponsibility": "Tu Responsabilidad",
+      "ownerProvidedAllocated": "Proporcionado por el Propietario (Asignado)",
+      "ownerProvidedFlatRate": "Proporcionado por el Propietario (Tarifa Fija)",
+      "utilityFees": "Cargos por Servicios",
+      "monthlyAdmin": "Admin. mensual",
+      "setupFee": "Cargo de instalación",
+      "processingFee": "Cargo de procesamiento",
+      "policiesAndRules": "Políticas y Normas",
+      "smoking": "Fumar",
+      "guests": "Huéspedes",
+      "animals": "Animales",
+      "violationFee": "Cargo por violación",
+      "petFeesPaid": "Cargos por mascotas pagados",
+      "noPetFeesPaid": "No se pagaron cargos por mascotas al firmar",
+      "maxDays": "máx {days} días",
+      "liabilityInsurance": "Seguro de Responsabilidad",
+      "required": "Obligatorio",
+      "minCoverage": "Cobertura mínima",
+      "violationFeeAmount": "Cargo por violación",
+      "earlyTermination": "Terminación Anticipada",
+      "giveAtLeastDaysNotice": "Dar aviso por escrito de al menos {days} días",
+      "payBuyoutFee": "Pagar un cargo de terminación de",
+      "repayConcessions": "Devolver concesiones"
+    },
     "redFlags": {
       "noneFound": "No se encontraron problemas",
       "noneFoundTitle": "No Se Encontraron Señales de Alerta",
@@ -162,7 +335,8 @@
       "title": "Conoce Tus Derechos como Inquilino",
       "keyCategories": "categorías clave",
       "refresh": "Actualizar",
-      "searchPlaceholder": "Buscar por tipo de ley, explicación o estatuto..."
+      "searchPlaceholder": "Buscar por tipo de ley, explicación o estatuto...",
+      "loadInfo": "Cargar Info"
     },
     "table": {
       "headers": {
@@ -207,7 +381,9 @@
       "scenario3": "Derechos de entrada del propietario y privacidad",
       "scenario4": "Romper mi contrato anticipadamente",
       "whatToDo": "Qué hacer:",
-      "source": "Fuente:"
+      "source": "Fuente:",
+      "loading": "Cargando Escenarios Comunes...",
+      "loadingSubtitle": "Analizando tu contrato para situaciones específicas..."
     }
   },
   "SourceCitation": {
@@ -275,6 +451,22 @@
       "securityDeposit": {
         "name": "Solicitud de Devolución de Depósito de Seguridad",
         "description": "Solicita la devolución de tu depósito de seguridad con respaldo legal"
+      },
+      "lateRent": {
+        "name": "Solicitud de Pago de Renta Retrasado",
+        "description": "Solicita tiempo adicional para pagar la renta con una fecha de pago propuesta"
+      },
+      "repairRequest": {
+        "name": "Solicitud de Reparaciones",
+        "description": "Solicita formalmente reparaciones para problemas en tu unidad de alquiler"
+      },
+      "emergencyRepair": {
+        "name": "Solicitud de Reparación de Emergencia",
+        "description": "Reporta problemas urgentes de seguridad que requieren atención inmediata"
+      },
+      "leaseNonRenewal": {
+        "name": "Aviso de No Renovación de Contrato",
+        "description": "Notifica formalmente a tu propietario que no renovarás tu contrato"
       }
     },
     "form": {
@@ -283,7 +475,21 @@
       "additionalDetails": "Detalles Adicionales (Opcional)",
       "additionalDetailsPlaceholder": "Agrega cualquier detalle específico sobre daños, limpieza u otra información relevante...",
       "generate": "Generar Carta",
-      "generating": "Generando Carta..."
+      "generating": "Generando Carta...",
+      "paymentDate": "Fecha en que Puedes Pagar",
+      "paymentDateHelp": "¿Cuándo podrás hacer el pago completo?",
+      "partialPayment": "Monto de Pago Parcial (Opcional)",
+      "partialPaymentHelp": "Si puedes hacer un pago parcial en la fecha de vencimiento, ingresa el monto aquí",
+      "repairIssues": "Problemas de Reparación",
+      "issue": "Problema",
+      "repairIssuePlaceholder": "ej., Grifo con fuga en la cocina, ventana rota en el dormitorio, etc.",
+      "addAnotherIssue": "Agregar Otro Problema",
+      "repairIssuesHelp": "Describe cada problema que necesita ser reparado. Puedes agregar más según sea necesario.",
+      "emergencyIssue": "Descripción del Problema de Emergencia",
+      "emergencyIssuePlaceholder": "ej., Fuga de agua importante inundando el apartamento, sin calefacción en invierno, chispas eléctricas, cerradura de puerta rota comprometiendo la seguridad, etc.",
+      "emergencyIssueHelp": "Describe el problema urgente de seguridad o habitabilidad que requiere atención inmediata.",
+      "moveOutDate": "Fecha de Mudanza (Opcional)",
+      "moveOutDateHelp": "Si es diferente de la fecha de finalización de tu contrato, especifica cuándo planeas mudarte."
     },
     "preview": {
       "title": "Vista Previa de la Carta",

@@ -20,6 +20,125 @@
     "createdBy": "Created by",
     "institution": "University of Chicago Law School • AI Lab"
   },
+  "Landing": {
+    "features": {
+      "badge": "Features",
+      "title": "Everything you need to know your rights",
+      "subtitle": "Powerful tools to help you understand your lease and communicate with your landlord.",
+      "aiAnalysis": {
+        "title": "AI Lease Analysis",
+        "description": "Get instant AI analysis of your lease. Upload your PDF and receive a full report in under 2 minutes.",
+        "cta": "Learn more"
+      },
+      "aiChat": {
+        "title": "Chat with AI",
+        "description": "Ask questions and get instant answers with context from your lease document.",
+        "cta": "Learn more"
+      },
+      "stateLaws": {
+        "title": "State Renter Laws",
+        "description": "Comprehensive coverage for all 50 states with city-specific regulations.",
+        "cta": "Learn more"
+      },
+      "letterGeneration": {
+        "title": "Letter Generation",
+        "description": "Professional templates for landlord communication including deposit returns and repairs.",
+        "cta": "Learn more"
+      }
+    },
+    "useCases": {
+      "unfairCharges": {
+        "title": "Caught Unfair Charges",
+        "subtitle": "Discover hidden fees",
+        "heading": "Spot unfair charges before you pay",
+        "description": "Upload your lease and LeaseWise's AI instantly identifies questionable fees, security deposit violations, and charges that may violate local tenant laws. Get specific statute citations to back up your claims.",
+        "feature1": "AI scans for hidden fees",
+        "feature2": "Compare against local tenant laws",
+        "feature3": "Get citation-backed explanations",
+        "feature4": "Generate dispute letters"
+      },
+      "gettingRepairs": {
+        "title": "Getting Repairs Done",
+        "subtitle": "Force landlord action",
+        "heading": "Know your repair and maintenance rights",
+        "description": "Understand exactly what your landlord is responsible for and the legal timeline they must follow. Generate professional repair request letters with legal backing from your state's tenant law.",
+        "feature1": "Identify landlord responsibilities",
+        "feature2": "Learn repair timelines",
+        "feature3": "State-specific legal requirements",
+        "feature4": "Generate formal repair requests"
+      },
+      "breakingLease": {
+        "title": "Breaking Your Lease",
+        "subtitle": "Understand penalties",
+        "heading": "Break your lease the right way",
+        "description": "Planning to leave early? LeaseWise analyzes your lease to show you exactly what it will cost, your legal obligations, and valid reasons that may let you break the lease penalty-free under state law.",
+        "feature1": "Calculate early termination costs",
+        "feature2": "Understand your obligations",
+        "feature3": "Find legal exit clauses",
+        "feature4": "Generate termination notices"
+      },
+      "beforeSigning": {
+        "title": "Reviewing Before Signing",
+        "subtitle": "Catch issues early",
+        "heading": "Review before you sign",
+        "description": "Get your lease analyzed before you commit. Our AI reviews every clause, highlights potential red flags, and ensures you understand exactly what you're agreeing to—before it's too late.",
+        "feature1": "Identify red flags early",
+        "feature2": "Understand all obligations",
+        "feature3": "Compare to standard terms",
+        "feature4": "Make informed decisions"
+      }
+    },
+    "testimonials": {
+      "title": "What renters are saying",
+      "subtitle": "Join thousands of renters who are protecting their rights",
+      "review1": {
+        "name": "Sarah M.",
+        "role": "Student, Chicago",
+        "quote": "LeaseChat helped me catch unfair fees in my lease. Saved me $800!"
+      },
+      "review2": {
+        "name": "James T.",
+        "role": "Engineer, Austin",
+        "quote": "Finally understand what I signed. The AI chat feature is incredible!"
+      },
+      "review3": {
+        "name": "Maria G.",
+        "role": "Teacher, NYC",
+        "quote": "Got my full security deposit back using the letter generator!"
+      },
+      "review4": {
+        "name": "David R.",
+        "role": "Designer, SF",
+        "quote": "Wish I had this before signing my last lease. Would've saved so much stress."
+      },
+      "review5": {
+        "name": "Emily K.",
+        "role": "Nurse, Boston",
+        "quote": "The state law section helped me understand my rights. Super helpful!"
+      },
+      "review6": {
+        "name": "Alex P.",
+        "role": "Developer, Seattle",
+        "quote": "Fast, accurate, and free. Can't believe this exists!"
+      },
+      "review7": {
+        "name": "Taylor S.",
+        "role": "Student, LA",
+        "quote": "Helped me negotiate better terms before signing. Highly recommend!"
+      },
+      "review8": {
+        "name": "Lisa H.",
+        "role": "Nurse, Miami",
+        "quote": "Caught several red flags before signing my lease. Dodged a bullet!"
+      }
+    },
+    "cta": {
+      "heading": "Start protecting your rights today",
+      "subtitle": "Free AI-powered lease analysis trusted by renters nationwide",
+      "button1": "Get Started Free",
+      "button2": "Learn More"
+    }
+  },
   "Features": {
     "aiAnalysis": {
       "title": "Get instant AI analysis of your lease",
@@ -70,6 +189,12 @@
   "AnalyzePage": {
     "title": "Analyze your lease",
     "subtitle": "Upload your lease PDF and enter your property address to get instant AI-powered analysis",
+    "featureSelection": {
+      "analyzeTitle": "Analyze My Lease",
+      "analyzeDescription": "Full analysis with red flags, AI chat, and personalized insights",
+      "knowRightsTitle": "Know My Rights",
+      "knowRightsDescription": "Quick lookup of tenant rights for your area (no lease needed)"
+    },
     "documentUpload": {
       "title": "Lease Document",
       "dragDrop": "Click to upload or drag & drop PDF",
@@ -82,7 +207,13 @@
       "title": "Your Information",
       "fullName": "Full Name",
       "email": "Email Address",
-      "address": "Property Address"
+      "address": "Property Address",
+      "placeholders": {
+        "fullName": "Enter your full name",
+        "email": "Enter your email address",
+        "address": "Start typing your address..."
+      },
+      "addressConfirmed": "Address confirmed"
     },
     "cta": "Analyze Lease",
     "analyzing": "Analyzing...",
@@ -148,6 +279,48 @@
       "detected": "detected",
       "notSpecified": "Not specified"
     },
+    "keyLeaseTerms": {
+      "title": "Key Lease Terms",
+      "subtitle": "Essential information from your lease agreement",
+      "importantTerms": "Important Terms",
+      "financialTerms": "Financial Terms",
+      "utilities": "Utilities",
+      "lessees": "Lessees (Residents)",
+      "apartment": "Apartment",
+      "leaseRenewal": "Lease Renewal",
+      "moveOutNotice": "Move-Out Notice",
+      "administrativeFee": "Administrative Fee",
+      "rentConcession": "Rent Concession",
+      "returnedPaymentFee": "Returned Payment Fee",
+      "lateRent": "Late Rent",
+      "automaticallyRenews": "Automatically renews",
+      "doesNotRenew": "Does not automatically renew",
+      "atLeastDaysNotice": "At least {days} days written notice required",
+      "ifNotPaidByDay": "If not paid by day {day}, ",
+      "yourResponsibility": "Your Responsibility",
+      "ownerProvidedAllocated": "Owner-Provided (Allocated)",
+      "ownerProvidedFlatRate": "Owner-Provided (Flat Rate)",
+      "utilityFees": "Utility Fees",
+      "monthlyAdmin": "Monthly admin",
+      "setupFee": "Setup fee",
+      "processingFee": "Processing fee",
+      "policiesAndRules": "Policies & Rules",
+      "smoking": "Smoking",
+      "guests": "Guests",
+      "animals": "Animals",
+      "violationFee": "Violation fee",
+      "petFeesPaid": "Pet fees paid",
+      "noPetFeesPaid": "No pet fees paid at signing",
+      "maxDays": "max {days} days",
+      "liabilityInsurance": "Liability Insurance",
+      "required": "Required",
+      "minCoverage": "Min coverage",
+      "violationFeeAmount": "Violation fee",
+      "earlyTermination": "Early Termination",
+      "giveAtLeastDaysNotice": "Give at least {days} days written notice",
+      "payBuyoutFee": "Pay a buy-out fee of",
+      "repayConcessions": "Repay concessions"
+    },
     "redFlags": {
       "noneFound": "No issues found",
       "noneFoundTitle": "No Red Flags Found",
@@ -162,7 +335,8 @@
       "title": "Know Your Renter Rights",
       "keyCategories": "key categories",
       "refresh": "Refresh",
-      "searchPlaceholder": "Search by law type, explanation, or statute..."
+      "searchPlaceholder": "Search by law type, explanation, or statute...",
+      "loadInfo": "Load Info"
     },
     "table": {
       "headers": {
@@ -207,7 +381,9 @@
       "scenario3": "Landlord entry and privacy rights",
       "scenario4": "Breaking my lease early",
       "whatToDo": "What to do:",
-      "source": "Source:"
+      "source": "Source:",
+      "loading": "Loading Common Scenarios...",
+      "loadingSubtitle": "Analyzing your lease for specific situations..."
     }
   },
   "SourceCitation": {
@@ -275,6 +451,22 @@
       "securityDeposit": {
         "name": "Security Deposit Return Request",
         "description": "Request the return of your security deposit with legal backing"
+      },
+      "lateRent": {
+        "name": "Late Rent Payment Request",
+        "description": "Request additional time to pay rent with a proposed payment date"
+      },
+      "repairRequest": {
+        "name": "Repair Request",
+        "description": "Formally request repairs for issues in your rental unit"
+      },
+      "emergencyRepair": {
+        "name": "Emergency Repair Request",
+        "description": "Report urgent safety issues that require immediate attention"
+      },
+      "leaseNonRenewal": {
+        "name": "Notice of Lease Non-Renewal",
+        "description": "Formally notify your landlord that you will not renew your lease"
       }
     },
     "form": {
@@ -283,7 +475,21 @@
       "additionalDetails": "Additional Details (Optional)",
       "additionalDetailsPlaceholder": "Add any specific details about damages, cleaning, or other relevant information...",
       "generate": "Generate Letter",
-      "generating": "Generating Letter..."
+      "generating": "Generating Letter...",
+      "paymentDate": "Date You Can Pay",
+      "paymentDateHelp": "When will you be able to make the full payment?",
+      "partialPayment": "Partial Payment Amount (Optional)",
+      "partialPaymentHelp": "If you can make a partial payment on the due date, enter the amount here",
+      "repairIssues": "Repair Issues",
+      "issue": "Issue",
+      "repairIssuePlaceholder": "e.g., Leaking faucet in kitchen, broken window in bedroom, etc.",
+      "addAnotherIssue": "Add Another Issue",
+      "repairIssuesHelp": "Describe each issue that needs to be repaired. You can add more as needed.",
+      "emergencyIssue": "Emergency Issue Description",
+      "emergencyIssuePlaceholder": "e.g., Major water leak flooding apartment, no heat in winter, electrical sparking, broken door lock compromising security, etc.",
+      "emergencyIssueHelp": "Describe the urgent safety or habitability issue that requires immediate attention.",
+      "moveOutDate": "Move-Out Date (Optional)",
+      "moveOutDateHelp": "If different from your lease end date, specify when you plan to move out."
     },
     "preview": {
       "title": "Letter Preview",

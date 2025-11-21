@@ -21,6 +21,8 @@ const config: Config = {
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.5s ease-out',
+        'scroll-left': 'scrollLeft 40s linear infinite',
+        'scroll-right': 'scrollRight 40s linear infinite',
       },
       keyframes: {
         fadeIn: {
@@ -31,9 +33,38 @@ const config: Config = {
           '0%': { transform: 'translateY(10px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
+        scrollLeft: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+        scrollRight: {
+          '0%': { transform: 'translateX(-50%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function({ addUtilities }: any) {
+      addUtilities({
+        '.scrollbar-hide': {
+          /* IE and Edge */
+          '-ms-overflow-style': 'none',
+          /* Firefox */
+          'scrollbar-width': 'none',
+          /* Safari and Chrome */
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          }
+        },
+        '.pause-animation': {
+          '&:hover': {
+            'animation-play-state': 'paused'
+          }
+        }
+      })
+    }
+  ],
 };
 export default config;
