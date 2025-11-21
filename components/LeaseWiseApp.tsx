@@ -1031,14 +1031,15 @@ export default function LeaseWiseApp() {
               </div>
 
               {/* Expanded Content Area */}
+              <div className="min-h-[400px] max-w-7xl mx-auto mt-8">
               {activeUseCase && (
                 <motion.div
                   key={activeUseCase}
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                  className="max-w-7xl mx-auto mt-8"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="w-full"
                 >
                   <div className="p-8 md:p-12">
                     {activeUseCase === 'unfair-charges' && (
@@ -1183,6 +1184,7 @@ export default function LeaseWiseApp() {
                   </div>
                 </motion.div>
               )}
+              </div>
             </div>
           </div>
 
